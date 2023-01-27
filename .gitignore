@@ -1,0 +1,14 @@
+.DS_Store
+TODO.txt
+quantification/*
+related_work/*
+manuscript/*
+
+# don't track large items 
+analysis/.Rproj.user
+analysis/.Rprofile
+analysis/accessory_data/*
+analysis/rough_draft/*
+analysis/results/*
+analysis/notes/*
+.Rproj.user
