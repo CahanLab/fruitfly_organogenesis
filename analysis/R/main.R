@@ -46,9 +46,6 @@ source("R/wt13_compare_Calderon.R")
 # late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
 source("R/wt13_compare_Seroka.R")
 
-# perform GSEA on the data 
-source("R/wt13_GSEA.R")
-
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
 
@@ -62,11 +59,13 @@ source("R/plot_early_wt12_statistics.R")
 source("R/plot_early_wt12_UMAP_proportion.R")
 
 # early wt12 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
-source("R/wt13_compare_Calderon.R")
+source("R/early_wt12_compare_Calderon.R")
 
 # early wt12 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
-source("R/wt13_compare_Seroka.R")
+source("R/early_wt12_compare_Seroka.R")
 
+# perform GSEA on the data 
+source("R/wt13_GSEA.R")
 
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
@@ -77,5 +76,11 @@ source("R/refined_wt13_early12_trachea.R")
 # refined analysis of early + late germ cells 
 source("R/refined_wt13_early12_germ.R")
 
+######################################################
+# down below are experimental scripts that I am trying out for testings. The results may or may not end up 
+# going into the final manuscript 
 
+# experimental script to compute the DE genes between early cluster and all late samples 
+# this is to help verify some of the ambiguous early clusters 
+source("R/early_cluster_vs_all_late.R")
 
