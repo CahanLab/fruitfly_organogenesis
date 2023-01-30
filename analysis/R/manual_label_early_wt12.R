@@ -12,7 +12,6 @@ object = readRDS(file.path("results", ANALYSIS_VERSION, "early_wt12_integrated/B
 DimPlot(object)
 DimPlot(object, group.by = 'Integrated_tentativeCellType', label = TRUE)
 
-
 # classic SG genes 
 VlnPlot(object, features = 'sage')
 VlnPlot(object, features = 'pip')
@@ -146,7 +145,7 @@ FeaturePlot(object, features = 'tey')
 VlnPlot(object, features = 'beat-IIa', pt.size = 0)
 FeaturePlot(object, features = 'beat-IIa')
 
-manual_tab = read.csv(file.path(TARGET_dir, 'manualCellType.csv'))
+manual_tab = read.csv(file.path(TARGET_dir, 'manualCellType_2.csv'))
 object@meta.data$manual_celltypes = NULL
 
 for(temp_cluster in unique(manual_tab$cluster)) { 
@@ -154,6 +153,6 @@ for(temp_cluster in unique(manual_tab$cluster)) {
 }
 
 p = DimPlot(object, group.by = 'manual_celltypes', label = TRUE)
-ggsave(filename = file.path(TARGET_dir, "Dan's best guess.png"), plot = p, width = 10, height = 8)
+ggsave(filename = file.path(TARGET_dir, "manual_celltypes.png"), plot = p, width = 10, height = 8)
 saveRDS(object, file = file.path(TARGET_dir, "manual_celltype_object1.rds"))
 

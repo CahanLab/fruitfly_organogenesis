@@ -55,9 +55,17 @@ source("R/integrate_early_wt12.R")
 # this is to manually label wildtype 1 and wildtype 2 early integrated data 
 source("R/manual_label_early_wt12.R") 
 
+# plot out statistics for for early wt12
+source("R/plot_early_wt12_statistics.R")
 
+# plot out UMAP and proportion for for early wt12
+source("R/plot_early_wt12_UMAP_proportion.R")
 
+# early wt12 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
+source("R/wt13_compare_Calderon.R")
 
+# early wt12 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
+source("R/wt13_compare_Seroka.R")
 
 
 # refined analysis of early + late salivary gland 
