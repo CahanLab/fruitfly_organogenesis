@@ -40,11 +40,25 @@ source("R/plot_wt13_statistics.R")
 # plot out UMAP and proportion for for wt13
 source("R/plot_wt13_UMAP_proportion.R")
 
+# late wt13 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
+source("R/wt13_compare_Calderon.R")
+
+# late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
+source("R/wt13_compare_Seroka.R")
+
+# perform GSEA on the data 
+source("R/wt13_GSEA.R")
+
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
 
 # this is to manually label wildtype 1 and wildtype 2 early integrated data 
 source("R/manual_label_early_wt12.R") 
+
+
+
+
+
 
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
@@ -55,6 +69,5 @@ source("R/refined_wt13_early12_trachea.R")
 # refined analysis of early + late germ cells 
 source("R/refined_wt13_early12_germ.R")
 
-# perform GSEA on the data 
-source("R/wt13_GSEA.R")
+
 
