@@ -76,6 +76,12 @@ source("R/refined_wt13_early12_trachea.R")
 # refined analysis of early + late germ cells 
 source("R/refined_wt13_early12_germ.R")
 
+# perform GSEA on the early wildtype data 
+source("R/early_wt12_GSEA.R")
+
+# match similarity between wild-type early samples and late samples 
+source("R/match_early_clusters_to_late_clusters.R")
+
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 
@@ -84,3 +90,6 @@ source("R/refined_wt13_early12_germ.R")
 # this is to help verify some of the ambiguous early clusters 
 source("R/early_cluster_vs_all_late.R")
 
+# experimental script to compute the DE genes between all the clusters and identify gene enrichment 
+# this is to help verify some of the ambiguous early clusters 
+source("R/early_cluster_vs_others.R")

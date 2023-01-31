@@ -35,10 +35,10 @@ loaded via a namespace (and not attached):
  [65] miniUI_0.1.1.1         lattice_0.20-45        cowplot_1.1.1          splines_4.1.2         
  [69] tensor_1.5             pillar_1.8.1           igraph_1.3.5           spatstat.geom_3.0-3   
  [73] future.apply_1.10.0    reshape2_1.4.4         codetools_0.2-18       leiden_0.4.3          
- [77] glue_1.6.2             data.table_1.14.6      renv_0.16.0            BiocManager_1.30.19   
- [81] png_0.1-8              vctrs_0.5.1            httpuv_1.6.7           polyclip_1.10-4       
- [85] gtable_0.3.1           RANN_2.6.1             purrr_0.3.5            tidyr_1.2.1           
- [89] scattermore_0.8        future_1.29.0          assertthat_0.2.1       mime_0.12             
- [93] xtable_1.8-4           later_1.3.0            survival_3.4-0         viridisLite_0.4.1     
- [97] tibble_3.1.8           cluster_2.1.4          globals_0.16.2         fitdistrplus_1.1-8    
-[101] ellipsis_0.3.2         ROCR_1.0-11           
+ [77] glue_1.6.2             data.table_1.14.6      renv_0.16.0            png_0.1-8             
+ [81] vctrs_0.5.1            httpuv_1.6.7           polyclip_1.10-4        gtable_0.3.1          
+ [85] RANN_2.6.1             purrr_0.3.5            tidyr_1.2.1            scattermore_0.8       
+ [89] future_1.29.0          assertthat_0.2.1       mime_0.12              xtable_1.8-4          
+ [93] later_1.3.0            survival_3.4-0         viridisLite_0.4.1      tibble_3.1.8          
+ [97] cluster_2.1.4          globals_0.16.2         fitdistrplus_1.1-8     ellipsis_0.3.2        
+[101] ROCR_1.0-11           
