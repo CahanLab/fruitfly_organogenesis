@@ -3,6 +3,8 @@ library(monocle3)
 library(presto)
 library(pheatmap)
 library(ggplot2)
+library(tradeSeq)
+
 set.seed(123)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland")
 dir.create(TARGET_dir)
@@ -37,7 +39,6 @@ cds <- new_cell_data_set(expression_matrix,
                          gene_metadata = gene_annotation)
 
 cds <- preprocess_cds(cds, num_dim = 100)
-
 cds <- reduce_dimension(cds)
 plot_cells(cds, label_groups_by_cluster=TRUE,  color_cells_by = "batch", cell_size = 1, label_cell_groups = FALSE)
 ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_UMAP.png'), width = 8, height = 6)
@@ -51,10 +52,11 @@ ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_toe.png'), width = 8, 
 cds <- cluster_cells(cds, resolution = 1e-2)
 plot_cells(cds, color_cells_by = "cluster", label_cell_groups = FALSE, cell_size = 1)
 
-marker_test_res <- top_markers(cds, group_cells_by="cluster", 
+marker_test_res <- monocle3::top_markers(cds, group_cells_by="cluster", 
                                reference_cells=1000, cores=8)
 
 write.csv(marker_test_res, file = file.path(TARGET_dir, "top_markers_monocle.csv"))
+
 rank_sum_results = presto::wilcoxauc(normalized_counts(cds), cds@clusters$UMAP$clusters)
 write.csv(rank_sum_results, file = file.path(TARGET_dir, "rank_sum_test.csv"))
 
@@ -89,20 +91,11 @@ pt<-as.data.frame(pseudotime(cds))
 colnames(pt)<-"pseudotime"
 cw<-as.matrix(rep(1,nrow(pt)))
 rownames(cw)<-rownames(pt)
+
 ts<-tradeSeq::fitGAM(as.matrix(expRaw),pseudotime=as.matrix(pt),cellWeights=cw)
 saveRDS(ts, file = file.path(TARGET_dir, "tradeseq_fitgam_results.rds"))
-
-ATres<-associationTest(ts)
+ATres<-tradeSeq::associationTest(ts)
 saveRDS(ATres, file = file.path(TARGET_dir, 'raw_associationTest.rds'))
-
-ATres = ATres[!is.na(ATres$pvalue), ]
-ATres$adj_p = p.adjust(ATres$pvalue)
-ATres = ATres[ATres$adj_p < 0.05, ]
-write.csv(ATres, file = file.path(TARGET_dir, "significant_associationTest.csv"))
-
-startRes <- startVsEndTest(ts)
-startRes$adj_p = p.adjust(startRes$pvalue)
-write.csv(startRes, file = file.path(TARGET_dir, 'raw_startvsendtest.csv'))  
 
 # plot out the heatmap 
 cds = readRDS(file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
@@ -110,16 +103,18 @@ ATres = readRDS(file.path(TARGET_dir, 'raw_associationTest.rds'))
 ATres = ATres[!is.na(ATres$pvalue), ]
 ATres$adj_p = p.adjust(ATres$pvalue, method = 'fdr')
 ATres = ATres[ATres$adj_p < 0.05, ]
-startRes = read.csv(file.path(TARGET_dir, 'raw_startvsendtest.csv'), row.names = 1)
-startRes = startRes[!is.na(startRes$pvalue), ]
-startRes$adj_p = p.adjust(startRes$pvalue, method = 'fdr')
 
-# start with early genes 
-startRes = startRes[startRes$adj_p < 0.05, ]
-pos_start_res = startRes[startRes$logFClineage1 < 0, ]
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[!is.na(rank_sum_test$padj), ]
+rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
+rank_sum_test = rank_sum_test[rank_sum_test$logFC > 0.1, ]
+#rank_sum_test = rank_sum_test[abs(rank_sum_test$logFC) > 0.1, ]
+
+pos_start_res = rank_sum_test[rank_sum_test$group == 2, ]
+
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[rownames(pos_start_res), ]
+norm_exp = norm_exp[pos_start_res$feature, ]
 
 # this will change 
 #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
@@ -148,11 +143,17 @@ pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
 # start with later genes
-startRes = startRes[startRes$adj_p < 0.05, ]
-pos_start_res = startRes[startRes$logFClineage1 > 0, ]
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[!is.na(rank_sum_test$padj), ]
+rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
+rank_sum_test = rank_sum_test[rank_sum_test$logFC > 0.1, ]
+#rank_sum_test = rank_sum_test[abs(rank_sum_test$logFC) > 0.1, ]
+
+pos_start_res = rank_sum_test[rank_sum_test$group == 1, ]
+
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[rownames(pos_start_res), ]
+norm_exp = norm_exp[pos_start_res$feature, ]
 
 # this will change 
 #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
@@ -185,11 +186,13 @@ ATres = readRDS(file.path(TARGET_dir, 'raw_associationTest.rds'))
 ATres = ATres[!is.na(ATres$pvalue), ]
 ATres$adj_p = p.adjust(ATres$pvalue, method = 'fdr')
 ATres = ATres[ATres$adj_p < 0.05, ]
-startRes = read.csv(file.path(TARGET_dir, 'raw_startvsendtest.csv'), row.names = 1)
-startRes = startRes[!is.na(startRes$pvalue), ]
-startRes$adj_p = p.adjust(startRes$pvalue, method = 'fdr')
-startRes = startRes[startRes$adj_p > 0.05, ]
-ATres = ATres[intersect(rownames(startRes), rownames(ATres)), ]
+
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[!is.na(rank_sum_test$padj), ]
+rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
+rank_sum_test = rank_sum_test[abs(rank_sum_test$logFC) > 0.1, ]
+
+ATres = ATres[setdiff(rownames(ATres), rank_sum_test$feature), ]
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
 norm_exp = norm_exp[rownames(ATres), ]
@@ -226,13 +229,18 @@ dev.off()
 library(enrichR)
 cds = readRDS(file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
 enrichR::setEnrichrSite("FlyEnrichr")
-startRes = read.csv(file.path(TARGET_dir, 'raw_startvsendtest.csv'), row.names = 1)
-startRes = startRes[!is.na(startRes$pvalue), ]
-startRes$adj_p = p.adjust(startRes$pvalue, method = 'fdr')
-startRes = startRes[startRes$adj_p < 0.05, ]
 
-startRes_early = startRes[startRes$logFClineage1 < 0, ]
-startRes_late = startRes[startRes$logFClineage1 >= 0, ]
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[!is.na(rank_sum_test$padj), ]
+rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
+rank_sum_test = rank_sum_test[rank_sum_test$logFC > 0.1, ]
+#rank_sum_test = rank_sum_test[abs(rank_sum_test$logFC) > 0.1, ]
+
+startRes_early = rank_sum_test[rank_sum_test$group == 2, ]
+startRes_late = rank_sum_test[rank_sum_test$group == 1, ]
+
+rownames(startRes_early) = startRes_early$feature
+rownames(startRes_late) = startRes_late$feature
 
 enrichment_results = enrichR::enrichr(
   genes = rownames(startRes_early), 
@@ -264,11 +272,13 @@ ATres = readRDS(file.path(TARGET_dir, 'raw_associationTest.rds'))
 ATres = ATres[!is.na(ATres$pvalue), ]
 ATres$adj_p = p.adjust(ATres$pvalue, method = 'fdr')
 ATres = ATres[ATres$adj_p < 0.05, ]
-startRes = read.csv(file.path(TARGET_dir, 'raw_startvsendtest.csv'), row.names = 1)
-startRes = startRes[!is.na(startRes$pvalue), ]
-startRes$adj_p = p.adjust(startRes$pvalue, method = 'fdr')
-startRes = startRes[startRes$adj_p > 0.05, ]
-ATres = ATres[intersect(rownames(startRes), rownames(ATres)), ]
+
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[!is.na(rank_sum_test$padj), ]
+rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
+rank_sum_test = rank_sum_test[abs(rank_sum_test$logFC) > 0.1, ]
+
+ATres = ATres[setdiff(rownames(ATres), rank_sum_test$feature), ]
 
 enrichment_results = enrichR::enrichr(
   genes = rownames(ATres), 
@@ -288,10 +298,10 @@ biological_analysis = biological_analysis[order(biological_analysis$P.value), ]
 sub_biological_analysis = biological_analysis[1:15, ]
 sub_biological_analysis$log_p = -log10(sub_biological_analysis$Adjusted.P.value)
 p <- ggplot(data=sub_biological_analysis, aes(x=reorder(Term, log_p), y=log_p)) +
-            xlab("GO Biological Process") +
-            ylab("-log10 P-value") +
-            ggtitle("Early Genes Enrichment") +
-            geom_bar(stat="identity", fill="steelblue") + coord_flip() + theme_bw()
+  xlab("GO Biological Process") +
+  ylab("-log10 P-value") +
+  ggtitle("Early Genes Enrichment") +
+  geom_bar(stat="identity", fill="steelblue") + coord_flip() + theme_bw()
 ggsave(filename = file.path(TARGET_dir, "early_go_enrichment.png"), plot = p, width = 10, height = 8)
 
 biological_analysis = read.csv(file.path(TARGET_dir, 'sig_GO_biological_late.csv'), row.names = 1)
@@ -319,7 +329,6 @@ ggsave(filename = file.path(TARGET_dir, "transient_go_enrichment.png"), plot = p
 #########################################################################
 # early genes 
 dir.create(file.path(TARGET_dir, 'early_genes'))
-
 biological_analysis = read.csv(file.path(TARGET_dir, 'sig_GO_biological_early.csv'), row.names = 1)
 biological_analysis = biological_analysis[order(biological_analysis$P.value), ]
 biological_analysis = biological_analysis[1:15, ]
@@ -464,7 +473,7 @@ withr::with_dir(file.path(TARGET_dir, 'late_genes'), {
 dir.create(file.path(TARGET_dir, 'transient_genes'))
 biological_analysis = read.csv(file.path(TARGET_dir, 'sig_GO_biological_transient.csv'), row.names = 1)
 biological_analysis = biological_analysis[order(biological_analysis$Adjusted.P.value), ]
-biological_analysis = biological_analysis[1:15, ]
+biological_analysis = biological_analysis[1:20, ]
 withr::with_dir(file.path(TARGET_dir, 'transient_genes'), {
   for(term in biological_analysis$Term) {
     target_genes = biological_analysis[biological_analysis$Term == term, 'Genes']
@@ -611,12 +620,12 @@ withr::with_dir(file.path(TARGET_dir, 'rib_genes'), {
     geom_line(aes(color=Type)) + theme_bw() 
   
   ggsave(paste0(term, "_dynamic_gene_line.png"), plot = p, width = 10, height = 8)
-
+  
   # get the average 
   no_rib_scaled = scaled_exp[rownames(scaled_exp) != 'rib', ]
   plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                         scaled_exp = scaled_exp['rib', ], 
-                         gene = 'rib')
+                       scaled_exp = scaled_exp['rib', ], 
+                       gene = 'rib')
   
   temp_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
                        scaled_exp =   apply(no_rib_scaled, MARGIN = 2, FUN = mean), 
@@ -635,9 +644,9 @@ withr::with_dir(file.path(TARGET_dir, 'rib_genes'), {
 # CrebA genes dynamics with golgi-vescile 
 dir.create(file.path(TARGET_dir, 'CrebA_genes'))
 
-biological_analysis = read.csv(file.path(TARGET_dir, 'sig_GO_biological_transient.csv'), row.names = 1)
+biological_analysis = read.csv(file.path(TARGET_dir, 'sig_GO_biological_early.csv'), row.names = 1)
 biological_analysis = biological_analysis[order(biological_analysis$Adjusted.P.value), ]
-biological_analysis = biological_analysis[1:15, ]
+#biological_analysis = biological_analysis[1:15, ]
 withr::with_dir(file.path(TARGET_dir, 'CrebA_genes'), {
   term = 'Golgi vesicle transport (GO:0048193)'
   target_genes = biological_analysis[biological_analysis$Term == term, 'Genes']
@@ -668,7 +677,7 @@ withr::with_dir(file.path(TARGET_dir, 'CrebA_genes'), {
       next
     }
     else {
-      yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 1.5, x.points=plot_df[, 'pseudotime'])
+      yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
       if(nrow(smoothed_df) == 0) {
         smoothed_df = data.frame('pseudotime' = yy$x)
       }
@@ -726,5 +735,3 @@ withr::with_dir(file.path(TARGET_dir, 'CrebA_genes'), {
     geom_line(aes(color=gene)) + theme_bw() 
   ggsave(paste0(term, "_dynamic_gene_line_avg.png"), plot = p, width = 10, height = 8)
 })
-
-

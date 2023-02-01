@@ -70,6 +70,9 @@ source("R/wt13_GSEA.R")
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
 
+# make figures for the in depth analysis of salivary glands
+source("R/plot_refined_wt13_early12_salivary_gland.R")
+
 # refined analysis of early + late trachea cells 
 source("R/refined_wt13_early12_trachea.R")
 
