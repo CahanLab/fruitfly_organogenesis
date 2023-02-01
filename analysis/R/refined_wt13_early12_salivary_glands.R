@@ -735,3 +735,53 @@ withr::with_dir(file.path(TARGET_dir, 'CrebA_genes'), {
     geom_line(aes(color=gene)) + theme_bw() 
   ggsave(paste0(term, "_dynamic_gene_line_avg.png"), plot = p, width = 10, height = 8)
 })
+
+#########################################################
+library(fgsea)
+pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
+
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+
+sub_rank_sum_test = rank_sum_test[rank_sum_test$group == 1, ]
+ranks <- sub_rank_sum_test$logFC
+names(ranks) <- sub_rank_sum_test$feature
+fgseaRes <- fgsea(pathways = pathway_list, 
+                  stats = ranks,
+                  minSize=10,
+                  maxSize=500)
+
+fgseaRes = data.frame(fgseaRes)
+fgseaRes = apply(fgseaRes,2,as.character)
+fgseaRes = as.data.frame(fgseaRes)
+fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
+write.csv(fgseaRes, file = file.path(TARGET_dir, 'late_gsea_results.csv'))
+
+sub_rank_sum_test = rank_sum_test[rank_sum_test$group == 2, ]
+ranks <- sub_rank_sum_test$logFC
+names(ranks) <- sub_rank_sum_test$feature
+fgseaRes <- fgsea(pathways = pathway_list, 
+                  stats = ranks,
+                  minSize=10,
+                  maxSize=500)
+
+fgseaRes = data.frame(fgseaRes)
+fgseaRes = apply(fgseaRes,2,as.character)
+fgseaRes = as.data.frame(fgseaRes)
+fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
+write.csv(fgseaRes, file = file.path(TARGET_dir, 'early_gsea_results.csv'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

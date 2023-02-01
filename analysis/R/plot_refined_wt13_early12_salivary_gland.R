@@ -1,6 +1,7 @@
 library(monocle3)
 library(ggplot2)
 library(RColorBrewer)
+library(dbplyr)
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')
 dir.create(TARGET_dir, recursive = TRUE)
@@ -40,3 +41,32 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   theme_minimal() + 
   scale_color_brewer(palette = 'Set2')
 ggsave(filename = file.path(TARGET_dir, "cluster.png"), plot = p, width = 8, height = 6)
+
+p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
+  geom_violin() +
+  geom_boxplot(width=0.1) +
+  theme_minimal() +
+  scale_fill_brewer(palette = 'Set2') + 
+  ylab("pseudotime") + 
+  xlab("batch")
+ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
