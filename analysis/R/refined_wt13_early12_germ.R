@@ -1,4 +1,5 @@
-
+library(monocle3)
+set.seed(123)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ")
 dir.create(TARGET_dir)
 

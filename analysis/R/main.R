@@ -46,6 +46,9 @@ source("R/wt13_compare_Calderon.R")
 # late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
 source("R/wt13_compare_Seroka.R")
 
+# match CNS subtypes with Seroka 
+source("R/wt13_match_CNS_seroka.R")
+
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
 
@@ -99,3 +102,6 @@ source("R/early_cluster_vs_all_late.R")
 # experimental script to compute the DE genes between all the clusters and identify gene enrichment 
 # this is to help verify some of the ambiguous early clusters 
 source("R/early_cluster_vs_others.R")
+
+# test the germ cells 
+source("R/germ_cells_exploration.R")

@@ -75,6 +75,25 @@ combination_df$late_cell_types = factor(combination_df$late_cell_types, levels=s
 combination_df$early_cell_types = as.character(combination_df$early_cell_types)
 combination_df$early_cell_types = factor(combination_df$early_cell_types, levels=sort(unique(combination_df$early_cell_types)))
 
+combination_df = readRDS(file.path(TARGET_dir, 'spearman_correlation_wt13_early_wt12.rds'))
+match_df = data.frame("early_cts" = unique(combination_df$early_cell_types), 
+                      "best_alignment" = NA)
+for(ct in match_df$early_cts) {
+  sub_comb_df = combination_df[combination_df$early_cell_types == ct, ]
+  best_align = sub_comb_df[which.max(sub_comb_df$spearman_correlation), 'late_cell_types']
+  match_df[match_df$early_cts == ct, 'best_alignment'] = as.vector(best_align)
+}
+write.csv(match_df, file = file.path(TARGET_dir, "early_match_late.csv"))
+
+match_df = data.frame("late_cts" = unique(combination_df$late_cell_types), 
+                      "best_alignment" = NA)
+for(ct in match_df$late_cts) {
+  sub_comb_df = combination_df[combination_df$late_cell_types == ct, ]
+  best_align = sub_comb_df[which.max(sub_comb_df$spearman_correlation), 'early_cell_types']
+  match_df[match_df$late_cts == ct, 'best_alignment'] = as.vector(best_align)
+}
+write.csv(match_df, file = file.path(TARGET_dir, "late_match_early.csv"))
+
 library(viridis)
 p = ggplot(combination_df, aes(late_cell_types, early_cell_types, fill= spearman_correlation)) + 
   geom_tile() +
