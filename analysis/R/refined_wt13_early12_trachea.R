@@ -64,7 +64,7 @@ write.csv(rank_sum_results, file = file.path(TARGET_dir, "rank_sum_test.csv"))
 plot_cells(cds, color_cells_by = "Phase", label_cell_groups = FALSE, cell_size = 1, show_trajectory_graph = FALSE)
 ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_phase.png'), width = 8, height = 6)
 
-cds <- learn_graph(cds, use_partition = FALSE)
+cds <- learn_graph(cds, use_partition = FALSE, learn_graph_control = list("minimal_branch_len" = 18))
 
 plot_cells(cds,
            color_cells_by = "batch",
