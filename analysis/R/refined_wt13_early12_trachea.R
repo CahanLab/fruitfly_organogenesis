@@ -117,6 +117,9 @@ library(fgsea)
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
 rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
 
+#rank_sum_test$remove = (rank_sum_test$pct_in < 10 & rank_sum_test$pct_out < 10)
+#rank_sum_test = rank_sum_test[rank_sum_test$remove == FALSE, ]
+
 for(ct in unique(rank_sum_test$group)) {
   sub_rank_sum_test = rank_sum_test[rank_sum_test$group == ct, ]
   ranks <- sub_rank_sum_test$logFC
@@ -130,7 +133,7 @@ for(ct in unique(rank_sum_test$group)) {
   fgseaRes = apply(fgseaRes,2,as.character)
   fgseaRes = as.data.frame(fgseaRes)
   fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
-  fgseaRes = fgseaRes[fgseaRes$pval < 0.05, ]
+  #fgseaRes = fgseaRes[fgseaRes$pval < 0.05, ]
   fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
   write.csv(fgseaRes, file = file.path(TARGET_dir, paste0(ct, '_gsea_results.csv')))
 }

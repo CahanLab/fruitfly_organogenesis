@@ -233,8 +233,8 @@ enrichR::setEnrichrSite("FlyEnrichr")
 rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
 rank_sum_test = rank_sum_test[!is.na(rank_sum_test$padj), ]
 rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
+#rank_sum_test = rank_sum_test[rank_sum_test$avgExpr > 0.1, ]
 rank_sum_test = rank_sum_test[rank_sum_test$logFC > 0.1, ]
-#rank_sum_test = rank_sum_test[abs(rank_sum_test$logFC) > 0.1, ]
 
 startRes_early = rank_sum_test[rank_sum_test$group == 2, ]
 startRes_late = rank_sum_test[rank_sum_test$group == 1, ]
@@ -251,6 +251,8 @@ enrichment_results = enrichR::enrichr(
 )
 
 biological_analysis = enrichment_results$GO_Biological_Process_2018
+biological_analysis = biological_analysis[order(biological_analysis$Adjusted.P.value), ]
+rownames(biological_analysis) = seq(1, nrow(biological_analysis))
 molecular_analysis = enrichment_results$GO_Molecular_Function_2018
 write.csv(biological_analysis, file = file.path(TARGET_dir, 'sig_GO_biological_early.csv'))
 
@@ -739,9 +741,7 @@ withr::with_dir(file.path(TARGET_dir, 'CrebA_genes'), {
 #########################################################
 library(fgsea)
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
-
 rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
-
 sub_rank_sum_test = rank_sum_test[rank_sum_test$group == 1, ]
 ranks <- sub_rank_sum_test$logFC
 names(ranks) <- sub_rank_sum_test$feature
@@ -750,7 +750,7 @@ fgseaRes <- fgsea(pathways = pathway_list,
                   minSize=10,
                   maxSize=500)
 
-fgseaRes = data.frame(fgseaRes)
+fgseaRes = data.frame(fgseaRes) 
 fgseaRes = apply(fgseaRes,2,as.character)
 fgseaRes = as.data.frame(fgseaRes)
 fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
@@ -769,19 +769,3 @@ fgseaRes = apply(fgseaRes,2,as.character)
 fgseaRes = as.data.frame(fgseaRes)
 fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
 write.csv(fgseaRes, file = file.path(TARGET_dir, 'early_gsea_results.csv'))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
