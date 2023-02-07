@@ -10,6 +10,5 @@ analysis/.Rprofile
 analysis/accessory_data/*
 analysis/rough_draft/*
 analysis/results/*
-!analysis/results/v18/figure_plots/
 analysis/notes/*
 .Rproj.user

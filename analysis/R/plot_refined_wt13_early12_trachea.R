@@ -33,7 +33,7 @@ ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2')
+  scale_color_brewer(palette = 'Set1')
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
@@ -46,7 +46,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   geom_violin() +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
   xlab("batch")
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
@@ -436,7 +436,6 @@ plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_d
 # interesting genes 
 # genes in development of trachea 
 Trachea_genes = pathway_list[["open tracheal system development (GO:0007424)"]]
-
 
 sub_plot_df = plot_df
 sub_plot_df = sub_plot_df[sub_plot_df$gene %in% Trachea_genes, ]

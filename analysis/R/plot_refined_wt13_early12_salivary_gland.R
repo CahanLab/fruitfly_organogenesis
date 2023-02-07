@@ -33,7 +33,7 @@ ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2')
+  scale_color_brewer(palette = 'Set1')
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
@@ -46,69 +46,55 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   geom_violin() +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
   xlab("batch")
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
-# plot out the GSEA results for early  
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "early_gsea_results.csv"), row.names = 1)
-GSEA_results = GSEA_results[!is.na(GSEA_results$padj), ]
-GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
-GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
-
-write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv"))
-
-# here are the interesting results that are not overlapping and are related to salivary gland development
-focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)", 
-                     "nucleosome organization (GO:0034728)", 
-                     "mitotic cytokinesis (GO:0000281)", 
-                     "dorsal/ventral pattern formation (GO:0009953)", 
-                     "gland morphogenesis (GO:0022612)", 
-                     "dorsal closure (GO:0007391)", 
-                     "Golgi vesicle transport (GO:0048193)")
-
-sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
-sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
-
-p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
+#############################################
+# plot out the GO results for early
+GO_terms = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "sig_GO_biological_early.csv"), row.names = 1)
+GO_terms = GO_terms[order(GO_terms$Adjusted.P.value, decreasing = FALSE), ]
+#GO_terms = GO_terms[1:40, ]
+GO_interest = c("mRNA splicing, via spliceosome (GO:0000398)", 
+                "regulation of canonical Wnt signaling pathway (GO:0060828)", 
+                "mitotic cytokinesis (GO:0000281)", 
+                "dorsal/ventral pattern formation (GO:0009953)", 
+                "salivary gland morphogenesis (GO:0007435)", 
+                "dorsal closure (GO:0007391)", 
+                "Golgi vesicle transport (GO:0048193)")
+GO_terms = GO_terms[GO_terms$Term %in% GO_interest, ]
+GO_terms$log_pval = -log10(GO_terms$Adjusted.P.value)
+p = ggplot(data=GO_terms, aes(x=reorder(Term, log_pval), y=log_pval)) +
   geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
-  ggtitle("Genesets enriched in earlier salivary gland cells") +
+  ggtitle("") +
   theme_bw()
-ggsave(filename = file.path(TARGET_dir, "early_SG_GSEA_results.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "Early_Cells_EnrichR_results.png"), plot = p, width = 10, height = 4)
 
-# plot out the GSEA results for later  
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "late_gsea_results.csv"), row.names = 1)
-GSEA_results = GSEA_results[!is.na(GSEA_results$padj), ]
-GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
-GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
+GO_terms = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "sig_GO_biological_late.csv"), row.names = 1)
+GO_terms = GO_terms[order(GO_terms$Adjusted.P.value, decreasing = FALSE), ]
+GO_terms = GO_terms[1:5, ]
 
-write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"))
-
-# remove neuropeptide signaling pathway (GO:0007218) because the leading edge is too small 
-
-sub_GSEA_results = GSEA_results[GSEA_results$pathway != 'neuropeptide signaling pathway (GO:0007218)', ]
-sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
-
-p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
+GO_terms$log_pval = -log10(GO_terms$Adjusted.P.value)
+p = ggplot(data=GO_terms, aes(x=reorder(Term, log_pval), y=log_pval)) +
   geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[2]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
-  ggtitle("Genesets enriched in later salivary gland cells") +
+  ggtitle("") +
   theme_bw()
-ggsave(filename = file.path(TARGET_dir, "later_SG_GSEA_results.png"), plot = p, width = 8, height = 6)
-
+ggsave(filename = file.path(TARGET_dir, "Late_Cells_EnrichR_results.png"), plot = p, width = 10, height = 4)
 
 #############################
 # plot out the Golgi Vesicle gene expression 
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
 term = 'Golgi vesicle transport (GO:0048193)'
-GSEA_results = read.csv(file.path(TARGET_dir, "sig_early_GSEA_results.csv"), row.names = 1)
 
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
+GO_terms = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "sig_GO_biological_early.csv"), row.names = 1)
+
+target_genes = GO_terms[GO_terms$Term == term, 'Genes']
+target_genes = stringr::str_split(target_genes, ";")[[1]]
 
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
@@ -177,10 +163,11 @@ ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot =
 # plot out the Cytoplasmic translation
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
 term = 'cytoplasmic translation (GO:0002181)'
-GSEA_results = read.csv(file.path(TARGET_dir, "sig_late_GSEA_results.csv"), row.names = 1)
 
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
+GO_terms = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "sig_GO_biological_late.csv"), row.names = 1)
+
+target_genes = GO_terms[GO_terms$Term == term, 'Genes']
+target_genes = stringr::str_split(target_genes, ";")[[1]]
 
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
