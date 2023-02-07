@@ -108,18 +108,16 @@ cds@colData[cds@colData$cluster_id %in% c(5, 4, 2), 'cell_type'] = 'Middle Trach
 cds@colData[cds@colData$cluster_id %in% c(8, 1), 'cell_type'] = 'Late Trachea Cells'
 cds@colData[cds@colData$cluster_id %in% c(9), 'cell_type'] = 'Branching Trachea Cells'
 
+saveRDS(cds, file = file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
 ##################################################
+cds = readRDS(file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
 rank_sum_results = presto::wilcoxauc(normalized_counts(cds), cds@colData$cell_type)
 write.csv(rank_sum_results, file = file.path(TARGET_dir, "rank_sum_test.csv"))
-
 
 library(fgsea) 
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
 rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
-
-#rank_sum_test$remove = (rank_sum_test$pct_in < 10 & rank_sum_test$pct_out < 10)
-#rank_sum_test = rank_sum_test[rank_sum_test$remove == FALSE, ]
-
+rank_sum_test = rank_sum_test[rank_sum_test$pct_in > 10 | rank_sum_test$pct_out > 10, ]
 for(ct in unique(rank_sum_test$group)) {
   sub_rank_sum_test = rank_sum_test[rank_sum_test$group == ct, ]
   ranks <- sub_rank_sum_test$logFC
@@ -132,8 +130,10 @@ for(ct in unique(rank_sum_test$group)) {
   fgseaRes = data.frame(fgseaRes)
   fgseaRes = apply(fgseaRes,2,as.character)
   fgseaRes = as.data.frame(fgseaRes)
+  fgseaRes$padj = as.numeric(fgseaRes$padj)
   fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
   #fgseaRes = fgseaRes[fgseaRes$pval < 0.05, ]
+  fgseaRes$NES = as.numeric(fgseaRes$NES)
   fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
   write.csv(fgseaRes, file = file.path(TARGET_dir, paste0(ct, '_gsea_results.csv')))
 }
@@ -145,7 +145,6 @@ plot_cells(cds,
            label_cell_groups=FALSE,
            show_trajectory_graph=FALSE, cell_size = 2)
 
-saveRDS(cds, file = file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
 
 ##################################################
 # look at enrichr 
