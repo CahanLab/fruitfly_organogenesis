@@ -170,6 +170,7 @@ write.csv(biological_analysis, file = file.path(TARGET_dir, 'sig_GO_biological_t
 library(fgsea)
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
 rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[rank_sum_test$pct_in > 10 | rank_sum_test$pct_out > 10, ]
 sub_rank_sum_test = rank_sum_test[rank_sum_test$group == 1, ]
 ranks <- sub_rank_sum_test$logFC
 names(ranks) <- sub_rank_sum_test$feature

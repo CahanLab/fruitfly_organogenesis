@@ -61,10 +61,10 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv
 
 # here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)", 
-               "nucleosome organization (GO:0034728)", 
+               "regulation of transcription, DNA-templated (GO:0006355)",
                "mitotic cytokinesis (GO:0000281)", 
-               "dorsal/ventral pattern formation (GO:0009953)", 
-               "gland morphogenesis (GO:0022612)", 
+               "negative regulation of translation (GO:0017148)", 
+               "salivary gland morphogenesis (GO:0007435)", 
                "dorsal closure (GO:0007391)", 
                "Golgi vesicle transport (GO:0048193)")
 
@@ -89,7 +89,9 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"
 
 # remove neuropeptide signaling pathway (GO:0007218) because the leading edge is too small 
 
-sub_GSEA_results = GSEA_results[GSEA_results$pathway != 'neuropeptide signaling pathway (GO:0007218)', ]
+#sub_GSEA_results = GSEA_results[GSEA_results$pathway != 'neuropeptide signaling pathway (GO:0007218)', ]
+GSEA_results = GSEA_results[order(GSEA_results$padj), ]
+sub_GSEA_results = GSEA_results[1:5, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
@@ -321,3 +323,4 @@ p<-ggplot(sub_plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
   ylab("average expression") +
   geom_line(aes(color = gene)) + theme_bw() 
 ggsave(file.path(TARGET_dir, "list_A_dynamic_gene_line_avg.png"), plot = p, width = 8, height = 5)
+
