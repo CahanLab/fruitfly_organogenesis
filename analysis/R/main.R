@@ -40,14 +40,8 @@ source("R/plot_wt13_statistics.R")
 # plot out UMAP and proportion for for wt13
 source("R/plot_wt13_UMAP_proportion.R")
 
-# late wt13 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
-source("R/wt13_compare_Calderon.R")
-
-# late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
-source("R/wt13_compare_Seroka.R")
-
-# match CNS subtypes with Seroka 
-source("R/wt13_match_CNS_seroka.R")
+# cross study comparison for late wildtype
+source("R/cross_study_comparison_wt13.R")
 
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
@@ -61,11 +55,6 @@ source("R/plot_early_wt12_statistics.R")
 # plot out UMAP and proportion for for early wt12
 source("R/plot_early_wt12_UMAP_proportion.R")
 
-# early wt12 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
-source("R/early_wt12_compare_Calderon.R")
-
-# early wt12 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
-source("R/early_wt12_compare_Seroka.R")
 
 # perform GSEA on the data 
 source("R/wt13_GSEA.R")
@@ -105,3 +94,19 @@ source("R/early_cluster_vs_others.R")
 
 # test the germ cells 
 source("R/germ_cells_exploration.R")
+
+# match CNS subtypes with Seroka 
+source("R/wt13_match_CNS_seroka.R")
+
+# early wt12 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
+source("R/early_wt12_compare_Calderon.R")
+
+# early wt12 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
+source("R/early_wt12_compare_Seroka.R")
+
+# late wt13 celltyping compare with the celltyping in Calderon et al, 2022 DOI: 10.1126/science.abn5800
+source("R/wt13_compare_Calderon.R")
+
+# late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
+source("R/wt13_compare_Seroka.R")
+
