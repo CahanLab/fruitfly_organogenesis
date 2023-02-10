@@ -39,7 +39,7 @@ cds <- reduce_dimension(cds)
 plot_cells(cds, label_groups_by_cluster=TRUE,  color_cells_by = "batch", cell_size = 1, label_cell_groups = FALSE)
 ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_UMAP.png'), width = 8, height = 6)
 
-cds <- cluster_cells(cds, resolution = 1e-4)
+cds <- cluster_cells(cds, resolution = 5e-3)
 plot_cells(cds, color_cells_by = "cluster", label_cell_groups = FALSE, cell_size = 1)
 ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_cluster.png'), width = 8, height = 6)
 
@@ -50,15 +50,65 @@ write.csv(marker_test_res, file = file.path(TARGET_dir, "top_markers_monocle.csv
 rank_sum_results = presto::wilcoxauc(normalized_counts(cds), cds@clusters$UMAP$clusters)
 write.csv(rank_sum_results, file = file.path(TARGET_dir, "rank_sum_test.csv"))
 
+cds <- learn_graph(cds, use_partition = TRUE)
+plot_cells(cds,
+           color_cells_by = "batch",
+           label_groups_by_cluster=FALSE,
+           label_leaves=FALSE,
+           label_branch_points=FALSE, cell_size = 1)
+cds <- order_cells(cds)
+plot_cells(cds,
+           color_cells_by = "pseudotime",
+           label_cell_groups=FALSE,
+           label_leaves=FALSE,
+           label_branch_points=FALSE,
+           graph_label_size=1.5, cell_size = 1, show_trajectory_graph = FALSE)
+ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_pt.png'), width = 8, height = 6)
+saveRDS(cds, file = file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
+
 ########################################
-# let's solve the identity of cluster 1 first 
+# to test out the main trajectory 
+main_cds = cds[, monocle3::clusters(cds) != 3 | monocle3::clusters(cds) != 1]
+expression_matrix = monocle3::normalized_counts(main_cds)
+expRaw = expression_matrix[apply(expression_matrix, MARGIN = 1, FUN = function(x){return(sum(x > 0) > 10) }), ]
+pt<-as.data.frame(pseudotime(main_cds))
+colnames(pt)<-"pseudotime"
+cw<-as.matrix(rep(1,nrow(pt)))
+rownames(cw)<-rownames(pt)
+ts<-tradeSeq::fitGAM(as.matrix(expRaw),pseudotime=as.matrix(pt),cellWeights=cw, parallel = TRUE)
+saveRDS(ts, file = file.path(TARGET_dir, "main_tradeseq_fitgam_results.rds"))
+ATres<-tradeSeq::associationTest(ts)
+saveRDS(ATres, file = file.path(TARGET_dir, 'main_raw_associationTest.rds'))
+
+########################################
+# to test out the main trajectory 
+sub_cds = cds[, monocle3::clusters(cds) == 3 | monocle3::clusters(cds) == 1]
+expression_matrix = monocle3::normalized_counts(sub_cds)
+expRaw = expression_matrix[apply(expression_matrix, MARGIN = 1, FUN = function(x){return(sum(x > 0) > 10) }), ]
+pt<-as.data.frame(pseudotime(sub_cds))
+colnames(pt)<-"pseudotime"
+cw<-as.matrix(rep(1,nrow(pt)))
+rownames(cw)<-rownames(pt)
+ts<-tradeSeq::fitGAM(as.matrix(expRaw),pseudotime=as.matrix(pt),cellWeights=cw, parallel = TRUE)
+saveRDS(ts, file = file.path(TARGET_dir, "sub_tradeseq_fitgam_results.rds"))
+ATres<-tradeSeq::associationTest(ts)
+saveRDS(ATres, file = file.path(TARGET_dir, 'sub_raw_associationTest.rds'))
+
+
+########################################
+# let's solve the identity the clusters
+library(enrichR)
+enrichR::setEnrichrSite("FlyEnrichr")
 dir.create(file.path(TARGET_dir, 'cluster_process'))
-marker_test_res = read.csv(file.path(TARGET_dir, "top_markers_monocle.csv"), row.names = 1)
+rank_sum_results = read.csv(file.path(TARGET_dir, "rank_sum_test.csv"), row.names = 1)
+
 withr::with_dir(file.path(TARGET_dir, 'cluster_process'), {
-  for(cluster in unique(marker_test_res$cell_group)) {
-    sub_marker_test_res = marker_test_res[marker_test_res$cell_group == cluster, ]
+  for(cluster in unique(rank_sum_results$group)) {
+    sub_marker_test_res = rank_sum_results[rank_sum_results$group == cluster, ]
+    sub_marker_test_res = sub_marker_test_res[sub_marker_test_res$logFC > 0.1, ]
+    sub_marker_test_res = sub_marker_test_res[sub_marker_test_res$padj < 0.05, ]
     enrichment_results = enrichR::enrichr(
-      genes = sub_marker_test_res$gene_id, 
+      genes = sub_marker_test_res$feature, 
       databases = c(
         "GO_Biological_Process_2018", 
         "GO_Molecular_Function_2018"
@@ -69,36 +119,32 @@ withr::with_dir(file.path(TARGET_dir, 'cluster_process'), {
   }
 })
 
-plot_cells(cds,
-           genes=c("nur", 'RpL38', 'RpL30'),
-           label_cell_groups=FALSE,
-           show_trajectory_graph=FALSE, cell_size = 2)
-plot_cells(cds, color_cells_by = "Phase", label_cell_groups = FALSE, cell_size = 1, show_trajectory_graph = FALSE)
+library(fgsea) 
+dir.create(file.path(TARGET_dir, 'cluster_process_GSEA'))
 
-plot_cells(cds, color_cells_by = "nFeature_RNA", label_cell_groups = FALSE, cell_size = 1, show_trajectory_graph = FALSE)
-plot_cells(cds, color_cells_by = "nCount_RNA", label_cell_groups = FALSE, cell_size = 1, show_trajectory_graph = FALSE)
+pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
+rank_sum_test = read.csv(file.path(TARGET_dir, 'rank_sum_test.csv'), row.names = 1)
+rank_sum_test = rank_sum_test[rank_sum_test$pct_in > 10 | rank_sum_test$pct_out > 10, ]
 
-cds@colData$log_nCount = log(cds@colData$nCount_RNA)
-plot_cells(cds, color_cells_by = "log_nCount", label_cell_groups = FALSE, cell_size = 1, show_trajectory_graph = FALSE)
+withr::with_dir(file.path(TARGET_dir, 'cluster_process_GSEA'), {
+  for(ct in unique(rank_sum_test$group)) {
+    sub_rank_sum_test = rank_sum_test[rank_sum_test$group == ct, ]
+    ranks <- sub_rank_sum_test$logFC
+    names(ranks) <- sub_rank_sum_test$feature
+    fgseaRes <- fgsea(pathways = pathway_list, 
+                      stats = ranks,
+                      minSize=10,
+                      maxSize=500)
+    
+    fgseaRes = data.frame(fgseaRes)
+    fgseaRes = apply(fgseaRes,2,as.character)
+    fgseaRes = as.data.frame(fgseaRes)
+    fgseaRes$padj = as.numeric(fgseaRes$padj)
+    fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
+    #fgseaRes = fgseaRes[fgseaRes$pval < 0.05, ]
+    fgseaRes$NES = as.numeric(fgseaRes$NES)
+    fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
+    write.csv(fgseaRes, file = file.path(paste0(ct, '_gsea_results.csv')))
+  }
+})
 
-cds@colData$log_nFeature = log(cds@colData$nFeature_RNA)
-plot_cells(cds, color_cells_by = "log_nFeature", label_cell_groups = FALSE, cell_size = 1, show_trajectory_graph = FALSE)
-
-ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_phase.png'), width = 8, height = 6)
-
-cds <- learn_graph(cds)
-
-plot_cells(cds,
-           color_cells_by = "batch",
-           label_groups_by_cluster=FALSE,
-           label_leaves=FALSE,
-           label_branch_points=FALSE)
-cds <- order_cells(cds)
-plot_cells(cds,
-           color_cells_by = "pseudotime",
-           label_cell_groups=FALSE,
-           label_leaves=FALSE,
-           label_branch_points=FALSE,
-           graph_label_size=1.5, cell_size = 1, show_trajectory_graph = FALSE)
-ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_pt.png'), width = 8, height = 6)
-saveRDS(cds, file = file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))

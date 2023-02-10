@@ -13,7 +13,7 @@ col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_co
 col_vector = col_vector[col_vector != col_vector[4]]
 col_vector = col_vector[col_vector != col_vector[4]]
 
-wt_object = readRDS(file.path('results', ANALYSIS_VERSION, 'manual_annotation_wt13/manual_celltype_object3.rds'))
+wt_object = readRDS(file.path('results', ANALYSIS_VERSION, 'manual_annotation_wt13/manual_celltype_object4.rds'))
 wt_object@meta.data[wt_object@meta.data$batch == 'rep_3', 'batch'] = 'rep_2'
 
 withr::with_dir(TARGET_dir, {

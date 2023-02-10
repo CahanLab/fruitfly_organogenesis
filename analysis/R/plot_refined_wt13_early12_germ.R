@@ -3,10 +3,10 @@ library(ggplot2)
 library(RColorBrewer)
 library(dbplyr)
 
-TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_trachea')
+TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_germ')
 dir.create(TARGET_dir, recursive = TRUE)
 
-cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "monocle3_no_batch_correct_object.rds"))
+cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "monocle3_no_batch_correct_object.rds"))
 
 UMAP_coord = cds@int_colData$reducedDims$UMAP
 colnames(UMAP_coord) = c("UMAP_1", "UMAP_2")
@@ -20,8 +20,14 @@ UMAP_coord[UMAP_coord$batch == 'early_rep_2', 'batch'] = 'Early rep 2'
 UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Late rep 1'
 UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Late rep 2'
 
-UMAP_coord$cell_type = cds@colData$cell_type
-UMAP_coord[UMAP_coord$cell_type == 'Branching Trachea Cells', 'cell_type'] = 'Tip Cells'
+UMAP_coord$cell_type = UMAP_coord$clusters
+UMAP_coord[UMAP_coord$clusters == '1', 'cell_type'] = 'Unknown 1'
+UMAP_coord[UMAP_coord$clusters == '3', 'cell_type'] = 'Unknown 2'
+UMAP_coord[UMAP_coord$clusters == '5', 'cell_type'] = 'Early Germ Cells'
+UMAP_coord[UMAP_coord$clusters == '6', 'cell_type'] = 'Middle Germ Cells 1'
+UMAP_coord[UMAP_coord$clusters == '2', 'cell_type'] = 'Middle Germ Cells 2'
+UMAP_coord[UMAP_coord$clusters == '4', 'cell_type'] = 'Late Germ Cells 1'
+
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   geom_point() + 
@@ -55,139 +61,162 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
   guides(color=guide_legend(title="")) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2', breaks=c('Early Trachea Cells', 'Middle Trachea Cells', 'Tip Cells', 'Late Trachea Cells'))
+  scale_color_brewer(palette = 'Set2')
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 8, height = 6)
 
 norm_exp = monocle3::normalized_counts(cds)
 
 
 
-UMAP_coord$trh = norm_exp['trh', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -trh), y=trh, fill = cell_type)) + 
+UMAP_coord$bam = norm_exp['bam', ]
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -bam), y=bam, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("trh normalized expression") + 
+  ylab("bam normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_trh.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_bam.png"), plot = p, width = 8, height = 6)
 
-UMAP_coord$Osi6 = norm_exp['Osi6', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi6), y=Osi6, fill = cell_type)) + 
-  geom_violin() +
-  guides(fill=guide_legend(title="")) +
-  #geom_boxplot(width=0.1) +
-  theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
-  ylab("Osi6 normalized expression") + 
-  xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_Osi6.png"), plot = p, width = 8, height = 6)
-
-UMAP_coord$Osi17 = norm_exp['Osi17', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi17), y=Osi17, fill = cell_type)) + 
-  geom_violin() +
-  guides(fill=guide_legend(title="")) +
-  #geom_boxplot(width=0.1) +
-  theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
-  ylab("Osi17 normalized expression") + 
-  xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_Osi6.png"), plot = p, width = 8, height = 6)
-
-UMAP_coord$btl = norm_exp['btl', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -btl), y=btl, fill = cell_type)) + 
+UMAP_coord$osk = norm_exp['osk', ]
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -osk), y=osk, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("btl normalized expression") + 
+  ylab("osk normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_btl.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_osk.png"), plot = p, width = 8, height = 6)
 
-UMAP_coord$Mipp1 = norm_exp['Mipp1', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Mipp1), y=Mipp1, fill = cell_type)) + 
+UMAP_coord$osk = norm_exp['osk', ]
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -osk), y=osk, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("Mipp1 normalized expression") + 
+  ylab("osk normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_Mipp1.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_osk.png"), plot = p, width = 8, height = 6)
 
-UMAP_coord$bnl = norm_exp['bnl', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -bnl), y=bnl, fill = cell_type)) + 
+UMAP_coord$pgc = norm_exp['pgc', ] # quietscent 
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -pgc), y=pgc, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("bnl normalized expression") + 
+  ylab("pgc normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_bnl.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_pgc.png"), plot = p, width = 8, height = 6)
 
-UMAP_coord$pnt = norm_exp['pnt', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -pnt), y=pnt, fill = cell_type)) + 
+UMAP_coord$gcl = norm_exp['gcl', ] # quietscent 
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -gcl), y=gcl, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("pnt normalized expression") + 
+  ylab("gcl normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_pnt.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_gcl.png"), plot = p, width = 8, height = 6)
 
-UMAP_coord$sty = norm_exp['sty', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -sty), y=sty, fill = cell_type)) + 
+UMAP_coord$nos = norm_exp['nos', ] # quietscent 
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -nos), y=nos, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("sty normalized expression") + 
+  ylab("nos normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_sty.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_nos.png"), plot = p, width = 8, height = 6)
 
-UMAP_coord$shg = norm_exp['shg', ]
-p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -shg), y=shg, fill = cell_type)) + 
+UMAP_coord$dpp = norm_exp['dpp', ]
+p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -dpp), y=dpp, fill = cell_type)) + 
   geom_violin() +
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("shg normalized expression") + 
+  ylab("dpp normalized expression") + 
   xlab("cell type")
-ggsave(filename = file.path(TARGET_dir, "violin_shg.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_dpp.png"), plot = p, width = 8, height = 6)
 
 ###############################
-# plot out the tracheal tip cells 
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Branching Trachea Cells_gsea_results.csv"), row.names = 1)
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "4_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
-write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_branching_GSEA_results.csv"))
+write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"))
 
 # here are the interesting results that are not overlapping and are related to salivary gland development
-focus_gsea = c("cell morphogenesis involved in differentiation (GO:0000904)", 
-               "cell-cell adhesion mediated by cadherin (GO:0044331)", 
-               "calcium-dependent cell-cell adhesion via plasma membrane cell adhesion molecules (GO:0016339)", 
-               "negative regulation of cell communication (GO:0010648)", 
-               "apical junction assembly (GO:0043297)")
+focus_gsea = c("proteasomal protein catabolic process (GO:0010498)", 
+               "proteasomal protein catabolic process (GO:0010498)", 
+               "inorganic cation transmembrane transport (GO:0098662)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
-  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[4]) + coord_flip() + 
+  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 6, 'Set2')[2]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
   theme_bw()
-ggsave(filename = file.path(TARGET_dir, "Tip_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+ggsave(filename = file.path(TARGET_dir, "late_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
-# plot out the tracheal early cells 
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Early Trachea Cells_gsea_results.csv"), row.names = 1)
+# middle stage 2
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "2_gsea_results.csv"), row.names = 1)
+GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
+GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
+write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_2_GSEA_results.csv"))
+
+# here are the interesting results that are not overlapping and are related to salivary gland development
+focus_gsea = c("proteasomal protein catabolic process (GO:0010498)", 
+               "negative regulation of cellular macromolecule biosynthetic process (GO:2000113)", 
+               "female gamete generation (GO:0007292)", 
+               "negative regulation of translation (GO:0017148)", 
+               "negative regulation of gene expression (GO:0010629)")
+
+sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
+sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
+
+p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
+  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 6, 'Set2')[4]) + coord_flip() + 
+  xlab("GO Biological Processes") + 
+  ylab("-log10 adjusted p-value") + 
+  ggtitle("") +
+  theme_bw()
+ggsave(filename = file.path(TARGET_dir, "middle_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+
+# middle stage 1
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "6_gsea_results.csv"), row.names = 1)
+GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
+GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
+write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_1_GSEA_results.csv"))
+
+# here are the interesting results that are not overlapping and are related to salivary gland development
+focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
+               "cytoskeleton-dependent cytokinesis (GO:0061640)", 
+               "mitotic cytokinesis (GO:0000281)", 
+               "cytoplasmic translation (GO:0002181)", 
+               "DNA packaging (GO:0006323)")
+
+sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
+sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
+
+p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
+  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 6, 'Set2')[3]) + coord_flip() + 
+  xlab("GO Biological Processes") + 
+  ylab("-log10 adjusted p-value") + 
+  ggtitle("") +
+  theme_bw()
+ggsave(filename = file.path(TARGET_dir, "middle_1_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+
+# early stage
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "5_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv"))
@@ -195,63 +224,65 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv
 # here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
                "regulation of gene expression (GO:0010468)", 
-               "regulation of mitotic cell cycle (GO:0007346)", 
-               "tracheal outgrowth, open tracheal system (GO:0007426)")
+               "Notch signaling pathway (GO:0007219)", 
+               "regulation of macromolecule metabolic process (GO:0060255)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
-  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + coord_flip() + 
+  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 6, 'Set2')[1]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
   theme_bw()
-ggsave(filename = file.path(TARGET_dir, "Early_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+ggsave(filename = file.path(TARGET_dir, "early_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
-# plot out the tracheal middle cells 
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Middle Trachea Cells_gsea_results.csv"), row.names = 1)
+# unknown 1 stage
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "1_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
-write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_GSEA_results.csv"))
+write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_unknown_1_GSEA_results.csv"))
 
 # here are the interesting results that are not overlapping and are related to salivary gland development
-focus_gsea = c("regulation of tube size, open tracheal system (GO:0035151)", 
-               "septate junction assembly (GO:0019991)", 
-               "regulation of translation (GO:0006417)", 
-               "dorsal closure (GO:0007391)", 
-               "Golgi vesicle transport (GO:0048193)", 
-               "chitin-based cuticle development (GO:0040003)")
+focus_gsea = c("cytoplasmic translation (GO:0002181)",
+               "ribosome assembly (GO:0042255)", 
+               "ribosomal small subunit biogenesis (GO:0042274)", 
+               "ribosomal large subunit biogenesis (GO:0042273)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
-  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[3]) + coord_flip() + 
+  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 8, 'Set2')[5]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
   theme_bw()
-ggsave(filename = file.path(TARGET_dir, "Middle_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+ggsave(filename = file.path(TARGET_dir, "unknown_1_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
-# plot out the tracheal Late cells 
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Late Trachea Cells_gsea_results.csv"), row.names = 1)
+# unknown 2 stage
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "3_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
-write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"))
+write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_unknown_2_GSEA_results.csv"))
 
-GSEA_results = GSEA_results[order(GSEA_results$padj), ]
-sub_GSEA_results = GSEA_results[1:5, ]
+# here are the interesting results that are not overlapping and are related to salivary gland development
+focus_gsea = c("positive regulation of transcription, DNA-templated (GO:0045893)",
+               "Wnt signaling pathway (GO:0016055)", 
+               "cell-cell adhesion via plasma-membrane adhesion molecules (GO:0098742)",
+               "imaginal disc-derived wing morphogenesis (GO:0007476)")
+
+sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
-  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[2]) + coord_flip() + 
+  geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 8, 'Set2')[6]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
   theme_bw()
-ggsave(filename = file.path(TARGET_dir, "Late_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
-
+ggsave(filename = file.path(TARGET_dir, "unknown_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
 #############################
 # plot out the Golgi Vesicle gene expression 
