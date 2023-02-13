@@ -6,6 +6,12 @@ library(dbplyr)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')
 dir.create(TARGET_dir, recursive = TRUE)
 
+rank_sum = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "rank_sum_test.csv"), row.names = 1)
+rank_sum = rank_sum[rank_sum$logFC > 0, ]
+rank_sum[rank_sum$group == 2, 'group'] = "Earlier Salivary Gland Cells"
+rank_sum[rank_sum$group == 1, 'group'] = "Later Salivary Gland Cells"
+
+write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
 
 UMAP_coord = cds@int_colData$reducedDims$UMAP

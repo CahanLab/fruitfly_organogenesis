@@ -6,6 +6,17 @@ library(dbplyr)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_germ')
 dir.create(TARGET_dir, recursive = TRUE)
 
+rank_sum = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "rank_sum_test.csv"), row.names = 1)
+rank_sum = rank_sum[rank_sum$logFC > 0, ]
+rank_sum[rank_sum$group == '1', ] = 'Unknown 1'
+rank_sum[rank_sum$group == '3', ] = 'Unknown 2'
+rank_sum[rank_sum$group == '5', ] = 'Early Germ Cells'
+rank_sum[rank_sum$group == '6', ] = 'Middle Germ Cells 1'
+rank_sum[rank_sum$group == '2', ] = 'Middle Germ Cells 2'
+rank_sum[rank_sum$group == '4', ] = 'Late Germ Cells 1'
+
+write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
+
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "monocle3_no_batch_correct_object.rds"))
 
 UMAP_coord = cds@int_colData$reducedDims$UMAP

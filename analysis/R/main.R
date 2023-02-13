@@ -43,6 +43,8 @@ source("R/plot_wt13_UMAP_proportion.R")
 # cross study comparison for late wildtype
 source("R/cross_study_comparison_wt13.R")
 
+# perform GSEA on the data 
+source("R/wt13_GSEA.R")
 
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
@@ -56,10 +58,6 @@ source("R/plot_early_wt12_statistics.R")
 # plot out UMAP and proportion for for early wt12
 source("R/plot_early_wt12_UMAP_proportion.R")
 
-
-# perform GSEA on the data 
-source("R/wt13_GSEA.R")
-
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
 
@@ -69,8 +67,14 @@ source("R/plot_refined_wt13_early12_salivary_gland.R")
 # refined analysis of early + late trachea cells 
 source("R/refined_wt13_early12_trachea.R")
 
+# make figures for the in depth analysis of trachea 
+source("R/plot_refined_wt13_early12_trachea.R")
+
 # refined analysis of early + late germ cells 
 source("R/refined_wt13_early12_germ.R")
+
+# make figures for the in depth analysis of germ cells 
+source("R/plot_refined_wt13_early12_germ.R")
 
 # perform GSEA on the early wildtype data 
 source("R/early_wt12_GSEA.R")
