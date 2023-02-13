@@ -13,7 +13,7 @@ enrichR::setEnrichrSite("FlyEnrichr")
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "wt13_enrichment")
 dir.create(TARGET_dir)
 
-object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13", "manual_celltype_object3.rds"))
+object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13", "manual_celltype_object4.rds"))
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
 
 withr::with_dir(TARGET_dir, {
@@ -23,7 +23,7 @@ withr::with_dir(TARGET_dir, {
     } else {
       print(stringr::str_replace_all(celltype, "/", "-"))
       dir.create(stringr::str_replace_all(celltype, "/", "-"))
-      markers <- FindMarkers(object = object, ident.1 = celltype, logfc.threshold = 0, min.pct = 0.1, group.by = 'manual_celltypes', test.use = 'wilcox')
+      markers = SeuratWrappers::RunPresto(object, ident.1 = celltype, logfc.threshold = 0, min.pct = 0.1, group.by = 'manual_celltypes') 
       write.csv(markers, file = file.path(stringr::str_replace_all(celltype, "/", "-"), 'markers_genes.csv'))
       
       ranks <- markers$avg_log2FC
@@ -33,8 +33,7 @@ withr::with_dir(TARGET_dir, {
       fgseaRes <- fgsea(pathways = pathway_list, 
                         stats = ranks,
                         minSize=10,
-                        maxSize=500,
-                        nperm=1000000)
+                        maxSize=500)
       fgseaRes = data.frame(fgseaRes)
       fgseaRes <- apply(fgseaRes,2,as.character)
       
