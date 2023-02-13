@@ -64,6 +64,7 @@ object = readRDS(file.path(TARGET_dir, 'manual_celltype_object.rds'))
 object@meta.data[object@meta.data$seurat_clusters == 26, 'manual_celltypes'] = 'Hindgut Muscle'
 object@meta.data[object@meta.data$seurat_clusters == 13, 'manual_celltypes'] = 'Pharyngeal Muscle'
 object@meta.data[object@meta.data$manual_celltypes == 'Germ Cell', 'manual_celltypes'] = 'Germ Cells'
+object@meta.data[object@meta.data$manual_celltypes == 'Longitudinal/Caudal Visceral Mesoderm', 'manual_celltypes'] = 'Longitudinal Visceral Mesoderm'
 object@meta.data[object@meta.data$seurat_clusters == 15 | object@meta.data$seurat_clusters == 4, 'manual_celltypes'] = 'Early CNS'
 object@meta.data[object@meta.data$seurat_clusters %in% c(33, 3, 11), 'manual_celltypes'] = 'Late CNS'
 DimPlot(object, group.by = 'manual_celltypes', label = TRUE)
