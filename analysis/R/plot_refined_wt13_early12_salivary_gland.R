@@ -266,6 +266,31 @@ ggsave(file.path(TARGET_dir, paste0(term, "_rib_dynamic_gene_line_avg.png")), pl
 
 ##################################################
 
+# look at TFs specific 
+early_rank_sum = read.csv("results/v18/early_wt12_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
+late_rank_sum = read.csv("results/v18/wt13_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
+early_rank_sum = early_rank_sum[early_rank_sum$p_val_adj < 0.05 & early_rank_sum$avg_log2FC > 0, ]
+late_rank_sum = late_rank_sum[late_rank_sum$p_val_adj < 0.05 & late_rank_sum$avg_log2FC > 0, ]
+
+TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
+TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
+all_genes = unique(c(rownames(late_rank_sum), rownames(early_rank_sum)))
+i_TFs = intersect(TF_tab$symbol, all_genes) # TFs that are specific for salivary glands based on DE genes 
+
+pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
+sg_TFs = intersect(pathway_list[["salivary gland development (GO:0007431)"]], TF_tab$symbol)
+target_genes = intersect(i_TFs, sg_TFs) # TFs that are previously known to be 
+
+early_object = readRDS("results/v18/manual_annotation_early_wt12/manual_celltype_object1.rds")
+
+# plot out the violin plot for all the TFs 
+dir.create(file.path(TARGET_dir, "early_TF"))
+withr::with_dir("", {
+  VlnPlot(early_object, features = 'SoxN', group.by = 'manual_celltypes', pt.size = 0)
+})
+
+
+###############################################
 # this is plot out the dynamically expressed TFs in salivary gland development
 ATres = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", 'raw_associationTest.rds'))
 ATres = ATres[!is.na(ATres$pvalue), ]

@@ -88,8 +88,8 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
   xlab("Cell Types") + 
   ggtitle("Stage 13-16 Cell Type Proportions")
 
+ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 14, height = 6)
 saveRDS(total_plot_df, file = file.path(TARGET_dir, "stage_13_16_proportion.rds"))
-
 # compare the similarity between the datasets 
 calc_spearman_correlation <- function(other_data, our_data, other_col, our_col) {
   other_meta = other_data@meta.data
