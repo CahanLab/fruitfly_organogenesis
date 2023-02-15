@@ -270,16 +270,7 @@ target_genes = eval(parse(text = target_genes))
 
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
-index_list = vector()
-for(gene in target_genes) { 
-  index_list = c(index_list, which(tolower(gene) == tolower(rownames(norm_exp))))
-}
-
-norm_exp = norm_exp[index_list, ]
-intersecting_genes = rownames(norm_exp)
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[intersecting_genes, ]
+norm_exp = norm_exp[c('CrebA', target_genes), ]
 # this will change 
 #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
 pt = monocle3::pseudotime(cds)
@@ -302,9 +293,9 @@ smoothed_df$pseudotime = NULL
 smoothed_df = t(smoothed_df)
 scaled_exp = t(scale(t(smoothed_df)))
 sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
+no_tf_scaled = scaled_exp[sorted_genes[sorted_genes != 'CrebA'], ]
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
+pheatmap(no_tf_scaled, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
 convert_line_plot <- function(scaled_exp) {
@@ -320,17 +311,31 @@ convert_line_plot <- function(scaled_exp) {
   return(plot_df)
 }
 
+plot_df = convert_line_plot(scaled_exp)
+tf_plot_df = plot_df[plot_df$gene == 'CrebA', ]
 
+scaled_exp = scaled_exp[rownames(scaled_exp) != 'CrebA', ]
 plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
                      scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'vesicle transport related genes (average)')
+                     gene = 'Golgi vesicle transport related genes (average)')
 plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+plot_df = rbind(plot_df, tf_plot_df)
+
+no_tf_plot = plot_df[plot_df$gene != 'CrebA', ]
+golgi_plot_df = no_tf_plot
+p<-ggplot(no_tf_plot, aes(x=pseudotime, y=scaled_exp, group=gene)) +
   xlab("pseudotime") + 
   ylab("average expression") +
   ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[3]) + theme_bw() 
+  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + theme_bw() 
 ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
+
+p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+  xlab("pseudotime") + 
+  ylab("smoothed and scaled expression") +
+  ggtitle(paste0('genes in ', term)) +
+  geom_line(aes(color=gene)) + theme_bw() 
+ggsave(file.path(TARGET_dir, paste0(term, "_CrebA_dynamic_gene_line_avg.png")), plot = p, width = 12, height = 8)
 
 # plot out the Cytoplasmic translation
 term = 'cytoplasmic translation (GO:0002181)'
@@ -341,16 +346,7 @@ target_genes = eval(parse(text = target_genes))
 
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
-index_list = vector()
-for(gene in target_genes) { 
-  index_list = c(index_list, which(tolower(gene) == tolower(rownames(norm_exp))))
-}
-
-norm_exp = norm_exp[index_list, ]
-intersecting_genes = rownames(norm_exp)
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[intersecting_genes, ]
+norm_exp = norm_exp[c('rib', target_genes), ]
 # this will change 
 #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
 pt = monocle3::pseudotime(cds)
@@ -373,9 +369,9 @@ smoothed_df$pseudotime = NULL
 smoothed_df = t(smoothed_df)
 scaled_exp = t(scale(t(smoothed_df)))
 sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
+no_tf_scaled = scaled_exp[sorted_genes[sorted_genes != 'rib'], ]
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
+pheatmap(no_tf_scaled, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
 convert_line_plot <- function(scaled_exp) {
@@ -391,17 +387,30 @@ convert_line_plot <- function(scaled_exp) {
   return(plot_df)
 }
 
+plot_df = convert_line_plot(scaled_exp)
+tf_plot_df = plot_df[plot_df$gene == 'rib', ]
 
+scaled_exp = scaled_exp[rownames(scaled_exp) != 'rib', ]
 plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
                      scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
                      gene = 'translation related genes (average)')
 plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+plot_df = rbind(plot_df, tf_plot_df)
+
+no_tf_plot = plot_df[plot_df$gene != 'rib', ]
+p<-ggplot(no_tf_plot, aes(x=pseudotime, y=scaled_exp, group=gene)) +
   xlab("pseudotime") + 
   ylab("average expression") +
   ggtitle(paste0('Average Gene Expression in ', term)) +
   geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[2]) + theme_bw() 
 ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
+
+p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+  xlab("pseudotime") + 
+  ylab("smoothed and scaled expression") +
+  ggtitle(paste0('genes in ', term)) +
+  geom_line(aes(color=gene)) + theme_bw() 
+ggsave(file.path(TARGET_dir, paste0(term, "_rib_dynamic_gene_line_avg.png")), plot = p, width = 10, height = 8)
 
 # plot out the tube size
 term = 'regulation of tube size, open tracheal system (GO:0035151)'
@@ -412,16 +421,7 @@ target_genes = eval(parse(text = target_genes))
 
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
-index_list = vector()
-for(gene in target_genes) { 
-  index_list = c(index_list, which(tolower(gene) == tolower(rownames(norm_exp))))
-}
-
-norm_exp = norm_exp[index_list, ]
-intersecting_genes = rownames(norm_exp)
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[intersecting_genes, ]
+norm_exp = norm_exp[c('CrebA', target_genes), ]
 # this will change 
 #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
 pt = monocle3::pseudotime(cds)
@@ -444,9 +444,9 @@ smoothed_df$pseudotime = NULL
 smoothed_df = t(smoothed_df)
 scaled_exp = t(scale(t(smoothed_df)))
 sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
+no_tf_scaled = scaled_exp[sorted_genes[sorted_genes != 'CrebA'], ]
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
+pheatmap(no_tf_scaled, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
 convert_line_plot <- function(scaled_exp) {
@@ -462,17 +462,38 @@ convert_line_plot <- function(scaled_exp) {
   return(plot_df)
 }
 
+plot_df = convert_line_plot(scaled_exp)
+tf_plot_df = plot_df[plot_df$gene == 'CrebA', ]
 
+scaled_exp = scaled_exp[rownames(scaled_exp) != 'CrebA', ]
 plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
                      scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'translation related genes (average)')
+                     gene = 'regulation of tube size (average)')
 plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+plot_df = rbind(plot_df, tf_plot_df)
+
+no_tf_plot = plot_df[plot_df$gene != 'CrebA', ]
+size_plot_df = no_tf_plot
+p<-ggplot(no_tf_plot, aes(x=pseudotime, y=scaled_exp, group=gene)) +
   xlab("pseudotime") + 
   ylab("average expression") +
   ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[3]) + theme_bw() 
+  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + theme_bw() 
 ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
+
+p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+  xlab("pseudotime") + 
+  ylab("smoothed and scaled expression") +
+  ggtitle(paste0('genes in ', term)) +
+  geom_line(aes(color=gene)) + theme_bw() 
+ggsave(file.path(TARGET_dir, paste0(term, "_CrebA_dynamic_gene_line_avg.png")), plot = p, width = 12, height = 8)
+
+new_plot_df = rbind(golgi_plot_df, size_plot_df)
+p<-ggplot(new_plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
+  xlab("pseudotime") + 
+  ylab("smoothed and scaled expression") +
+  geom_line(aes(color=gene)) + theme_bw() 
+ggsave(file.path(TARGET_dir, paste0("tube_size_vs_golgi_gene_line_avg.png")), plot = p, width = 12, height = 8)
 
 ##############################################
 # this is plot out the dynamically expressed TFs 
