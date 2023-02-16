@@ -1,5 +1,5 @@
 library(Seurat)
-library()
+library(viridis)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "cross_study_comparison_wt13")
 dir.create(TARGET_dir)
 
@@ -148,7 +148,6 @@ calc_spearman_correlation <- function(other_data, our_data, other_col, our_col) 
 seroka_correlation = calc_spearman_correlation(Seroka_object, our_object, other_col = 'harmonized_celltypes', our_col =  'harmonized_celltypes')
 saveRDS(seroka_correlation, file = file.path(TARGET_dir, "seroka_correlation.rds"))
 
-library(viridis)
 seroka_correlation$our_ct = factor(seroka_correlation$our_ct, levels=sort(as.vector(unique(seroka_correlation$our_ct))))
 seroka_correlation$other_ct = factor(seroka_correlation$other_ct, levels=sort(as.vector(unique(seroka_correlation$other_ct))))
 
@@ -199,6 +198,7 @@ withr::with_dir(
   }
 )
 
+##################################################
 # run the python scripts in the seroka 
 SCN_classification = read.csv(file.path(TARGET_dir, 'Seroka_comparison_scn', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(our_object@meta.data), ]
@@ -229,6 +229,10 @@ calc_class_proportion <- function(our_object, our_ct_col, other_ct_col) {
 seroka_proportion = calc_class_proportion(our_object, our_ct_col = 'harmonized_celltypes', 'seroka_scn')
 seroka_proportion$other_ct = as.vector(seroka_proportion$other_ct)
 seroka_proportion[seroka_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
+
+# check if all the cell types are in there 
+setdiff(c(unique(Seroka_object@meta.data$harmonized_celltypes), 'Unknown (SCN rand)'), unique(seroka_proportion$other_ct))
+# [1] "Unknown"
 
 seroka_proportion$our_ct = factor(seroka_proportion$our_ct, levels=sort(as.vector(unique(seroka_proportion$our_ct))))
 seroka_proportion$other_ct = factor(seroka_proportion$other_ct, levels=sort(as.vector(unique(seroka_proportion$other_ct))))
@@ -275,6 +279,15 @@ calderon_proportion = calc_class_proportion(our_object, our_ct_col = 'harmonized
 calderon_proportion$other_ct = as.vector(calderon_proportion$other_ct)
 calderon_proportion[calderon_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
 
+# check if all the cell types are in there 
+setdiff(c(unique(Calderon_object@meta.data$harmonized_celltypes), 'Unknown (SCN rand)'), unique(calderon_proportion$other_ct))
+# [1] "Unknown" "Unknown (SCN rand)"
+
+# add in zero unknown (SCN rand)
+zero_df = data.frame(our_ct = unique(calderon_proportion$our_ct),
+                     other_ct = 'Unknown (SCN rand)', 
+                     class_proportion = 0)
+calderon_proportion = rbind(calderon_proportion, zero_df)
 calderon_proportion$our_ct = factor(calderon_proportion$our_ct, levels=sort(as.vector(unique(calderon_proportion$our_ct))))
 calderon_proportion$other_ct = factor(calderon_proportion$other_ct, levels=sort(as.vector(unique(calderon_proportion$other_ct))))
 saveRDS(calderon_proportion, file = file.path(TARGET_dir, "calderon_proportion.rds"))
