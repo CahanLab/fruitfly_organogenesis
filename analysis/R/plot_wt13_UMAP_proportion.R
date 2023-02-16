@@ -17,20 +17,30 @@ wt_object = readRDS(file.path('results', ANALYSIS_VERSION, 'manual_annotation_wt
 wt_object@meta.data[wt_object@meta.data$batch == 'rep_3', 'batch'] = 'rep_2'
 
 withr::with_dir(TARGET_dir, {
+  # modifying the 
+  p = DimPlot(wt_object, group.by = 'manual_celltypes', label = FALSE, label.size = 5) +
+    ggtitle("Stage 13 – 16 Drosophila Embryonic Cell Type Labels") + 
+    xlim(c(-8, 12)) + 
+    theme(text = element_text(size = 18))
+  ggsave(file.path("cell_type_UMAP_Unlabelled.png"), plot = p, width = 17, height = 10)
+  
   p = DimPlot(wt_object, group.by = 'manual_celltypes', label = TRUE, label.size = 5) +
-    ggtitle("Stage 13 - 16: Celltype Labels") + 
-    xlim(c(-8, 12))
-  ggsave(file.path("cell_type_UMAP.png"), plot = p, width = 20, height = 10)
+    ggtitle("Stage 13 – 16 Drosophila Embryonic Cell Type Labels") + 
+    xlim(c(-8, 12)) + 
+    theme(text = element_text(size = 18))
+  ggsave(file.path("cell_type_UMAP.png"), plot = p, width = 17, height = 10)
   
   p = DimPlot(wt_object, group.by = 'batch', label = FALSE, label.size = 5) +
     ggtitle("Stage 13 - 16: Batch") + 
-    xlim(c(-8, 12))
-  ggsave(file.path("Batch_UMAP.png"), plot = p, width = 20, height = 10)
+    xlim(c(-8, 12)) + 
+    theme(text = element_text(size = 22), legend.text=element_text(size=22))
+  ggsave(file.path("Batch_UMAP.png"), plot = p, width = 17, height = 10)
   
   p = DimPlot(wt_object, group.by = 'seurat_clusters', label = TRUE, label.size = 8) +
     ggtitle("Stage 13 - 16: Seurat Clusters") + 
-    xlim(c(-8, 12))
-  ggsave(file.path("clusters_UMAP.png"), plot = p, width = 20, height = 10)
+    xlim(c(-8, 12)) + 
+    theme(text = element_text(size = 22), legend.text=element_text(size=22))
+  ggsave(file.path("clusters_UMAP.png"), plot = p, width = 17, height = 10)
   
 })
 
@@ -45,7 +55,7 @@ withr::with_dir(TARGET_dir, {
     geom_bar(stat="identity") + theme_bw() + coord_flip() + 
     ylab("Stage 13 - 16: Total Cell Proportion") + 
     xlab("Cell Types")
-  ggsave(filename = file.path("cell_proportion_bar.png"), plot = p, width = 14, height = 6)
+  ggsave(filename = file.path("cell_proportion_bar.png"), plot = p, width = 10, height = 6)
 })
 
 # plot out the proportion of each cell type per batch

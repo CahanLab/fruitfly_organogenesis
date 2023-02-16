@@ -43,6 +43,9 @@ source("R/plot_wt13_UMAP_proportion.R")
 # cross study comparison for late wildtype
 source("R/cross_study_comparison_wt13.R")
 
+# plot out cross study comparison for late wildtype 
+source("R/plot_cross_study_comparison_wt13.R")
+
 # perform GSEA on the data 
 source("R/wt13_GSEA.R")
 
