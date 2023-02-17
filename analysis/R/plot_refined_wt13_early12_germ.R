@@ -6,14 +6,14 @@ library(dbplyr)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_germ')
 dir.create(TARGET_dir, recursive = TRUE)
 
-rank_sum = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "rank_sum_test.csv"), row.names = 1)
+rank_sum = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "rank_sum_test.csv"), row.names = 1)
 rank_sum = rank_sum[rank_sum$logFC > 0, ]
-rank_sum[rank_sum$group == '1', ] = 'Unknown 1'
-rank_sum[rank_sum$group == '3', ] = 'Unknown 2'
-rank_sum[rank_sum$group == '5', ] = 'Early Germ Cells'
-rank_sum[rank_sum$group == '6', ] = 'Middle Germ Cells 1'
-rank_sum[rank_sum$group == '2', ] = 'Middle Germ Cells 2'
-rank_sum[rank_sum$group == '4', ] = 'Late Germ Cells 1'
+rank_sum[rank_sum$group == '1', 'group'] = 'Unknown 1'
+rank_sum[rank_sum$group == '3', 'group'] = 'Unknown 2'
+rank_sum[rank_sum$group == '5', 'group'] = 'Early Germ Cells'
+rank_sum[rank_sum$group == '6', 'group'] = 'Middle Germ Cells 1'
+rank_sum[rank_sum$group == '2', 'group'] = 'Middle Germ Cells 2'
+rank_sum[rank_sum$group == '4', 'group'] = 'Late Germ Cells 1'
 
 write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
 
@@ -162,7 +162,6 @@ GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"))
 
-# here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("proteasomal protein catabolic process (GO:0010498)", 
                "proteasomal protein catabolic process (GO:0010498)", 
                "inorganic cation transmembrane transport (GO:0098662)")
@@ -184,7 +183,6 @@ GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_2_GSEA_results.csv"))
 
-# here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("proteasomal protein catabolic process (GO:0010498)", 
                "negative regulation of cellular macromolecule biosynthetic process (GO:2000113)", 
                "female gamete generation (GO:0007292)", 
@@ -208,7 +206,6 @@ GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_1_GSEA_results.csv"))
 
-# here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
                "cytoskeleton-dependent cytokinesis (GO:0061640)", 
                "mitotic cytokinesis (GO:0000281)", 
@@ -232,7 +229,6 @@ GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv"))
 
-# here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
                "regulation of gene expression (GO:0010468)", 
                "Notch signaling pathway (GO:0007219)", 
@@ -255,7 +251,6 @@ GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_unknown_1_GSEA_results.csv"))
 
-# here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("cytoplasmic translation (GO:0002181)",
                "ribosome assembly (GO:0042255)", 
                "ribosomal small subunit biogenesis (GO:0042274)", 
@@ -278,7 +273,6 @@ GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_unknown_2_GSEA_results.csv"))
 
-# here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("positive regulation of transcription, DNA-templated (GO:0045893)",
                "Wnt signaling pathway (GO:0016055)", 
                "cell-cell adhesion via plasma-membrane adhesion molecules (GO:0098742)",
@@ -294,313 +288,4 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   ggtitle("") +
   theme_bw()
 ggsave(filename = file.path(TARGET_dir, "unknown_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
-
-#############################
-# plot out the Golgi Vesicle gene expression 
-cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "monocle3_no_batch_correct_object.rds"))
-cds = cds[, monocle3::clusters(cds) != 9] # remove the branch from the main trajectory
-
-term = 'Golgi vesicle transport (GO:0048193)'
-GSEA_results = read.csv(file.path(TARGET_dir, "sig_middle_GSEA_results.csv"), row.names = 1)
-
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
-
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-index_list = vector()
-for(gene in target_genes) { 
-  index_list = c(index_list, which(tolower(gene) == tolower(rownames(norm_exp))))
-}
-
-norm_exp = norm_exp[index_list, ]
-intersecting_genes = rownames(norm_exp)
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[intersecting_genes, ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
-sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
-png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
-
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-
-plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                     scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'vesicle transport related genes (average)')
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[3]) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
-
-# plot out the Cytoplasmic translation
-term = 'cytoplasmic translation (GO:0002181)'
-GSEA_results = read.csv(file.path(TARGET_dir, "sig_late_GSEA_results.csv"), row.names = 1)
-
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
-
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-index_list = vector()
-for(gene in target_genes) { 
-  index_list = c(index_list, which(tolower(gene) == tolower(rownames(norm_exp))))
-}
-
-norm_exp = norm_exp[index_list, ]
-intersecting_genes = rownames(norm_exp)
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[intersecting_genes, ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
-sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
-png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
-
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-
-plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                     scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'translation related genes (average)')
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[2]) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
-
-# plot out the tube size
-term = 'regulation of tube size, open tracheal system (GO:0035151)'
-GSEA_results = read.csv(file.path(TARGET_dir, "sig_middle_GSEA_results.csv"), row.names = 1)
-
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
-
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-index_list = vector()
-for(gene in target_genes) { 
-  index_list = c(index_list, which(tolower(gene) == tolower(rownames(norm_exp))))
-}
-
-norm_exp = norm_exp[index_list, ]
-intersecting_genes = rownames(norm_exp)
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[intersecting_genes, ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
-sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
-png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
-
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-
-plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                     scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'translation related genes (average)')
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[3]) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
-
-##############################################
-# this is plot out the dynamically expressed TFs 
-ATres = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", 'raw_associationTest.rds'))
-ATres = ATres[!is.na(ATres$pvalue), ]
-ATres$adj_p = p.adjust(ATres$pvalue, method = 'fdr')
-ATres = ATres[ATres$adj_p < 0.05, ]
-pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
-
-TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
-TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
-i_TFs = intersect(TF_tab$symbol, rownames(ATres))
-
-ts_TFs = intersect(pathway_list[["open tracheal system development (GO:0007424)"]], TF_tab$symbol)
-target_genes = intersect(i_TFs, ts_TFs)
-
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[target_genes, ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
-sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
-png(filename = file.path(TARGET_dir, paste0("TF_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
-
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-
-ATres = ATres[target_genes, ]
-ATres = ATres[order(ATres$meanLogFC, decreasing = TRUE), ]
-
-rank_sum_test = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", 'rank_sum_test.csv'), row.names = 1)
-rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
-rank_sum_test = rank_sum_test[rank_sum_test$logFC > 0.1, ]
-
-target_genes = target_genes[target_genes %in% rank_sum_test$feature]
-scaled_exp = scaled_exp[target_genes, ]
-plot_df = convert_line_plot(scaled_exp)
-
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-
-sub_plot_df = plot_df
-
-p<-ggplot(sub_plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  geom_line(aes(color = gene)) + theme_bw() 
-ggsave(file.path(TARGET_dir, "list_A_dynamic_gene_line_avg.png"), plot = p, width = 12, height = 5)
-
-# find the TFs sepcific to the tip cells 
-rank_sum_test = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", 'rank_sum_test.csv'), row.names = 1)
-rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
-rank_sum_test = rank_sum_test[rank_sum_test$logFC > 0.1, ]
-tip_test = rank_sum_test[rank_sum_test$group == "Branching Trachea Cells", ]
-
-TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
-TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
-i_TFs = intersect(TF_tab$symbol, tip_test$feature)
-
-# there are no specific TFs for the tip cells 
 
