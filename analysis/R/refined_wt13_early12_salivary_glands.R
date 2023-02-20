@@ -183,6 +183,9 @@ fgseaRes = data.frame(fgseaRes)
 fgseaRes = apply(fgseaRes,2,as.character)
 fgseaRes = as.data.frame(fgseaRes)
 fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
+fgseaRes$NES = as.numeric(fgseaRes$NES)
+fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
+
 write.csv(fgseaRes, file = file.path(TARGET_dir, 'late_gsea_results.csv'))
 
 sub_rank_sum_test = rank_sum_test[rank_sum_test$group == 2, ]
@@ -197,4 +200,7 @@ fgseaRes = data.frame(fgseaRes)
 fgseaRes = apply(fgseaRes,2,as.character)
 fgseaRes = as.data.frame(fgseaRes)
 fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
+fgseaRes$NES = as.numeric(fgseaRes$NES)
+fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
+
 write.csv(fgseaRes, file = file.path(TARGET_dir, 'early_gsea_results.csv'))
