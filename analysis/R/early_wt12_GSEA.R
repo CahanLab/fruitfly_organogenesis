@@ -24,7 +24,6 @@ withr::with_dir(TARGET_dir, {
       print(stringr::str_replace_all(celltype, "/", "-"))
       dir.create(stringr::str_replace_all(celltype, "/", "-"))
       markers = SeuratWrappers::RunPresto(object, ident.1 = celltype, logfc.threshold = 0, min.pct = 0.1, group.by = 'manual_celltypes') 
-      #markers <- FindMarkers(object = object, ident.1 = celltype, logfc.threshold = 0, min.pct = 0.1, group.by = 'manual_celltypes', test.use = 'wilcox')
       write.csv(markers, file = file.path(stringr::str_replace_all(celltype, "/", "-"), 'markers_genes.csv'))
       
       ranks <- markers$avg_log2FC
@@ -34,8 +33,7 @@ withr::with_dir(TARGET_dir, {
       fgseaRes <- fgsea(pathways = pathway_list, 
                         stats = ranks,
                         minSize=10,
-                        maxSize=500,
-                        nperm=1000000)
+                        maxSize=500)
       fgseaRes = data.frame(fgseaRes)
       fgseaRes <- apply(fgseaRes,2,as.character)
       

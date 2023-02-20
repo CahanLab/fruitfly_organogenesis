@@ -55,6 +55,9 @@ source("R/integrate_early_wt12.R")
 # this is to manually label wildtype 1 and wildtype 2 early integrated data 
 source("R/manual_label_early_wt12.R") 
 
+# perform GSEA on the early wildtype data 
+source("R/early_wt12_GSEA.R")
+
 # plot out statistics for for early wt12
 source("R/plot_early_wt12_statistics.R")
 
@@ -78,9 +81,6 @@ source("R/refined_wt13_early12_germ.R")
 
 # make figures for the in depth analysis of germ cells 
 source("R/plot_refined_wt13_early12_germ.R")
-
-# perform GSEA on the early wildtype data 
-source("R/early_wt12_GSEA.R")
 
 # match similarity between wild-type early samples and late samples 
 source("R/match_early_clusters_to_late_clusters.R")
