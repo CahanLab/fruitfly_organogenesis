@@ -5,7 +5,7 @@ library(ggdendroplot)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_late_statistics')
 dir.create(TARGET_dir, recursive = TRUE)
 
-object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13/manual_celltype_object3.rds"))
+object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13/manual_celltype_object4.rds"))
 object@meta.data[object@meta.data$batch == 'rep_3', 'batch'] = 'rep_2'
 
 withr::with_dir(TARGET_dir, {

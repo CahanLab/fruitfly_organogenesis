@@ -49,6 +49,9 @@ source("R/plot_cross_study_comparison_wt13.R")
 # perform GSEA on the data 
 source("R/wt13_GSEA.R")
 
+# plot out the marker genes for rare cell types 
+source("R/plot_selected_marker_genes_wt13.R")
+
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
 
@@ -88,6 +91,8 @@ source("R/match_early_clusters_to_late_clusters.R")
 # compare cell cycle cells 
 source("R/plot_compare_cell_cycle_wt13_early_12.R")
 
+# plot out the quality metrics for all 4 batches 
+source("R/")
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 
