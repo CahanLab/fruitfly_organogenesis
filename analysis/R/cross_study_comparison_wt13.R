@@ -90,6 +90,8 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
 
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 14, height = 6)
 saveRDS(total_plot_df, file = file.path(TARGET_dir, "stage_13_16_proportion.rds"))
+
+#############################################################################
 # compare the similarity between the datasets 
 calc_spearman_correlation <- function(other_data, our_data, other_col, our_col) {
   other_meta = other_data@meta.data
@@ -215,7 +217,7 @@ calc_class_proportion <- function(our_object, our_ct_col, other_ct_col) {
     other_ct = as.character(combination_df[temp_index, 'other_ct'])
     
     sub_our_meta = our_meta[our_meta[, our_ct_col] == our_ct, ]
-    other_proportion_list = table(sub_our_meta$seroka_scn) / nrow(sub_our_meta)
+    other_proportion_list = table(sub_our_meta[, other_ct_col]) / nrow(sub_our_meta)
   
     if(other_ct %in% names(other_proportion_list) == FALSE) {
       combination_df[temp_index, "class_proportion"] = 0
@@ -331,16 +333,17 @@ withr::with_dir(
 
 
 # run the python scripts in the Calderon 
-SCN_classification = read.csv(file.path(TARGET_dir, 'Calderon_comparison_scn', 'SCN_classification.csv'), row.names = 1)
-SCN_classification = SCN_classification[rownames(our_object@meta.data), ]
-our_object@meta.data$calderon_scn = SCN_classification$SCN_class
+SCN_classification = read.csv(file.path(TARGET_dir, 'Our_data_comparison_Seroka', 'SCN_classification.csv'), row.names = 1)
+SCN_classification = SCN_classification[rownames(Seroka_object@meta.data), ]
+Seroka_object@meta.data$our_ct = SCN_classification$SCN_class
+Seroka_object@meta.data$cluster_id = paste0(Seroka_object@meta.data$cell_type, "_", Seroka_object@meta.data$harmonized_celltypes)
 
-calderon_proportion = calc_class_proportion(our_object, our_ct_col = 'harmonized_celltypes', 'calderon_scn')
-calderon_proportion$other_ct = as.vector(calderon_proportion$other_ct)
-calderon_proportion[calderon_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
+seroka_reverse_proportion = calc_class_proportion(Seroka_object, our_ct_col = 'cluster_id', 'our_ct')
+seroka_reverse_proportion$other_ct = as.vector(seroka_reverse_proportion$other_ct)
+seroka_reverse_proportion[seroka_reverse_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
 
 # check if all the cell types are in there 
-setdiff(c(unique(Calderon_object@meta.data$harmonized_celltypes), 'Unknown (SCN rand)'), unique(calderon_proportion$other_ct))
+setdiff(c(unique(our_object@meta.data$manual_celltypes), 'Unknown (SCN rand)'), unique(seroka_reverse_proportion$other_ct))
 # [1] "Unknown" "Unknown (SCN rand)"
 
 # add in zero unknown (SCN rand)
@@ -348,11 +351,11 @@ zero_df = data.frame(our_ct = unique(calderon_proportion$our_ct),
                      other_ct = 'Unknown (SCN rand)', 
                      class_proportion = 0)
 calderon_proportion = rbind(calderon_proportion, zero_df)
-calderon_proportion$our_ct = factor(calderon_proportion$our_ct, levels=sort(as.vector(unique(calderon_proportion$our_ct))))
-calderon_proportion$other_ct = factor(calderon_proportion$other_ct, levels=sort(as.vector(unique(calderon_proportion$other_ct))))
+seroka_reverse_proportion$our_ct = factor(seroka_reverse_proportion$our_ct, levels=sort(as.vector(unique(seroka_reverse_proportion$our_ct))))
+seroka_reverse_proportion$other_ct = factor(seroka_reverse_proportion$other_ct, levels=sort(as.vector(unique(seroka_reverse_proportion$other_ct))))
 saveRDS(calderon_proportion, file = file.path(TARGET_dir, "calderon_proportion.rds"))
 
-p = ggplot(calderon_proportion, aes(our_ct, other_ct, fill= class_proportion)) + 
+p = ggplot(seroka_reverse_proportion, aes(our_ct, other_ct, fill= class_proportion)) + 
   geom_tile() +
   xlab("Our Cell Types") +
   ylab("Calderon et al's Cell Types") +
