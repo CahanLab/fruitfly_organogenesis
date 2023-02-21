@@ -35,11 +35,11 @@ total_plot_df[total_plot_df$data_type == 'Calderon et al, 2022', 'data_type'] = 
 total_plot_df[total_plot_df$data_type == 'Seroka et al, 2022', 'data_type'] = 'Seroka et al (stage 14-16)'
 
 p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportion, fill = data_type)) +
-  geom_bar(stat="identity", position=position_dodge()) + theme_bw() + coord_flip() + 
+  geom_bar(stat="identity", position=position_dodge(), width = 0.7) + theme_bw() + coord_flip() + 
   ylab("Total Cell Proportion") + 
   xlab("Harmonized Cell Types") + 
   ggtitle("Stage 13-16 Cell Type Proportions") +
-  theme(text = element_text(size = 18))
+  theme(text = element_text(size = 18), legend.title=element_blank())
 
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 14)
 

@@ -92,7 +92,7 @@ source("R/match_early_clusters_to_late_clusters.R")
 source("R/plot_compare_cell_cycle_wt13_early_12.R")
 
 # plot out the quality metrics for all 4 batches 
-source("R/")
+source("R/plot_quality_metrics_4_batches.R")
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 

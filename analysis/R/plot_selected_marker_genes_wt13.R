@@ -12,12 +12,11 @@ marker_gene_list[['Dorsal Vessel']] = c('tin', 'prc', 'tup', 'Him')
 marker_gene_list[['Garland Cells']] = c('CG42255', 'beta4GalNacTA', 'Amnionless', 'CG15209')
 marker_gene_list[['Esophagus']] = c('ect', 'amd', 'CG13631', 'Osi7', 'Osi14')
 marker_gene_list[['Hypopharynx']] = c('CG6118', 'bbg', 'CG10211')
-marker_gene_list[['Epipharynx']] = c('yellow-e3', 'optix', 'sprt')
-marker_gene_list[['Hindgut Muscle']] = c('wnt4', 'AbdB', 'bin', 'up')
+marker_gene_list[['Epipharynx']] = c('yellow-e3', 'Optix', 'sprt')
+marker_gene_list[['Hindgut Muscle']] = c('Wnt4', 'Abd-B', 'bin', 'up')
 marker_gene_list[['Pharyngeal Muscle']] = c('bt', 'up', 'CG5080')
-marker_gene_list[['Optic Lobe']] = c('E(Spl)M5-HLH', 'Obp99a', 'SoxN')
-marker_gene_list[['Malpighian tubules']] = c('CG31272', 'Bw', 'ZnT35C')
-
+marker_gene_list[['Optic Lobe']] = c('E(spl)m5-HLH', 'Obp99a', 'SoxN')
+marker_gene_list[['Malpighian tubules']] = c('CG31272', 'bw', 'ZnT35C')
 
 withr::with_dir(TARGET_dir, {
   for(ct in names(marker_gene_list)) {

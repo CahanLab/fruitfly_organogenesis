@@ -10,15 +10,17 @@ object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_early
 withr::with_dir(TARGET_dir, {
   p = Seurat::VlnPlot(object, features = 'nFeature_RNA', group.by = 'batch', pt.size = 0) + 
     ylab("Number of Genes Expressed") + 
-    xlab("Batch")
+    xlab("Batch") + 
+    theme(text = element_text(size = 22), legend.text=element_text(size=22))
   ggsave(filename = 'nFeatures_RNA.png', plot = p, width = 8, height = 6)
   
   p = Seurat::VlnPlot(object, features = 'log10_nCount_RNA', group.by = 'batch', pt.size = 0) + 
     ylab("log10(# of Counts)") + 
-    xlab("Batch")
+    xlab("Batch") + 
+    theme(text = element_text(size = 22), legend.text=element_text(size=22))
   ggsave(filename = 'log10_nCount_RNA.png', plot = p, width = 8, height = 6)
 })
 
 #> table(object@meta.data$batch)
 #rep_1 rep_2 
-#13207 7478 
+#13207 7378

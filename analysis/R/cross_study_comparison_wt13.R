@@ -175,6 +175,7 @@ p = ggplot(Calderon_correlation, aes(our_ct, other_ct, fill= spearman_correlatio
   ggtitle("Stage 13-16: Correlation similarity between cell types' centroids")
 ggsave(filename = file.path(TARGET_dir, 'Calderon_cell_correlation.png'), plot = p, width = 14, height = 6)
 
+###############################################
 # pySCN the Seroka 
 dir.create(file.path(TARGET_dir, 'Seroka_comparison_scn'))
 withr::with_dir(
@@ -269,6 +270,65 @@ withr::with_dir(
     Matrix::writeMM(query_exp, file.path("raw_query_exp.txt"))
   }
 )
+
+# run the python scripts in the Calderon 
+SCN_classification = read.csv(file.path(TARGET_dir, 'Calderon_comparison_scn', 'SCN_classification.csv'), row.names = 1)
+SCN_classification = SCN_classification[rownames(our_object@meta.data), ]
+our_object@meta.data$calderon_scn = SCN_classification$SCN_class
+
+calderon_proportion = calc_class_proportion(our_object, our_ct_col = 'harmonized_celltypes', 'calderon_scn')
+calderon_proportion$other_ct = as.vector(calderon_proportion$other_ct)
+calderon_proportion[calderon_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
+
+# check if all the cell types are in there 
+setdiff(c(unique(Calderon_object@meta.data$harmonized_celltypes), 'Unknown (SCN rand)'), unique(calderon_proportion$other_ct))
+# [1] "Unknown" "Unknown (SCN rand)"
+
+# add in zero unknown (SCN rand)
+zero_df = data.frame(our_ct = unique(calderon_proportion$our_ct),
+                     other_ct = 'Unknown (SCN rand)', 
+                     class_proportion = 0)
+calderon_proportion = rbind(calderon_proportion, zero_df)
+calderon_proportion$our_ct = factor(calderon_proportion$our_ct, levels=sort(as.vector(unique(calderon_proportion$our_ct))))
+calderon_proportion$other_ct = factor(calderon_proportion$other_ct, levels=sort(as.vector(unique(calderon_proportion$other_ct))))
+saveRDS(calderon_proportion, file = file.path(TARGET_dir, "calderon_proportion.rds"))
+
+p = ggplot(calderon_proportion, aes(our_ct, other_ct, fill= class_proportion)) + 
+  geom_tile() +
+  xlab("Our Cell Types") +
+  ylab("Calderon et al's Cell Types") +
+  scale_fill_viridis(option = "D", discrete=FALSE) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  ggtitle("Stage 13-16: SCN Classification Proportion (Calderon et al)")
+ggsave(filename = file.path(TARGET_dir, 'Calderon_cell_proportion.png'), plot = p, width = 14, height = 6)
+
+########################################
+# to run the reverse SCN 
+# pySCN the Calderon 
+dir.create(file.path(TARGET_dir, 'Our_data_comparison_Seroka'))
+withr::with_dir(
+  file.path(TARGET_dir, 'Our_data_comparison_Seroka'), 
+  {
+    raw_train_exp = our_object@assays$RNA@counts
+    train_st = our_object@meta.data
+
+    write(colnames(raw_train_exp), file = file.path("raw_train_colnames.txt"))
+    write(rownames(raw_train_exp), file = file.path("raw_train_rownames.txt"))
+    Matrix::writeMM(raw_train_exp, file.path("raw_train_exp.txt"))
+    
+    write.csv(train_st, file = 'raw_train_st.csv')
+  }
+)
+
+withr::with_dir(
+  file.path(TARGET_dir, 'Our_data_comparison_Seroka'), 
+  { 
+    raw_expQuery = Seroka_object@assays$RNA@counts
+    write(colnames(raw_expQuery), file = "raw_query_colnames.txt")
+    write(rownames(raw_expQuery), file = "raw_query_rownames.txt")
+    Matrix::writeMM(raw_expQuery, "raw_query_exp.txt")
+  }
+)
+
 
 # run the python scripts in the Calderon 
 SCN_classification = read.csv(file.path(TARGET_dir, 'Calderon_comparison_scn', 'SCN_classification.csv'), row.names = 1)
