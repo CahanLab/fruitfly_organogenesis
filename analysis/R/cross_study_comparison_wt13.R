@@ -305,7 +305,6 @@ ggsave(filename = file.path(TARGET_dir, 'Calderon_cell_proportion.png'), plot = 
 
 ########################################
 # to run the reverse SCN 
-# pySCN the Calderon 
 dir.create(file.path(TARGET_dir, 'Our_data_comparison_Seroka'))
 withr::with_dir(
   file.path(TARGET_dir, 'Our_data_comparison_Seroka'), 
@@ -331,30 +330,27 @@ withr::with_dir(
   }
 )
 
-
-# run the python scripts in the Calderon 
+# run the python scripts in the Our_data_comparison_Seroka
 SCN_classification = read.csv(file.path(TARGET_dir, 'Our_data_comparison_Seroka', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(Seroka_object@meta.data), ]
-Seroka_object@meta.data$our_ct = SCN_classification$SCN_class
-
 Seroka_object@meta.data = cbind(Seroka_object@meta.data, SCN_classification)
-Seroka_object@meta.data$cluster_id = paste0(Seroka_object@meta.data$harmonized_celltypes, "_", Seroka_object@meta.data$seurat_clusters)
+saveRDS(Seroka_object, file = file.path(TARGET_dir, 'reverse_seroka_SCN_object.rds'))
 
-seroka_reverse_proportion = calc_class_proportion(Seroka_object, our_ct_col = 'cluster_id', 'our_ct')
-seroka_reverse_proportion$other_ct = as.vector(seroka_reverse_proportion$other_ct)
-seroka_reverse_proportion[seroka_reverse_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
+#################
+dir.create(file.path(TARGET_dir, 'Our_data_comparison_Calderon'))
+#use the same classifier that was used to classify seroka
+withr::with_dir(
+  file.path(TARGET_dir, 'Our_data_comparison_Calderon'), 
+  { 
+    raw_expQuery = Calderon_object@assays$RNA@counts
+    write(colnames(raw_expQuery), file = "raw_query_colnames.txt")
+    write(rownames(raw_expQuery), file = "raw_query_rownames.txt")
+    Matrix::writeMM(raw_expQuery, "raw_query_exp.txt")
+  }
+)
 
-# check if all the cell types are in there 
-setdiff(c(unique(our_object@meta.data$manual_celltypes), 'Unknown (SCN rand)'), unique(seroka_reverse_proportion$other_ct))
-
-seroka_reverse_proportion$our_ct = factor(seroka_reverse_proportion$our_ct, levels=sort(as.vector(unique(seroka_reverse_proportion$our_ct))))
-seroka_reverse_proportion$other_ct = factor(seroka_reverse_proportion$other_ct, levels=sort(as.vector(unique(seroka_reverse_proportion$other_ct))))
-#saveRDS(calderon_proportion, file = file.path(TARGET_dir, "calderon_proportion.rds"))
-
-p = ggplot(seroka_reverse_proportion, aes(our_ct, other_ct, fill= class_proportion)) + 
-  geom_tile() +
-  xlab("Our Cell Types") +
-  ylab("Calderon et al's Cell Types") +
-  scale_fill_viridis(option = "D", discrete=FALSE) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
-  ggtitle("Stage 13-16: SCN Classification Proportion (Calderon et al)")
-ggsave(filename = file.path(TARGET_dir, 'Calderon_cell_proportion.png'), plot = p, width = 14, height = 6)
+# run the python scripts in the Our_data_comparison_Seroka 
+SCN_classification = read.csv(file.path(TARGET_dir, 'Our_data_comparison_Calderon', 'SCN_classification.csv'), row.names = 1)
+SCN_classification = SCN_classification[rownames(Calderon_object@meta.data), ]
+Calderon_object@meta.data = cbind(Calderon_object@meta.data, SCN_classification)
+saveRDS(Calderon_object, file = file.path(TARGET_dir, 'reverse_calderon_SCN_object.rds'))

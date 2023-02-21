@@ -43,6 +43,49 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
 
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 14)
 
+# plot the reverse SCN results 
+dir.create(file.path(TARGET_dir, 'reverse_SCN_seroka'), recursive = TRUE)
+reverse_seroka_object = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_wt13/reverse_seroka_SCN_object.rds"))
 
+withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_seroka'), {
+  start_index = grep("harmonized_celltypes", colnames(reverse_seroka_object@meta.data)) + 1
+  
+  for(scn_ct in unique(reverse_seroka_object@meta.data$SCN_class)) {
+    reverse_seroka_object@meta.data$cur_ct = NA
+    reverse_seroka_object@meta.data[reverse_seroka_object@meta.data$SCN_class == scn_ct, 'cur_ct'] = scn_ct
+    reverse_seroka_object@meta.data[reverse_seroka_object@meta.data$SCN_class != scn_ct, 'cur_ct'] = 'Other'
+    
+    color_label = RColorBrewer::brewer.pal(n = 3, name = 'Set2')
+    color_label = color_label[2:3]
+    names(color_label) = c(scn_ct, 'Other')
+    p = DimPlot(reverse_seroka_object, group.by = 'cur_ct') + 
+        scale_colour_manual(values = color_label) + 
+        ggtitle(paste0("Stage 14-16 from Seroka et al, 2022: SCN classified ", scn_ct))
+    ggsave(paste(scn_ct, "_umap.png"), width = 10, height = 8)
+    
+  }
+})
+
+# plot the reverse SCN results for Calderon data
+dir.create(file.path(TARGET_dir, 'reverse_SCN_calderon'), recursive = TRUE)
+reverse_calderon_object = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_wt13/reverse_calderon_SCN_object.rds"))
+
+withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_calderon'), {
+
+  for(scn_ct in unique(reverse_seroka_object@meta.data$SCN_class)) {
+    reverse_calderon_object@meta.data$cur_ct = NA
+    reverse_calderon_object@meta.data[reverse_calderon_object@meta.data$SCN_class == scn_ct, 'cur_ct'] = scn_ct
+    reverse_calderon_object@meta.data[reverse_calderon_object@meta.data$SCN_class != scn_ct, 'cur_ct'] = 'Other'
+    
+    color_label = RColorBrewer::brewer.pal(n = 3, name = 'Set2')
+    color_label = color_label[2:3]
+    names(color_label) = c(scn_ct, 'Other')
+    p = DimPlot(reverse_calderon_object, group.by = 'cur_ct') + 
+      scale_colour_manual(values = color_label) + 
+      ggtitle(paste0("Stage 14-16 from Calderon et al, 2022: SCN classified ", scn_ct))
+    ggsave(paste(scn_ct, "_umap.png"), width = 10, height = 8)
+    
+  }
+})
 
 
