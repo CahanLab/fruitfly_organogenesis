@@ -336,7 +336,9 @@ withr::with_dir(
 SCN_classification = read.csv(file.path(TARGET_dir, 'Our_data_comparison_Seroka', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(Seroka_object@meta.data), ]
 Seroka_object@meta.data$our_ct = SCN_classification$SCN_class
-Seroka_object@meta.data$cluster_id = paste0(Seroka_object@meta.data$cell_type, "_", Seroka_object@meta.data$harmonized_celltypes)
+
+Seroka_object@meta.data = cbind(Seroka_object@meta.data, SCN_classification)
+Seroka_object@meta.data$cluster_id = paste0(Seroka_object@meta.data$harmonized_celltypes, "_", Seroka_object@meta.data$seurat_clusters)
 
 seroka_reverse_proportion = calc_class_proportion(Seroka_object, our_ct_col = 'cluster_id', 'our_ct')
 seroka_reverse_proportion$other_ct = as.vector(seroka_reverse_proportion$other_ct)
@@ -344,16 +346,10 @@ seroka_reverse_proportion[seroka_reverse_proportion$other_ct == 'rand', 'other_c
 
 # check if all the cell types are in there 
 setdiff(c(unique(our_object@meta.data$manual_celltypes), 'Unknown (SCN rand)'), unique(seroka_reverse_proportion$other_ct))
-# [1] "Unknown" "Unknown (SCN rand)"
 
-# add in zero unknown (SCN rand)
-zero_df = data.frame(our_ct = unique(calderon_proportion$our_ct),
-                     other_ct = 'Unknown (SCN rand)', 
-                     class_proportion = 0)
-calderon_proportion = rbind(calderon_proportion, zero_df)
 seroka_reverse_proportion$our_ct = factor(seroka_reverse_proportion$our_ct, levels=sort(as.vector(unique(seroka_reverse_proportion$our_ct))))
 seroka_reverse_proportion$other_ct = factor(seroka_reverse_proportion$other_ct, levels=sort(as.vector(unique(seroka_reverse_proportion$other_ct))))
-saveRDS(calderon_proportion, file = file.path(TARGET_dir, "calderon_proportion.rds"))
+#saveRDS(calderon_proportion, file = file.path(TARGET_dir, "calderon_proportion.rds"))
 
 p = ggplot(seroka_reverse_proportion, aes(our_ct, other_ct, fill= class_proportion)) + 
   geom_tile() +
