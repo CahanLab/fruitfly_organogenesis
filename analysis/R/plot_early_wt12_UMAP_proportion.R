@@ -19,25 +19,21 @@ withr::with_dir(TARGET_dir, {
   # modifying the 
   p = DimPlot(wt_object, group.by = 'manual_celltypes', label = FALSE, label.size = 5) +
     ggtitle("Stage 10 – 12 Drosophila Embryonic Cell Type Labels") + 
-    xlim(c(-8, 12)) + 
     theme(text = element_text(size = 18))
   ggsave(file.path("cell_type_UMAP_Unlabelled.png"), plot = p, width = 17, height = 10)
   
   p = DimPlot(wt_object, group.by = 'manual_celltypes', label = TRUE, label.size = 5) +
     ggtitle("Stage 10 – 12 Drosophila Embryonic Cell Type Labels") + 
-    xlim(c(-8, 12)) + 
     theme(text = element_text(size = 18))
   ggsave(file.path("cell_type_UMAP.png"), plot = p, width = 17, height = 10)
   
   p = DimPlot(wt_object, group.by = 'batch', label = FALSE, label.size = 5) +
     ggtitle("Stage 10 - 12: Batch") + 
-    xlim(c(-8, 12)) + 
     theme(text = element_text(size = 22), legend.text=element_text(size=22))
   ggsave(file.path("Batch_UMAP.png"), plot = p, width = 17, height = 10)
   
   p = DimPlot(wt_object, group.by = 'seurat_clusters', label = TRUE, label.size = 8) +
     ggtitle("Stage 10 - 12: Seurat Clusters") + 
-    xlim(c(-8, 12)) + 
     theme(text = element_text(size = 22), legend.text=element_text(size=22))
   ggsave(file.path("clusters_UMAP.png"), plot = p, width = 17, height = 10)
   

@@ -67,6 +67,9 @@ source("R/plot_early_wt12_statistics.R")
 # plot out UMAP and proportion for for early wt12
 source("R/plot_early_wt12_UMAP_proportion.R")
 
+# cross study comparison for early wildtype
+source("R/cross_study_comparison_early_wt12.R")
+
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
 
