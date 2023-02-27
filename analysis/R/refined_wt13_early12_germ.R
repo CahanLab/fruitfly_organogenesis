@@ -148,3 +148,21 @@ withr::with_dir(file.path(TARGET_dir, 'cluster_process_GSEA'), {
   }
 })
 
+##################
+# check y chromosome genes 
+cds = readRDS(file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
+genes_chrom = read.csv("../quantification/reference_genome_info/dmel-all-r6.33.gtf", header = FALSE, sep = '\t')
+genes_chrom = genes_chrom[genes_chrom$V1 == 'Y', ]
+genes_symbol = stringr::str_split(genes_chrom$V9, ";", simplify = TRUE)
+genes_symbol = as.data.frame(genes_symbol)
+genes_symbol = stringr::str_remove_all(genes_symbol$V2, " gene_symbol ")
+y_genes = unique(genes_symbol)
+
+dir.create(file.path(TARGET_dir, 'Y_chromosome_genes'))
+
+withr::with_dir(file.path(TARGET_dir, 'Y_chromosome_genes'), {
+  for(y_gene in y_genes) {
+    plot_cells(cds, genes = y_gene, cell_size = 1)
+    ggsave(paste0(y_gene, "_exp.png"))
+  }
+})

@@ -49,6 +49,9 @@ source("R/plot_cross_study_comparison_wt13.R")
 # perform GSEA on the data 
 source("R/wt13_GSEA.R")
 
+# plot out the results for late wildtype 3 GSEA 
+source("R/plot_wt13_GSEA.R")
+
 # plot out the marker genes for rare cell types 
 source("R/plot_selected_marker_genes_wt13.R")
 
@@ -61,6 +64,9 @@ source("R/manual_label_early_wt12.R")
 # perform GSEA on the early wildtype data 
 source("R/early_wt12_GSEA.R")
 
+# plot out the results for late wildtype 3 GSEA 
+source("R/plot_early_wt12_GSEA.R")
+
 # plot out statistics for for early wt12
 source("R/plot_early_wt12_statistics.R")
 
@@ -69,6 +75,9 @@ source("R/plot_early_wt12_UMAP_proportion.R")
 
 # cross study comparison for early wildtype
 source("R/cross_study_comparison_early_wt12.R")
+
+#plot the cross study comparisons for early wild type 2
+source("R/plot_cross_study_comparison_wt12.R")
 
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")

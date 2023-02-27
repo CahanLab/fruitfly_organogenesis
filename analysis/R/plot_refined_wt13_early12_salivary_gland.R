@@ -3,6 +3,37 @@ library(ggplot2)
 library(RColorBrewer)
 library(dbplyr)
 
+
+plot_heatmap <- function(cds, target_genes, bandwidth = 3) {
+  norm_exp = monocle3::normalized_counts(cds)
+  norm_exp = as.matrix(norm_exp)
+  norm_exp = norm_exp[c(target_genes), ]
+  # this will change 
+  #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
+  pt = monocle3::pseudotime(cds)
+  pt = data.frame(pseudotime = pt)
+  plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
+  smoothed_df = data.frame()
+  for(gene in colnames(plot_df)) {
+    if(gene == 'pseudotime') {
+      next
+    }
+    else {
+      yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = bandwidth, x.points=plot_df[, 'pseudotime'])
+      if(nrow(smoothed_df) == 0) {
+        smoothed_df = data.frame('pseudotime' = yy$x)
+      }
+      smoothed_df[, gene] = yy$y
+    }
+  }
+  smoothed_df$pseudotime = NULL
+  smoothed_df = t(smoothed_df)
+  scaled_exp = t(scale(t(smoothed_df)))
+  sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
+  scaled_exp = scaled_exp[sorted_genes, ]
+  return(scaled_exp)
+}
+
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')
 dir.create(TARGET_dir, recursive = TRUE)
 
@@ -26,27 +57,31 @@ UMAP_coord[UMAP_coord$batch == 'early_rep_2', 'batch'] = 'Early rep 2'
 UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Late rep 1'
 UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Late rep 2'
 
-UMAP_coord[UMAP_coord$clusters == 2, 'clusters'] = "Earlier Salivary Gland Cells"
-UMAP_coord[UMAP_coord$clusters == 1, 'clusters'] = "Later Salivary Gland Cells"
+UMAP_coord[UMAP_coord$clusters == 2, 'clusters'] = "Early Salivary Gland Cells"
+UMAP_coord[UMAP_coord$clusters == 1, 'clusters'] = "Late Salivary Gland Cells"
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   geom_point() + 
   theme_minimal() + 
   scale_color_viridis_c(option = "plasma") + 
-  guides(fill=guide_legend(title="pseudo-time"))
+  guides(fill=guide_legend(title="pseudo-time")) + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set1')
+  scale_color_brewer(palette = 'Set1') + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   geom_point() + 
+  guides(color=guide_legend(title="")) +
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2')
-ggsave(filename = file.path(TARGET_dir, "cluster.png"), plot = p, width = 8, height = 6)
+  scale_color_brewer(palette = 'Set2') + 
+  theme(text = element_text(size = 18))
+ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
   geom_violin() +
@@ -54,14 +89,16 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   theme_minimal() +
   scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
-  xlab("batch")
+  xlab("batch") + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 # plot out the GSEA results for early  
-GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "early_gsea_results.csv"), row.names = 1)
+GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "early_gsea_results.csv"))
 GSEA_results = GSEA_results[!is.na(GSEA_results$padj), ]
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
 GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
+GSEA_results = GSEA_results[, -1]
 
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv"))
 
@@ -82,7 +119,8 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("Genesets enriched in earlier salivary gland cells") +
-  theme_bw()
+  theme_bw() + 
+  theme(text = element_text(size = 14), plot.title.position = "plot") 
 ggsave(filename = file.path(TARGET_dir, "early_SG_GSEA_results.png"), plot = p, width = 8, height = 6)
 
 # plot out the GSEA results for later  
@@ -105,7 +143,9 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("Genesets enriched in later salivary gland cells") +
-  theme_bw()
+  theme_bw() + 
+  theme(text = element_text(size = 14), plot.title.position = "plot")
+  
 ggsave(filename = file.path(TARGET_dir, "later_SG_GSEA_results.png"), plot = p, width = 8, height = 6)
 
 
@@ -263,6 +303,97 @@ p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
   geom_line(aes(color=gene)) + theme_bw() 
 ggsave(file.path(TARGET_dir, paste0(term, "_rib_dynamic_gene_line_avg.png")), plot = p, width = 10, height = 8)
 
+
+##################################################
+early_DE_genes = read.csv("results/v18/early_wt12_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
+late_DE_genes = read.csv("results/v18/wt13_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
+
+late_DE_genes = late_DE_genes[late_DE_genes$p_val_adj < 0.05 & late_DE_genes$avg_log2FC > 0, ]
+early_DE_genes = early_DE_genes[early_DE_genes$p_val_adj < 0.05 & early_DE_genes$avg_log2FC > 0, ]
+
+late_DE_genes$symbol = rownames(late_DE_genes)
+early_DE_genes$symbol = rownames(early_DE_genes)
+
+late_DE_genes$type = 'late'
+early_DE_genes$type = 'early'
+combined_DE_genes = rbind(late_DE_genes, early_DE_genes)
+combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'] = 
+  paste0(combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'], "_", "both")
+
+sub_type_rank_sum = read.csv(file.path(TARGET_dir, 'DE_genes.csv'), row.names = 1)
+sub_type_rank_sum = sub_type_rank_sum[sub_type_rank_sum$padj < 0.05, ]
+
+early_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Earlier Salivary Gland Cells', ]
+early_sum_test = early_sum_test[early_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'early', 'symbol'], ]
+
+heatmap_df = plot_heatmap(cds, early_sum_test$feature, bandwidth = 3)
+
+png(filename = file.path(TARGET_dir, paste0("early_SG_dynamic_gene_heatmap.png")), height = 2500, width = 1000, res = 200)
+pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
+dev.off()
+
+late_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Later Salivary Gland Cells', ]
+late_sum_test = late_sum_test[late_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'late', 'symbol'], ]
+
+heatmap_df = plot_heatmap(cds, late_sum_test$feature, bandwidth = 3)
+
+png(filename = file.path(TARGET_dir, paste0("late_SG_dynamic_gene_heatmap.png")), height = 1500, width = 1000, res = 200)
+pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
+dev.off()
+
+# look at TFs 
+TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
+TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
+
+early_TFs = intersect(TF_tab$symbol, early_sum_test$feature)
+late_TFs = intersect(TF_tab$symbol, late_sum_test$feature)
+
+middle_sum_test = combined_DE_genes[grep("both", combined_DE_genes$type), ]
+middle_TF = intersect(TF_tab$symbol, unique(middle_sum_test$symbol))
+
+# this is for the dotplot 
+all_TFs = c(early_TFs, middle_TF)
+meta_tab = cds@colData
+norm_data = normalized_counts(cds)
+
+diff_count = c()
+for(TF in all_TFs) {
+  early_norm = norm_data[, rownames(meta_tab[meta_tab$cell_type == 'Early Salivary Gland Cells', ])]
+  late_norm = norm_data[, rownames(meta_tab[meta_tab$cell_type == 'Late Salivary Gland Cells', ])]
+  
+  percent_early = sum(early_norm[TF, ] > 0) / ncol(early_norm)  
+  percent_late = sum(late_norm[TF, ] > 0) / ncol(late_norm) 
+  
+  diff = abs(percent_early - percent_late)
+  diff_count = c(diff_count, percent_late)
+}
+
+names(diff_count) = all_TFs
+sort(diff_count)
+
+
+plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
+  xlab("Cell Types")
+
+zmeta_tab = cds@colData
+norm_data = normalized_counts(cds)
+meta_tab$sens = norm_data['sens', ]
+meta_tab$fkh = norm_data['fkh', ]
+meta_tab$CrebA = norm_data['CrebA', ]
+meta_tab$sage = norm_data['sage', ]
+meta_tab$toe = norm_data['toe', ]
+meta_tab$eyg = norm_data['eyg', ]
+meta_tab$trh = norm_data['trh', ]
+meta_tab$rib = norm_data['rib', ]
+
+meta_tab = as.data.frame(meta_tab)
+p <- ggplot(meta_tab, aes(x=cell_type, y=rib)) + 
+  geom_violin()
+
+heatmap_df = plot_heatmap(cds, early_TFs, bandwidth = 3)
+png(filename = file.path(TARGET_dir, paste0("early_TF_SG_dynamic_gene_heatmap.png")), height = 500, width = 1000, res = 200)
+pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
+dev.off()
 
 ##################################################
 
