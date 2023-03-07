@@ -55,6 +55,9 @@ source("R/plot_wt13_GSEA.R")
 # plot out the marker genes for rare cell types 
 source("R/plot_selected_marker_genes_wt13.R")
 
+# plot out all the marker genes for the cell types 
+source("R/plot_all_marker_genes_wt13.R")
+
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
 

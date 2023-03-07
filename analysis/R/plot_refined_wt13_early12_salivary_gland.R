@@ -352,7 +352,11 @@ middle_sum_test = combined_DE_genes[grep("both", combined_DE_genes$type), ]
 middle_TF = intersect(TF_tab$symbol, unique(middle_sum_test$symbol))
 
 # this is for the dotplot 
-all_TFs = c(early_TFs, middle_TF)
+all_TFs = c(early_TFs, middle_TF, late_TFs)
+cds@colData$cell_type = NA
+cds@colData[clusters(cds) == 2, 'cell_type'] = "Early Salivary Gland Cells"
+cds@colData[clusters(cds) == 1, 'cell_type'] = "Late Salivary Gland Cells"
+  
 meta_tab = cds@colData
 norm_data = normalized_counts(cds)
 
@@ -369,12 +373,13 @@ for(TF in all_TFs) {
 }
 
 names(diff_count) = all_TFs
-sort(diff_count)
+sort(diff_count) 
 
 
-plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
-  xlab("Cell Types")
+p = plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
+  xlab("Cell Types") + coord_flip()
 
+ggsave(filename = file.path(TARGET_dir, 'dynamic_TF.png'), plot = p, width = 10, height = 5)
 zmeta_tab = cds@colData
 norm_data = normalized_counts(cds)
 meta_tab$sens = norm_data['sens', ]
