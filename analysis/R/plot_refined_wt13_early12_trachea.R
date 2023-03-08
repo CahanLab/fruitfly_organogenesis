@@ -19,10 +19,10 @@ UMAP_coord$clusters = as.vector(monocle3::clusters(cds))
 UMAP_coord$pseudotime = as.vector(monocle3::pseudotime(cds))
 UMAP_coord$batch = as.vector(cds@colData$batch)
 
-UMAP_coord[UMAP_coord$batch == 'early_rep_1', 'batch'] = 'Early rep 1'
-UMAP_coord[UMAP_coord$batch == 'early_rep_2', 'batch'] = 'Early rep 2'
-UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Late rep 1'
-UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Late rep 2'
+UMAP_coord[UMAP_coord$batch == 'early_rep_1', 'batch'] = 'Stage 10-12 rep 1'
+UMAP_coord[UMAP_coord$batch == 'early_rep_2', 'batch'] = 'Stage 10-12 rep 2'
+UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Stage 13-16 rep 1'
+UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Stage 13-16 rep 2'
 
 UMAP_coord$cell_type = cds@colData$cell_type
 UMAP_coord[UMAP_coord$cell_type == 'Branching Trachea Cells', 'cell_type'] = 'Tip Cells'
@@ -31,19 +31,22 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   geom_point() + 
   theme_minimal() + 
   scale_color_viridis_c(option = "plasma") + 
-  guides(fill=guide_legend(title="pseudo-time"))
+  guides(fill=guide_legend(title="pseudo-time")) + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set1')
+  scale_color_brewer(palette = 'Set1') + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set3')
+  scale_color_brewer(palette = 'Set3') + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "cluster.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
@@ -52,19 +55,19 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   theme_minimal() +
   scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
-  xlab("batch")
+  xlab("batch") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
   guides(color=guide_legend(title="")) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2', breaks=c('Early Trachea Cells', 'Middle Trachea Cells', 'Tip Cells', 'Late Trachea Cells'))
+  scale_color_brewer(palette = 'Set2', breaks=c('Early Trachea Cells', 'Middle Trachea Cells', 'Tip Cells', 'Late Trachea Cells')) + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 8, height = 6)
 
 norm_exp = monocle3::normalized_counts(cds)
-
-
 
 UMAP_coord$trh = norm_exp['trh', ]
 p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -trh), y=trh, fill = cell_type)) + 
@@ -74,7 +77,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -trh), y=trh, fill = cell_type))
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("trh normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_trh.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$Osi6 = norm_exp['Osi6', ]
@@ -85,7 +89,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi6), y=Osi6, fill = cell_type
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("Osi6 normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_Osi6.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$Osi17 = norm_exp['Osi17', ]
@@ -96,7 +101,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi17), y=Osi17, fill = cell_ty
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("Osi17 normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_Osi6.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$btl = norm_exp['btl', ]
@@ -107,7 +113,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -btl), y=btl, fill = cell_type))
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("btl normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_btl.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$Mipp1 = norm_exp['Mipp1', ]
@@ -118,7 +125,9 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Mipp1), y=Mipp1, fill = cell_ty
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("Mipp1 normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
 ggsave(filename = file.path(TARGET_dir, "violin_Mipp1.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$bnl = norm_exp['bnl', ]
@@ -129,7 +138,9 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -bnl), y=bnl, fill = cell_type))
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("bnl normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
 ggsave(filename = file.path(TARGET_dir, "violin_bnl.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$pnt = norm_exp['pnt', ]
@@ -140,7 +151,9 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -pnt), y=pnt, fill = cell_type))
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("pnt normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
 ggsave(filename = file.path(TARGET_dir, "violin_pnt.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$sty = norm_exp['sty', ]
@@ -151,7 +164,9 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -sty), y=sty, fill = cell_type))
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("sty normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
 ggsave(filename = file.path(TARGET_dir, "violin_sty.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$shg = norm_exp['shg', ]
@@ -162,7 +177,9 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -shg), y=shg, fill = cell_type))
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("shg normalized expression") + 
-  xlab("cell type")
+  xlab("cell type") + 
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
 ggsave(filename = file.path(TARGET_dir, "violin_shg.png"), plot = p, width = 8, height = 6)
 
 ###############################
@@ -176,19 +193,31 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_branching_GSEA_results
 focus_gsea = c("cell morphogenesis involved in differentiation (GO:0000904)", 
                "cell-cell adhesion mediated by cadherin (GO:0044331)", 
                "calcium-dependent cell-cell adhesion via plasma membrane cell adhesion molecules (GO:0016339)", 
-               "negative regulation of cell communication (GO:0010648)", 
+               "positive regulation of intracellular signal transduction (GO:1902533)", 
                "apical junction assembly (GO:0043297)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
+sub_GSEA_results[sub_GSEA_results$pathway == "calcium-dependent cell-cell adhesion via plasma membrane cell adhesion molecules (GO:0016339)", 'pathway'] = 'calcium-dependent cell-cell adhesion via plasma membrane \n cell adhesion molecules (GO:0016339)'
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
   geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[4]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
-  theme_bw()
+  theme_bw() + 
+  theme(text = element_text(size = 18))
 ggsave(filename = file.path(TARGET_dir, "Tip_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+
+# plot out the genes in dotplot 
+term = 'positive regulation of intracellular signal transduction (GO:1902533)'
+target_genes = sub_GSEA_results[sub_GSEA_results$pathway == term, 'leadingEdge']
+target_genes = eval(parse(text = target_genes))
+
+# dot plot 
+p = plot_genes_by_group(cds, markers = target_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
+  xlab("Cell Types") + coord_flip()
+ggsave(filename = file.path(TARGET_dir, 'intracellular_signal_transduction.png'), plot = p, width = 10, height = 5)
 
 # plot out the tracheal early cells 
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Early Trachea Cells_gsea_results.csv"), row.names = 1)
@@ -210,7 +239,9 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
-  theme_bw()
+  theme_bw() + 
+  theme(text = element_text(size = 18))
+
 ggsave(filename = file.path(TARGET_dir, "Early_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
 # plot out the tracheal middle cells 
@@ -235,7 +266,9 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
-  theme_bw()
+  theme_bw() + 
+  theme(text = element_text(size = 18))
+
 ggsave(filename = file.path(TARGET_dir, "Middle_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
 # plot out the tracheal Late cells 
@@ -253,7 +286,9 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   xlab("GO Biological Processes") + 
   ylab("-log10 adjusted p-value") + 
   ggtitle("") +
-  theme_bw()
+  theme_bw() +   
+  theme(text = element_text(size = 18))
+
 ggsave(filename = file.path(TARGET_dir, "Late_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
 

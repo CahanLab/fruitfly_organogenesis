@@ -52,10 +52,10 @@ UMAP_coord$clusters = as.vector(monocle3::clusters(cds))
 UMAP_coord$pseudotime = as.vector(monocle3::pseudotime(cds))
 UMAP_coord$batch = as.vector(cds@colData$batch)
 
-UMAP_coord[UMAP_coord$batch == 'early_rep_1', 'batch'] = 'Early rep 1'
-UMAP_coord[UMAP_coord$batch == 'early_rep_2', 'batch'] = 'Early rep 2'
-UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Late rep 1'
-UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Late rep 2'
+UMAP_coord[UMAP_coord$batch == 'early_rep_1', 'batch'] = 'Stage 10-12 rep 1'
+UMAP_coord[UMAP_coord$batch == 'early_rep_2', 'batch'] = 'Stage 10-12 rep 2'
+UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Stage 13-16 rep 1'
+UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Stage 13-16 rep 2'
 
 UMAP_coord[UMAP_coord$clusters == 2, 'clusters'] = "Early Salivary Gland Cells"
 UMAP_coord[UMAP_coord$clusters == 1, 'clusters'] = "Late Salivary Gland Cells"
@@ -90,7 +90,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
   xlab("batch") + 
-  theme(text = element_text(size = 18))
+  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 # plot out the GSEA results for early  
@@ -375,7 +375,7 @@ for(TF in all_TFs) {
 names(diff_count) = all_TFs
 sort(diff_count) 
 
-
+# dot plot
 p = plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + coord_flip()
 

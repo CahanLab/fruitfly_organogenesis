@@ -77,6 +77,7 @@ source("R/plot_early_wt12_statistics.R")
 source("R/plot_early_wt12_UMAP_proportion.R")
 
 # cross study comparison for early wildtype
+# will need to run this manually because you would have to run some python scripts 
 source("R/cross_study_comparison_early_wt12.R")
 
 #plot the cross study comparisons for early wild type 2
