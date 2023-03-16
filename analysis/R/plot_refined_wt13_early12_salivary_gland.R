@@ -4,36 +4,7 @@ library(RColorBrewer)
 library(dbplyr)
 
 
-plot_heatmap <- function(cds, target_genes, bandwidth = 3) {
-  norm_exp = monocle3::normalized_counts(cds)
-  norm_exp = as.matrix(norm_exp)
-  norm_exp = norm_exp[c(target_genes), ]
-  # this will change 
-  #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-  pt = monocle3::pseudotime(cds)
-  pt = data.frame(pseudotime = pt)
-  plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-  smoothed_df = data.frame()
-  for(gene in colnames(plot_df)) {
-    if(gene == 'pseudotime') {
-      next
-    }
-    else {
-      yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = bandwidth, x.points=plot_df[, 'pseudotime'])
-      if(nrow(smoothed_df) == 0) {
-        smoothed_df = data.frame('pseudotime' = yy$x)
-      }
-      smoothed_df[, gene] = yy$y
-    }
-  }
-  smoothed_df$pseudotime = NULL
-  smoothed_df = t(smoothed_df)
-  scaled_exp = t(scale(t(smoothed_df)))
-  sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-  scaled_exp = scaled_exp[sorted_genes, ]
-  return(scaled_exp)
-}
-
+##### Plotting UMAPS and violin plots ######
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')
 dir.create(TARGET_dir, recursive = TRUE)
 
@@ -93,6 +64,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   theme(text = element_text(size = 24), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = margin(1,1,1.5,1.2, "cm"))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
+###### plotting out GSEA results in bar plots ######
 # plot out the GSEA results for early  
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "early_gsea_results.csv"))
 GSEA_results = GSEA_results[!is.na(GSEA_results$padj), ]
@@ -151,7 +123,38 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
 ggsave(filename = file.path(TARGET_dir, "later_SG_GSEA_results.png"), plot = p, width = 10, height = 6)
 
 
-#############################
+##### plotting function for the heatmap #####
+plot_heatmap <- function(cds, target_genes, bandwidth = 3) {
+  norm_exp = monocle3::normalized_counts(cds)
+  norm_exp = as.matrix(norm_exp)
+  norm_exp = norm_exp[c(target_genes), ]
+  # this will change 
+  #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
+  pt = monocle3::pseudotime(cds)
+  pt = data.frame(pseudotime = pt)
+  plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
+  smoothed_df = data.frame()
+  for(gene in colnames(plot_df)) {
+    if(gene == 'pseudotime') {
+      next
+    }
+    else {
+      yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = bandwidth, x.points=plot_df[, 'pseudotime'])
+      if(nrow(smoothed_df) == 0) {
+        smoothed_df = data.frame('pseudotime' = yy$x)
+      }
+      smoothed_df[, gene] = yy$y
+    }
+  }
+  smoothed_df$pseudotime = NULL
+  smoothed_df = t(smoothed_df)
+  scaled_exp = t(scale(t(smoothed_df)))
+  sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
+  scaled_exp = scaled_exp[sorted_genes, ]
+  return(scaled_exp)
+}
+
+###### plotting out dynamic gene heatmap ######
 # plot out the Golgi Vesicle gene expression 
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
 term = 'Golgi vesicle transport (GO:0048193)'
