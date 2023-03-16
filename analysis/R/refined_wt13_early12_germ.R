@@ -143,7 +143,7 @@ withr::with_dir(file.path(TARGET_dir, 'cluster_process_GSEA'), {
     fgseaRes = fgseaRes[!is.na(fgseaRes$padj), ]
     #fgseaRes = fgseaRes[fgseaRes$pval < 0.05, ]
     fgseaRes$NES = as.numeric(fgseaRes$NES)
-    fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
+    #fgseaRes = fgseaRes[fgseaRes$NES > 0, ]
     write.csv(fgseaRes, file = file.path(paste0(ct, '_gsea_results.csv')))
   }
 })
@@ -166,3 +166,7 @@ withr::with_dir(file.path(TARGET_dir, 'Y_chromosome_genes'), {
     ggsave(paste0(y_gene, "_exp.png"))
   }
 })
+
+##### Let's look at some of the things for #####
+cds = readRDS(file.path(TARGET_dir, "monocle3_no_batch_correct_object.rds"))
+

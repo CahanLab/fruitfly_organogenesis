@@ -11,7 +11,7 @@ p = ggplot(calderon_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
   geom_tile() +
   xlab("Stage 13-16 Embryonic Cell Types") +
   ylab("SCN Cell Types from Calderon et al (stage 14-16)") +
-  scale_fill_viridis(option = "D", discrete=FALSE) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_viridis(option = "D", discrete=FALSE, limits=c(0,1)) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
   guides(fill=guide_legend(title="Percent Classified")) +
   theme(text = element_text(size = 18)) +
   ggtitle("Stage 13-16: SCN Classification Proportion using cell types from Calderon et al")
@@ -22,10 +22,10 @@ p = ggplot(seroka_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
   geom_tile() +
   xlab("Stage 13-16 Embryonic Cell Types") +
   ylab("SCN Cell Types from Seroka et al (stage 14-16)") +
-  scale_fill_viridis(option = "D", discrete=FALSE) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_viridis(option = "D", discrete=FALSE, limits=c(0,1)) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
   guides(fill=guide_legend(title="Percent Classified")) +
   theme(text = element_text(size = 18)) +
-  ggtitle("Stage 13-16: SCN Classification Proportion using cell types from Seroka et al")
+  ggtitle("Stage 13-16: SCN Classification Proportion using cell types from Seroka et al") 
 ggsave(filename = file.path(TARGET_dir, 'Seroka_SCN_proportion.png'), plot = p, width = 14, height = 10)
 
 # this is to plot out cell type proportion 

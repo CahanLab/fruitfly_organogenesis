@@ -10,7 +10,9 @@ object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_early
 marker_gene_list = list()
 marker_gene_list[['Crystal Cells']] = c('PPO1', 'PPO2', 'CG17109')
 marker_gene_list[['Malpighian tubules']] = c('CG3699', 'Fst')
-marker_gene_list[['Apodemes']] = c('CG7296', 'TwdlM', 'TwdlB', 'CG7299')
+marker_gene_list[['Apodemes']] = c('CG7296', 'TwdlM', 'TwdlB', 'CG7299', 'TwdlL')
+marker_gene_list[['Hindgut']] = c('otp', 'CG17780', 'CG13082')
+marker_gene_list[['Salivary Gland']] = c('sano', 'pip', 'CG9005', 'PH4alphaSG2')
 
 withr::with_dir(TARGET_dir, {
   for(ct in names(marker_gene_list)) {

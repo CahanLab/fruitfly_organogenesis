@@ -65,14 +65,14 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   theme_minimal() + 
   scale_color_viridis_c(option = "plasma") + 
   guides(fill=guide_legend(title="pseudo-time")) + 
-  theme(text = element_text(size = 18))
+  theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
   scale_color_brewer(palette = 'Set1') + 
-  theme(text = element_text(size = 18))
+  theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
@@ -80,8 +80,8 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   guides(color=guide_legend(title="")) +
   theme_minimal() + 
   scale_color_brewer(palette = 'Set2') + 
-  theme(text = element_text(size = 18))
-ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 8, height = 6)
+  theme(text = element_text(size = 24))
+ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 10, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
   geom_violin() +
@@ -90,7 +90,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
   xlab("batch") + 
-  theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(text = element_text(size = 24), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = margin(1,1,1.5,1.2, "cm"))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 # plot out the GSEA results for early  
@@ -113,15 +113,16 @@ focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
+sub_GSEA_results$pathway = stringr::str_replace_all(sub_GSEA_results$pathway, "\\(", "\n\\(\\")
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
   geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + coord_flip() + 
   xlab("GO Biological Processes") + 
-  ylab("-log10 adjusted p-value") + 
-  ggtitle("Genesets enriched in earlier salivary gland cells") +
+  ylab("-log10(adj p-value)") + 
+  ggtitle("") +
   theme_bw() + 
-  theme(text = element_text(size = 14), plot.title.position = "plot") 
-ggsave(filename = file.path(TARGET_dir, "early_SG_GSEA_results.png"), plot = p, width = 8, height = 6)
+  theme(text = element_text(size = 24), plot.title.position = "plot") 
+ggsave(filename = file.path(TARGET_dir, "early_SG_GSEA_results.png"), plot = p, width = 10, height = 6)
 
 # plot out the GSEA results for later  
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "late_gsea_results.csv"), row.names = 1)
@@ -137,16 +138,17 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"
 GSEA_results = GSEA_results[order(GSEA_results$padj), ]
 sub_GSEA_results = GSEA_results[1:5, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
+sub_GSEA_results$pathway = stringr::str_replace_all(sub_GSEA_results$pathway, "\\(", "\n\\(\\")
 
 p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
   geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[2]) + coord_flip() + 
   xlab("GO Biological Processes") + 
-  ylab("-log10 adjusted p-value") + 
-  ggtitle("Genesets enriched in later salivary gland cells") +
+  ylab("-log10(adj p-value)") + 
+  ggtitle("") +
   theme_bw() + 
-  theme(text = element_text(size = 14), plot.title.position = "plot")
-  
-ggsave(filename = file.path(TARGET_dir, "later_SG_GSEA_results.png"), plot = p, width = 8, height = 6)
+  theme(text = element_text(size = 24), plot.title.position = "plot") 
+
+ggsave(filename = file.path(TARGET_dir, "later_SG_GSEA_results.png"), plot = p, width = 10, height = 6)
 
 
 #############################
