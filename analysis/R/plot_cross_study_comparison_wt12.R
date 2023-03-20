@@ -13,7 +13,7 @@ p = ggplot(calderon_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
   ylab("SCN Cell Types from Calderon et al (stage 10-12)") +
   scale_fill_viridis(option = "D", discrete=FALSE, limits=c(0,1)) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
   guides(fill=guide_legend(title="Percent Classified")) +
-  theme(text = element_text(size = 18)) +
+  theme(text = element_text(size = 22), plot.title.position = "plot") +
   ggtitle("Stage 10-12: SCN Classification Proportion using cell types from Calderon et al")
 ggsave(filename = file.path(TARGET_dir, 'Calderon_SCN_proportion.png'), plot = p, width = 14, height = 10)
 
@@ -24,7 +24,7 @@ p = ggplot(seroka_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
   ylab("SCN Cell Types from Seroka et al (stage 12)") +
   scale_fill_viridis(option = "D", discrete=FALSE, limits=c(0,1)) + scale_x_discrete(guide = guide_axis(angle = 45)) + 
   guides(fill=guide_legend(title="Percent Classified")) +
-  theme(text = element_text(size = 18)) +
+  theme(text = element_text(size = 22), plot.title.position = "plot") +
   ggtitle("Stage 10-12: SCN Classification Proportion using cell types from Seroka et al")
 ggsave(filename = file.path(TARGET_dir, 'Seroka_SCN_proportion.png'), plot = p, width = 14, height = 10)
 
@@ -39,7 +39,7 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
   ylab("Total Cell Proportion") + 
   xlab("Harmonized Cell Types") + 
   ggtitle("Stage 10-12 Cell Type Proportions") +
-  theme(text = element_text(size = 18), legend.title=element_blank())
+  theme(text = element_text(size = 24), legend.title=element_blank(), plot.title.position = "plot")
 
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 14)
 
@@ -60,7 +60,9 @@ withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_seroka'), {
     names(color_label) = c(scn_ct, 'Other')
     p = DimPlot(reverse_seroka_object, group.by = 'cur_ct') + 
         scale_colour_manual(values = color_label) + 
-        ggtitle(paste0("Stage 12 from Seroka et al, 2022: SCN classified ", scn_ct))
+        ggtitle(paste0("Stage 12 from Seroka et al, 2022: SCN classified ", scn_ct)) +   
+        theme(text = element_text(size = 18), plot.title.position = "plot")
+
     ggsave(paste(scn_ct, "_umap.png"), width = 10, height = 8)
     
   }
@@ -82,7 +84,8 @@ withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_calderon'), {
     names(color_label) = c(scn_ct, 'Other')
     p = DimPlot(reverse_calderon_object, group.by = 'cur_ct') + 
       scale_colour_manual(values = color_label) + 
-      ggtitle(paste0("Stage 10-12 from Calderon et al, 2022: SCN classified ", scn_ct))
+      ggtitle(paste0("Stage 10-12 from Calderon et al, 2022: SCN classified ", scn_ct)) + 
+      theme(text = element_text(size = 18), plot.title.position = "plot") 
     ggsave(paste(scn_ct, "_umap.png"), width = 10, height = 8)
     
   }
