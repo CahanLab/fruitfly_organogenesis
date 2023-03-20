@@ -487,6 +487,7 @@ cds = cds[, monocle3::clusters(cds) != 9] # remove the branch from the main traj
 GSEA_results = read.csv(file.path(TARGET_dir, "sig_middle_GSEA_results.csv"), row.names = 1)
 
 term = 'regulation of tube size, open tracheal system (GO:0035151)'
+
 target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
 target_genes = eval(parse(text = target_genes))
 norm_exp_1 = plot_heatmap(cds, target_genes)
@@ -509,3 +510,9 @@ norm_exp_1 = plot_heatmap(cds, target_genes)
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1300, res = 200)
 pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = term)
 dev.off()
+
+##### plot out the transcription factors #####
+
+
+
+

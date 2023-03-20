@@ -2,7 +2,7 @@ library(monocle3)
 library(ggplot2)
 library(RColorBrewer)
 library(dbplyr)
-
+library(pheatmap)
 
 ##### Plotting UMAPS and violin plots ######
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')
@@ -309,7 +309,7 @@ p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
 ggsave(file.path(TARGET_dir, paste0(term, "_rib_dynamic_gene_line_avg.png")), plot = p, width = 10, height = 8)
 
 
-##################################################
+##### look at salivary gland specific genes #####
 early_DE_genes = read.csv("results/v18/early_wt12_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
 late_DE_genes = read.csv("results/v18/wt13_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
 
@@ -331,6 +331,7 @@ sub_type_rank_sum = sub_type_rank_sum[sub_type_rank_sum$padj < 0.05, ]
 early_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Earlier Salivary Gland Cells', ]
 early_sum_test = early_sum_test[early_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'early', 'symbol'], ]
 
+##### plot out the salivary gland specific genes in dynamic heatmap #####
 heatmap_df = plot_heatmap(cds, early_sum_test$feature, bandwidth = 3)
 
 png(filename = file.path(TARGET_dir, paste0("early_SG_dynamic_gene_heatmap.png")), height = 2500, width = 1000, res = 200)
@@ -346,6 +347,7 @@ png(filename = file.path(TARGET_dir, paste0("late_SG_dynamic_gene_heatmap.png"))
 pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
+##### Plotting out the TFs #####
 # look at TFs 
 TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
 TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
@@ -382,9 +384,14 @@ sort(diff_count)
 
 # dot plot
 p = plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
-  xlab("Cell Types") + coord_flip()
+  xlab("Cell Types") + 
+  coord_flip() + 
+  scale_x_discrete(limits = c('Late Salivary Gland Cells', 'Early Salivary Gland Cells')) + 
+  theme(text = element_text(size = 24))
 
-ggsave(filename = file.path(TARGET_dir, 'dynamic_TF.png'), plot = p, width = 10, height = 5)
+ggsave(filename = file.path(TARGET_dir, 'dynamic_TF.png'), plot = p, width = 15, height = 4.5)
+
+##### plot out the dynamic heatmaps for the TFs#####
 zmeta_tab = cds@colData
 norm_data = normalized_counts(cds)
 meta_tab$sens = norm_data['sens', ]
@@ -404,106 +411,4 @@ heatmap_df = plot_heatmap(cds, early_TFs, bandwidth = 3)
 png(filename = file.path(TARGET_dir, paste0("early_TF_SG_dynamic_gene_heatmap.png")), height = 500, width = 1000, res = 200)
 pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
-
-##################################################
-
-# look at TFs specific 
-early_rank_sum = read.csv("results/v18/early_wt12_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
-late_rank_sum = read.csv("results/v18/wt13_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
-early_rank_sum = early_rank_sum[early_rank_sum$p_val_adj < 0.05 & early_rank_sum$avg_log2FC > 0, ]
-late_rank_sum = late_rank_sum[late_rank_sum$p_val_adj < 0.05 & late_rank_sum$avg_log2FC > 0, ]
-
-TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
-TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
-all_genes = unique(c(rownames(late_rank_sum), rownames(early_rank_sum)))
-i_TFs = intersect(TF_tab$symbol, all_genes) # TFs that are specific for salivary glands based on DE genes 
-
-pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
-sg_TFs = intersect(pathway_list[["salivary gland development (GO:0007431)"]], TF_tab$symbol)
-target_genes = intersect(i_TFs, sg_TFs) # TFs that are previously known to be 
-
-early_object = readRDS("results/v18/manual_annotation_early_wt12/manual_celltype_object1.rds")
-
-# plot out the violin plot for all the TFs 
-dir.create(file.path(TARGET_dir, "early_TF"))
-withr::with_dir("", {
-  VlnPlot(early_object, features = 'SoxN', group.by = 'manual_celltypes', pt.size = 0)
-})
-
-
-###############################################
-# this is plot out the dynamically expressed TFs in salivary gland development
-ATres = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", 'raw_associationTest.rds'))
-ATres = ATres[!is.na(ATres$pvalue), ]
-ATres$adj_p = p.adjust(ATres$pvalue, method = 'fdr')
-ATres = ATres[ATres$adj_p < 0.05, ]
-pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
-
-TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
-TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
-i_TFs = intersect(TF_tab$symbol, rownames(ATres))
-
-sg_TFs = intersect(pathway_list[["salivary gland development (GO:0007431)"]], TF_tab$symbol)
-target_genes = intersect(i_TFs, sg_TFs)
-
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[target_genes, ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
-sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
-scaled_exp = scaled_exp[sorted_genes, ]
-png(filename = file.path(TARGET_dir, paste0("SG_TF_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(scaled_exp[sorted_genes, ], cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
-
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-
-plot_df = convert_line_plot(scaled_exp)
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-rank_sum_test = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", 'rank_sum_test.csv'), row.names = 1)
-rank_sum_test = rank_sum_test[rank_sum_test$padj < 0.05, ]
-rank_sum_test = rank_sum_test[rank_sum_test$group == 1, ]
-rank_sum_test = rank_sum_test[rank_sum_test$feature %in% plot_df$gene, ]
-rank_sum_test = rank_sum_test[order(abs(rank_sum_test$logFC), decreasing = TRUE), ]
-
-# interesting genes 
-list_A = as.vector(rank_sum_test$feature[1:5])
-sub_plot_df = plot_df[plot_df$gene %in% list_A, ]
-p<-ggplot(sub_plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  geom_line(aes(color = gene)) + theme_bw() 
-ggsave(file.path(TARGET_dir, "list_A_dynamic_gene_line_avg.png"), plot = p, width = 8, height = 5)
 
