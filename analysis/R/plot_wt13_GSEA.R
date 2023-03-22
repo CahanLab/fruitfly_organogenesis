@@ -69,6 +69,7 @@ gsea_results$GeneRatio = gsea_results$num_leadingEdges / gsea_results$size
 gsea_results$NES = as.numeric(gsea_results$NES)
 gsea_results = gsea_results[order(gsea_results$NES, decreasing = TRUE), ]
 gsea_results = gsea_results[1:10, ]
+gsea_results[gsea_results$pathway == 'proteasome-mediated ubiquitin-dependent protein catabolic process (GO:0043161)', 'pathway'] = 'proteasome-mediated ubiquitin-dependent \n protein catabolic process (GO:0043161)'
 gsea_results$pathway = stringr::str_replace_all(gsea_results$pathway, "\\(", "\n\\(\\")
 
 p = ggplot(gsea_results, aes(x = reorder(pathway, -padj), y = NES)) + 
@@ -82,4 +83,4 @@ p = ggplot(gsea_results, aes(x = reorder(pathway, -padj), y = NES)) +
   coord_flip() + 
   theme(text = element_text(size = 24), plot.title.position = "plot")
 
-ggsave(filename = file.path(TARGET_dir, "stage13-16_gc.png"), width = 12, height = 10)
+ggsave(filename = file.path(TARGET_dir, "stage13-16_gc.png"), width = 16, height = 10)

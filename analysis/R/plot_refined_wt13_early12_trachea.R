@@ -61,7 +61,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
   xlab("batch") + 
-  theme(text = element_text(size = 24), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = margin(1,1,1.5,1.2, "cm"))
+  theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
@@ -492,7 +492,7 @@ target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
 target_genes = eval(parse(text = target_genes))
 norm_exp_1 = plot_heatmap(cds, target_genes)
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1500, res = 200)
-pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = term)
+pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = stringr::str_split(term, ' \\(')[[1]][1], fontsize = 14)
 dev.off()
 
 term = 'Golgi vesicle transport (GO:0048193)'
@@ -500,7 +500,7 @@ target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
 target_genes = eval(parse(text = target_genes))
 norm_exp_1 = plot_heatmap(cds, target_genes)
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
-pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = term)
+pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = stringr::str_split(term, ' \\(')[[1]][1], fontsize = 14)
 dev.off()
 
 term = 'chitin-based cuticle development (GO:0040003)'
@@ -508,11 +508,37 @@ target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
 target_genes = eval(parse(text = target_genes))
 norm_exp_1 = plot_heatmap(cds, target_genes)
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1300, res = 200)
-pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = term)
+pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = stringr::str_split(term, ' \\(')[[1]][1], fontsize = 14)
 dev.off()
 
+
 ##### plot out the transcription factors #####
+cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "monocle3_no_batch_correct_object.rds"))
+early_DE_genes = read.csv("results/v18/early_wt12_enrichment/Trachea/markers_genes.csv", row.names = 1)
+late_DE_genes = read.csv("results/v18/wt13_enrichment/Trachea/markers_genes.csv", row.names = 1)
+late_DE_genes = late_DE_genes[late_DE_genes$p_val_adj < 0.05 & late_DE_genes$avg_log2FC > 0, ]
+early_DE_genes = early_DE_genes[early_DE_genes$p_val_adj < 0.05 & early_DE_genes$avg_log2FC > 0, ]
 
+late_DE_genes$symbol = rownames(late_DE_genes)
+early_DE_genes$symbol = rownames(early_DE_genes)
 
+late_DE_genes$type = 'late'
+early_DE_genes$type = 'early'
+combined_DE_genes = rbind(late_DE_genes, early_DE_genes)
+combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'] = 
+  paste0(combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'], "_", "both")
+
+TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
+TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
+
+i_TFs = intersect(TF_tab$symbol, combined_DE_genes$symbol)
+
+combined_DE_genes = combined_DE_genes[combined_DE_genes$symbol %in% i_TFs, ]
+
+p = plot_genes_by_group(cds, markers = i_TFs, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
+  xlab("Cell Types") + 
+  coord_flip() + 
+  theme(text = element_text(size = 24))
+ggsave(filename = file.path(TARGET_dir, 'dynamic_TF.png'), plot = p, width = 30, height = 6)
 
 

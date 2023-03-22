@@ -61,7 +61,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   scale_fill_brewer(palette = 'Set1') + 
   ylab("pseudotime") + 
   xlab("batch") + 
-  theme(text = element_text(size = 24), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = margin(1,1,1.5,1.2, "cm"))
+  theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 ###### plotting out GSEA results in bar plots ######
