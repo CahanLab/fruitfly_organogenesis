@@ -109,6 +109,14 @@ source("R/plot_compare_cell_cycle_wt13_early_12.R")
 
 # plot out the quality metrics for all 4 batches 
 source("R/plot_quality_metrics_4_batches.R")
+
+# perform analysis of matrisome in late wildtype 
+source("R/wt13_matrisome.R")
+
+# perform analysis of matrisome in early wildtype 
+source("R/early_wt12_matrisome.R")
+
+
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 

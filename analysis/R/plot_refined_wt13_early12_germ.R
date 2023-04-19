@@ -145,11 +145,12 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_2_GSEA_results.
 focus_gsea = c("proteasomal protein catabolic process (GO:0010498)", 
                "regulation of oskar mRNA translation (GO:0046011)", 
                "negative regulation of translation (GO:0017148)", 
-               'pole cell migration (GO:0007280)')
+               'pole cell migration (GO:0007280)', 
+               'negative regulation of transcription, DNA-templated (GO:0045892)')
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
-sub_GSEA_results[sub_GSEA_results$pathway == "negative regulation of cellular macromolecule biosynthetic process (GO:2000113)", 'pathway'] = 'negative regulation of cellular \n macromolecule biosynthetic process (GO:2000113)'
+sub_GSEA_results[sub_GSEA_results$pathway == "negative regulation of transcription, DNA-templated (GO:0045892)", 'pathway'] = 'negative regulation of transcription, \nDNA-templated (GO:0045892)'
 
 sub_GSEA_results$pathway = stringr::str_replace_all(sub_GSEA_results$pathway, "\\(", "\n\\(\\")
 
@@ -161,6 +162,18 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   theme_bw() +   
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "middle_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 4.7)
+
+term = "negative regulation of translation (GO:0017148)"
+target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
+target_genes = eval(parse(text = target_genes))
+genes_translation = target_genes
+
+term = "negative regulation of transcription, DNA-templated (GO:0045892)"
+target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
+target_genes = eval(parse(text = target_genes))
+genes_transcription = target_genes
+
+length(intersect(genes_transcription, genes_translation))
 
 # middle stage 1
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "6_gsea_results.csv"), row.names = 1)
@@ -304,7 +317,7 @@ p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cel
 ggsave(filename = file.path(TARGET_dir, 'male_germ_markers.png'), plot = p, width = 12, height = 5)
 
 # female germ genes 
-set_genes = c("ovo", "out")
+set_genes = c("ovo", "otu")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 

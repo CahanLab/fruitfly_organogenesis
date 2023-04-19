@@ -14,7 +14,6 @@ rank_sum = rank_sum[rank_sum$logFC > 0, ]
 write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
 
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "monocle3_no_batch_correct_object.rds"))
-cds@colData[cds@colData$cell_type == 'Branching Trachea Cells', 'cell_type'] = 'Tip Tracheal Cells'
 
 UMAP_coord = cds@int_colData$reducedDims$UMAP
 colnames(UMAP_coord) = c("UMAP_1", "UMAP_2")
@@ -29,7 +28,10 @@ UMAP_coord[UMAP_coord$batch == 'late_rep_1', 'batch'] = 'Stage 13-16 rep 1'
 UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Stage 13-16 rep 2'
 
 UMAP_coord$cell_type = cds@colData$cell_type
-UMAP_coord[UMAP_coord$cell_type == 'Branching Trachea Cells', 'cell_type'] = 'Tip Cells'
+UMAP_coord[UMAP_coord$cell_type == 'Branching Trachea Cells', 'cell_type'] = 'Tracheal Tip Cells'
+UMAP_coord[UMAP_coord$cell_type == 'Late Trachea Cells', 'cell_type'] = 'Late Tracheal Cells'
+UMAP_coord[UMAP_coord$cell_type == 'Middle Trachea Cells', 'cell_type'] = 'Middle Tracheal Cells'
+UMAP_coord[UMAP_coord$cell_type == 'Early Trachea Cells', 'cell_type'] = 'Early Tracheal Cells'
 
 # plotting umaps and violin plots -----------------------------------------
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
@@ -68,7 +70,7 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
   guides(color=guide_legend(title="")) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2', breaks=c('Early Trachea Cells', 'Middle Trachea Cells', 'Tip Cells', 'Late Trachea Cells')) + 
+  scale_color_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 10, height = 6)
 
@@ -80,7 +82,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -trh), y=trh, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("trh normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -92,7 +94,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi6), y=Osi6, fill = cell_type
   guides(fill=guide_legend(title="")) +
   #geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("Osi6 normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -104,7 +106,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi17), y=Osi17, fill = cell_ty
   guides(fill=guide_legend(title="")) +
   #geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("Osi17 normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -116,11 +118,11 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -btl), y=btl, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("btl normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-ggsave(filename = file.path(TARGET_dir, "violin_btl.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_btl.png"), plot = p, width = 10, height = 6)
 
 UMAP_coord$Mipp1 = norm_exp['Mipp1', ]
 p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Mipp1), y=Mipp1, fill = cell_type)) + 
@@ -128,12 +130,11 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Mipp1), y=Mipp1, fill = cell_ty
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("Mipp1 normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-ggsave(filename = file.path(TARGET_dir, "violin_Mipp1.png"), plot = p, width = 8, height = 6)
+ggsave(filename = file.path(TARGET_dir, "violin_Mipp1.png"), plot = p, width = 10, height = 6)
 
 UMAP_coord$bnl = norm_exp['bnl', ]
 p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -bnl), y=bnl, fill = cell_type)) + 
@@ -141,11 +142,10 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -bnl), y=bnl, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("bnl normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
 ggsave(filename = file.path(TARGET_dir, "violin_bnl.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$pnt = norm_exp['pnt', ]
@@ -154,11 +154,10 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -pnt), y=pnt, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("pnt normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
 ggsave(filename = file.path(TARGET_dir, "violin_pnt.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$sty = norm_exp['sty', ]
@@ -167,11 +166,10 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -sty), y=sty, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("sty normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
 ggsave(filename = file.path(TARGET_dir, "violin_sty.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$shg = norm_exp['shg', ]
@@ -180,7 +178,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -shg), y=shg, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("shg normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -214,7 +212,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   ggtitle("") +
   theme_bw() + 
   theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, "Tip_Cells_GSEA_results.png"), plot = p, width = 12, height = 6)
+ggsave(filename = file.path(TARGET_dir, "Tip_Cells_GSEA_results.png"), plot = p, width = 10.4, height = 4.5)
 
 # plot out all the genes associated with the terms 
 for(term in sub_GSEA_results$pathway) { 
@@ -320,7 +318,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   theme_bw() +   
   theme(text = element_text(size = 24))
 
-ggsave(filename = file.path(TARGET_dir, "Late_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+ggsave(filename = file.path(TARGET_dir, "Late_Cells_GSEA_results.png"), plot = p, width = 8.8, height = 4)
 
 for(term in sub_GSEA_results$pathway) { 
   target_genes = sub_GSEA_results[sub_GSEA_results$pathway == term, 'leadingEdge']
@@ -450,35 +448,46 @@ p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=geneset, color = genese
   theme(text = element_text(size = 18))
 ggsave(file.path(TARGET_dir, paste0(term, "chitin_vs_tube_size.png")), plot = p, width = 8, height = 5)
 
-# look at correlation between chitin and tube size
-term = 'septate junction assembly (GO:0019991)'
+# plot out all three dynamics 
+term = 'regulation of tube size, open tracheal system (GO:0035151)'
+target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
+target_genes = eval(parse(text = target_genes))
+norm_exp_1 = plot_heatmap(cds, target_genes)
+plot_norm_1 = average_geneset(norm_exp_1)
+plot_norm_1$geneset = 'regulation of tube size (average expression)'
+
+term = 'Golgi vesicle transport (GO:0048193)'
 target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
 target_genes = eval(parse(text = target_genes))
 norm_exp_2 = plot_heatmap(cds, target_genes)
 plot_norm_2 = average_geneset(norm_exp_2)
-plot_norm_2$geneset = 'septate junction assembly (average expression)'
+plot_norm_2$geneset = 'Golgi vesicle transport (average expression)'
+
+term = 'chitin-based cuticle development (GO:0040003)'
+target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
+target_genes = eval(parse(text = target_genes))
+norm_exp_3 = plot_heatmap(cds, target_genes)
+plot_norm_3 = average_geneset(norm_exp_3)
+plot_norm_3$geneset = 'chitin-based cuticle development (average expression)'
 
 x = ccf(plot_norm_2$scaled_exp, plot_norm_1$scaled_exp)
 correlation = x$acf[, 1, 1]
 names(correlation) = x$lag[, 1, 1]
 max_correlation = correlation[which.max(correlation)]
 
-plot_df = rbind(plot_norm_1, plot_norm_2)
+plot_df = rbind(plot_norm_1, plot_norm_2, plot_norm_3)
 plot_df$geneset = stringr::str_replace_all(plot_df$geneset, "\\(", "\n\\(\\")
 
-plot_df$geneset = factor(x = plot_df$geneset, levels = sort(unique(plot_df$geneset), decreasing = TRUE))
 p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=geneset, color = geneset)) +
   xlab("pseudotime") + 
   ylab("average expression") +
-  ggtitle(paste0('septate junction assembly vs regulation of tube size')) +
-  geom_line() + 
+  ggtitle("") +
+  geom_line(linewidth = 1.2) + 
   theme_bw() + 
-  scale_color_brewer(palette='Set2') +
-  annotate("text", x=0.8, y=1, label= paste0("cross-correlation: ", round(as.numeric(max_correlation), digits = 3),  "\n lag: ", round(as.numeric(names(max_correlation)) / nrow(plot_norm_1), digits = 3))) + 
+  scale_color_brewer(palette='Set1') +
   guides(color=guide_legend(title="")) + 
-  theme(text = element_text(size = 18))
-
-ggsave(file.path(TARGET_dir, paste0(term, "septate_vs_tube_size.png")), plot = p, width = 8, height = 5)
+  theme(text = element_text(size = 24), legend.position="bottom", plot.margin = margin(t = 0, r = 2, b = 0, l = 0, "cm"))
+ggsave(file.path(TARGET_dir, paste0("golig_chitin_size.png")), plot = p, width = 11, height = 9)
 
 # plot out the dynamic gene heatmap ---------------------------------------
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "monocle3_no_batch_correct_object.rds"))
