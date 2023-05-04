@@ -39,9 +39,9 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
   ylab("Total Cell Proportion") + 
   xlab("Harmonized Cell Types") + 
   ggtitle("Stage 13-16 Cell Type Proportions") +
+  ylim(c(0, 0.3)) +
   theme(text = element_text(size = 24), legend.title=element_blank(), plot.title.position = "plot")
-
-ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 14)
+ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 9)
 
 # plot the reverse SCN results 
 dir.create(file.path(TARGET_dir, 'reverse_SCN_seroka'), recursive = TRUE)

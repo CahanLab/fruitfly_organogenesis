@@ -1,14 +1,9 @@
 library(ggplot2)
-TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt13_matrisome')
 
-object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13/manual_celltype_object4.rds"))
+##### set up for plotting of various things #####
+TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'plasmatocytes_matrisome')
+dir.create(TARGET_dir, recursive = TRUE)
 
-matrisome_df = read.csv("accessory_data/matrisome_data/drosophila_matrisome.csv")
-
-interesting_cat_list = c("Basement Membrane", "Basement Membrane; Laminin", 'Insulin Family', "Other", "Prolyl 4-Hydroxylase")
-
-# the below function as a modification from Seurat Dotplot https://github.com/satijalab/seurat/blob/HEAD/R/visualization.R
-# only return the plotting DF 
 modified_dotPlot_df <- function(
     object,
     assay = NULL,
@@ -193,46 +188,33 @@ modified_dotPlot_df <- function(
   return(data.plot)
 }
 
-filter_genes <- function(plot_df) {
-  good_genes = c()
-  for(temp_gene in unique(plot_df$features.plot)) {
-    subset_plot_df = plot_df[plot_df$features.plot == temp_gene, ]
-    if(max(subset_plot_df$pct.exp) > 1) {
-      good_genes = c(good_genes, temp_gene)
-    }
-  }
-  return(good_genes)
-}
+wt13_object = readRDS("results/v18/manual_annotation_wt13/manual_celltype_object4.rds")
+early_wt12_object = readRDS("results/v18/manual_annotation_early_wt12/manual_celltype_object1.rds")
 
+gene_list = list()
+gene_list[['phagocytic_receptor']] = c("drpr", 'crq', 'NimC4', 'Sr-CI', 'PGRP-LC')
+gene_list[['opsinin']] = c("Tep2", 'Tep4')
+gene_list[['Thioester-containing']] = c("NimB1", 'NimB3', "NimB4", "NimB5")
+gene_list[['alpha-beta']] = c("mew", "mys")
+gene_list[['engulfment']] = c("SCAR", "Rac1", "Rac2", 'chic')
+gene_list[['rabs']] = c("Rab5", "Rab7", "Lamp1")
+gene_list[['cathepsin']] = c("cathD", "CtsB1")
+gene_list[['antimicrobial']] = c("Drs", "Dro", "DptA", "DptB",'CecA1', "CecA2", 
+                                 "Def", 'Mtk', 'BomS4', 'BomBc2', 'BomT1', 'BomS3', 
+                                 'BomBc1', 'BomS2', 'BomT3', 'BomBc3', 'BomS6', 
+                                 'BomS1', 'BomT2', 'BomS5')
+##### make plots for the genes listed wt13 #####
 big_plot_df = data.frame()
-for(temp_cat in interesting_cat_list) {
+for(temp_cat in names(gene_list)) {
   
-  if(temp_cat == 'Other') {
-    matrisome_genes = c('Ppn', 'Pxn', 'SPARC', 'Tig')
-  }
-  else {
-    temp_matrisome_df = matrisome_df[matrisome_df$Matrisome.Class...Protein.Family == temp_cat, ]
-    matrisome_genes = temp_matrisome_df$Gene.Name
-    matrisome_genes = intersect(matrisome_genes, rownames(object))
-    if(temp_cat == "Prolyl 4-Hydroxylase") {
-      matrisome_genes = c(matrisome_genes, 'Plod')
-    }
-  }
-  
-  temp_plot_df = modified_dotPlot_df(object, features = matrisome_genes, group.by = 'manual_celltypes')
+  temp_plot_df = modified_dotPlot_df(wt13_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
   #temp_plot_df$avg.exp.scaled = NULL
   temp_plot_df$matrisome_type = temp_cat 
-  
-  good_genes = filter_genes(temp_plot_df)
-  temp_plot_df = temp_plot_df[temp_plot_df$features.plot %in% good_genes, ]
   
   big_plot_df = rbind(big_plot_df, temp_plot_df)
 }
 
-big_plot_df$log_exp = log1p(big_plot_df$avg.exp)
-big_plot_df$matrisome_type = factor(big_plot_df$matrisome_type, levels = c("Basement Membrane", "Basement Membrane; Laminin", "Other", "Prolyl 4-Hydroxylase", "Insulin Family"))
 big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), decreasing = TRUE))
-
 p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
   geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
   #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
@@ -256,55 +238,21 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
   ggtitle("Stage 13-16 Embryos")
-ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes.png"), plot = p, width = 14, height = 8)
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_wt13.png"), plot = p, width = 14, height = 7)
 
-##### this is to plot out the insulin downstream #####
-# Akt - Akt1
-# PI3K - Pi3K21B, Pi3K68D, Pi3K59F, Pi3K92E
-# LnR - Lnr
-# RhebGTP
-insulin_downstream_genes = c("Pten", 
-                             "Pdk1", 
-                             "Ilp2", 
-                             "Lnk", 
-                             "chico", 
-                             "Tsc1", 
-                             "gig", 
-                             "Tor", 
-                             "Lst8", 
-                             "rictor", 
-                             "Sin1", 
-                             "Lst8", 
-                             "Tor", 
-                             "raptor", 
-                             "foxo", 
-                             "Thor", 
-                             "S6k", 
-                             "Akt1", 
-                             'Pi3K21B',
-                             'Pi3K68D', 
-                             'Pi3K59F', 
-                             'Pi3K92E', 
-                             'Lnr')
-type_list = list()
-type_list[['kinase receptor']] = c('Lnr')
-type_list[['kinase']] = c("Akt1", "Pdk1", 'Pi3K21B', 'Pi3K68D', 'Pi3K59F', 'Pi3K92E', 'Tor', 'S6k')
-type_list[['adaptor']] = c('Lnk', 'chico', 'Lst8', 'rictor', 'Sin1', 'raptor', 'Tsc1') 
-type_list[['transcription factor activator']] = c('foxo')
-type_list[['transcription factor inhibitor']] = c('gig')
-type_list[['inhibitory binding protein']] = c('Thor')
-type_list[['phosphatase']] = c('Pten')
-type_list[['ligand']] = c('Ilp2')
-
-insulin_downstream_genes = unique(insulin_downstream_genes)
-temp_plot_df = modified_dotPlot_df(object, features = insulin_downstream_genes, group.by = 'manual_celltypes')
-temp_plot_df$type = NA
-for(temp_type in names(type_list)) {
-  temp_genes = type_list[[temp_type]]
-  temp_plot_df[temp_plot_df$features.plot %in% temp_genes, 'type'] = temp_type
+##### make plots for the genes listed early_wt12 #####
+big_plot_df = data.frame()
+for(temp_cat in names(gene_list)) {
+  
+  temp_plot_df = modified_dotPlot_df(early_wt12_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
+  #temp_plot_df$avg.exp.scaled = NULL
+  temp_plot_df$matrisome_type = temp_cat 
+  
+  big_plot_df = rbind(big_plot_df, temp_plot_df)
 }
 
-p <- ggplot(data = temp_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
+big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), decreasing = TRUE))
+p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
   geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
   #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
   guides(size = guide_legend(title = 'Percent Expressed')) +
@@ -316,7 +264,7 @@ p <- ggplot(data = temp_plot_df, mapping = aes_string(y = 'id', x = 'features.pl
   ) + 
   theme_classic()  + 
   facet_grid(
-    cols = vars(type),
+    cols = vars(matrisome_type),
     scales = "free_x",
     space = "free_x",
     switch = "y"
@@ -327,54 +275,52 @@ p <- ggplot(data = temp_plot_df, mapping = aes_string(y = 'id', x = 'features.pl
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
   ggtitle("Stage 10-12 Embryos")
-ggsave(filename = file.path(TARGET_dir, "insulin_genes.png"), plot = p, width = 12, height = 6)
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_early_wt12.png"), plot = p, width = 14, height = 7)
 
-##### This is to get the genes for Chitin cuticle genes #####
-interesting_cat_list = c("Cuticle; Tweedle", "Cuticle", "Chitin-binding-domain-containing Proteins", "Cuticle; R&R Chitin-binding-domain-containing Proteins")
+##### this is to compare the genes between early and late #####
+sub_wt_early_object = subset(early_wt12_object, subset = manual_celltypes == "Plasmatocytes")
+sub_wt_late_object = subset(wt13_object, subset = manual_celltypes == 'Plasmatocytes')
+sub_wt_late_object$experimental_condition = 'stage 13-16'
+sub_wt_early_object$experimental_condition = 'stage 10-12'
+
+combined_ct_object = merge(sub_wt_early_object, sub_wt_late_object)
+object = Seurat::CreateSeuratObject(combined_ct_object@assays$RNA@counts, project = 'plasmatocytes')
+object@meta.data$experimental_condition = combined_ct_object@meta.data$experimental_condition
+object@meta.data$batch = paste0(combined_ct_object@meta.data$experimental_condition, "_", combined_ct_object@meta.data$batch)
+object = Seurat::NormalizeData(object)
+
 big_plot_df = data.frame()
-for(temp_cat in interesting_cat_list) {
+for(temp_cat in c('opsinin', 'alpha-beta', 'engulfment', 'cathepsin')) {
   
-  if(temp_cat == 'Other') {
-    matrisome_genes = c('Ppn', 'Pxn', 'SPARC', 'Tig')
-  }
-  else {
-    temp_matrisome_df = matrisome_df[matrisome_df$Matrisome.Class...Protein.Family == temp_cat, ]
-    matrisome_genes = temp_matrisome_df$Gene.Name
-    matrisome_genes = intersect(matrisome_genes, rownames(object))
-  }
-  
-  temp_plot_df = modified_dotPlot_df(object, features = matrisome_genes, group.by = 'manual_celltypes')
+  temp_plot_df = modified_dotPlot_df(object, features = gene_list[[temp_cat]], group.by = 'experimental_condition')
   #temp_plot_df$avg.exp.scaled = NULL
   temp_plot_df$matrisome_type = temp_cat 
   
-  good_genes = filter_genes(temp_plot_df)
-  temp_plot_df = temp_plot_df[temp_plot_df$features.plot %in% good_genes, ]
-  
   big_plot_df = rbind(big_plot_df, temp_plot_df)
 }
-big_plot_df$log_exp = log1p(big_plot_df$avg.exp)
-p <- ggplot(data = big_plot_df, mapping = aes_string(x = 'id', y = 'features.plot')) +
+
+big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), decreasing = TRUE))
+p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
   geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
   #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
   guides(size = guide_legend(title = 'Percent Expressed')) +
   guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
   scale_colour_viridis_c() + 
   labs(
-    x = 'Cell Types',
-    y = 'Genes'
+    x = '',
+    y = 'Cell Types'
   ) + 
   theme_classic()  + 
   facet_grid(
-    rows = vars(matrisome_type),
-    scales = "free_y",
-    space = "free_y",
-    switch = "x"
+    cols = vars(matrisome_type),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
   ) + 
   theme(
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.y = element_text(angle = 0), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
-  ggtitle("Stage 13-16 Embryos")
-ggsave(filename = file.path(TARGET_dir, "chitin_genes.png"), plot = p, width = 12, height = 19)
-
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
+  ggtitle("")
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_comparison.png"), plot = p, width = 14, height = 7)

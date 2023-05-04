@@ -7,6 +7,8 @@ TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'cross_study
 dir.create(TARGET_dir, recursive = TRUE)
 
 calderon_SCN_matrix = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_early_wt12/calderon_proportion.rds"))
+calderon_SCN_matrix$our_ct = as.character(calderon_SCN_matrix$our_ct)
+calderon_SCN_matrix[calderon_SCN_matrix$our_ct == 'Unknown', 'our_ct'] = 'Unknown (CNS)'
 p = ggplot(calderon_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) + 
   geom_tile() +
   xlab("Stage 10-12 Embryonic Cell Types") +
@@ -18,6 +20,9 @@ p = ggplot(calderon_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
 ggsave(filename = file.path(TARGET_dir, 'Calderon_SCN_proportion.png'), plot = p, width = 14, height = 10)
 
 seroka_SCN_matrix = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_early_wt12/seroka_proportion.rds"))
+seroka_SCN_matrix$our_ct = as.character(seroka_SCN_matrix$our_ct)
+seroka_SCN_matrix[seroka_SCN_matrix$our_ct == 'Unknown', 'our_ct'] = 'Unknown (CNS)'
+
 p = ggplot(seroka_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) + 
   geom_tile() +
   xlab("Stage 10-12 Embryonic Cell Types") +
@@ -41,7 +46,7 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
   ggtitle("Stage 10-12 Cell Type Proportions") +
   theme(text = element_text(size = 24), legend.title=element_blank(), plot.title.position = "plot")
 
-ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 14)
+ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 9)
 
 # plot the reverse SCN results 
 dir.create(file.path(TARGET_dir, 'reverse_SCN_seroka'), recursive = TRUE)

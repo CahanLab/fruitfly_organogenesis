@@ -12,8 +12,8 @@ rank_sum = rank_sum[rank_sum$logFC > 0, ]
 rank_sum[rank_sum$group == '1', 'group'] = 'Unknown 1'
 rank_sum[rank_sum$group == '3', 'group'] = 'Unknown 2'
 rank_sum[rank_sum$group == '5', 'group'] = 'Early Germ Cells'
-rank_sum[rank_sum$group == '6', 'group'] = 'Middle Germ Cells 1'
-rank_sum[rank_sum$group == '2', 'group'] = 'Middle Germ Cells 2'
+rank_sum[rank_sum$group == '6', 'group'] = 'Interm. Germ Cells 1'
+rank_sum[rank_sum$group == '2', 'group'] = 'Interm. Germ Cells 2'
 rank_sum[rank_sum$group == '4', 'group'] = 'Late Germ Cells'
 
 write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
@@ -40,8 +40,8 @@ UMAP_coord$cell_type = UMAP_coord$clusters
 UMAP_coord[UMAP_coord$clusters == '1', 'cell_type'] = 'Unknown 1'
 UMAP_coord[UMAP_coord$clusters == '3', 'cell_type'] = 'Unknown 2'
 UMAP_coord[UMAP_coord$clusters == '5', 'cell_type'] = 'Early Germ Cells'
-UMAP_coord[UMAP_coord$clusters == '6', 'cell_type'] = 'Middle Germ Cells 1'
-UMAP_coord[UMAP_coord$clusters == '2', 'cell_type'] = 'Middle Germ Cells 2'
+UMAP_coord[UMAP_coord$clusters == '6', 'cell_type'] = 'Interm. Germ Cells 1'
+UMAP_coord[UMAP_coord$clusters == '2', 'cell_type'] = 'Interm. Germ Cells 2'
 UMAP_coord[UMAP_coord$clusters == '4', 'cell_type'] = 'Late Germ Cells'
 
 
@@ -78,8 +78,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$cell_type <- factor(UMAP_coord$cell_type, levels = c("Early Germ Cells", 
-                                                                "Middle Germ Cells 1", 
-                                                                "Middle Germ Cells 2", 
+                                                                "Interm. Germ Cells 1", 
+                                                                "Interm. Germ Cells 2", 
                                                                 "Late Germ Cells", 
                                                                 "Unknown 1", 
                                                                 "Unknown 2"))
@@ -110,6 +110,20 @@ for(gene_interest in gene_interest_list) {
   ggsave(filename = file.path(TARGET_dir, paste0("violin_", gene_interest, ".png")), plot = p, width = 8, height = 6)
 }
 
+gene_interest_list = c('bam', 'bgcn', 'zpg', 'stg', 'esg', 'kmg', 'Rbp4', 'Pp2C1', 'CG6701', 'Parp16', 'Glut3')
+for(gene_interest in gene_interest_list) {
+  UMAP_coord$gene_exp = norm_exp[gene_interest, ]
+  p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -gene_exp), y=gene_exp, fill = cell_type)) + 
+    geom_violin() +
+    guides(fill=guide_legend(title="")) +
+    geom_boxplot(width=0.1) +
+    theme_minimal() +
+    scale_fill_brewer(palette = 'Set2') + 
+    ylab(paste0(gene_interest, " normalized expression")) + 
+    xlab("cell type") + 
+    theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  ggsave(filename = file.path(TARGET_dir, paste0("violin_", gene_interest, ".png")), plot = p, width = 8, height = 6)
+}
 ###### plot out the GSEA results #####
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "4_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]

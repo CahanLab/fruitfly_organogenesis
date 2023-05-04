@@ -30,7 +30,7 @@ UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Stage 13-16 rep 2'
 UMAP_coord$cell_type = cds@colData$cell_type
 UMAP_coord[UMAP_coord$cell_type == 'Branching Trachea Cells', 'cell_type'] = 'Tracheal Tip Cells'
 UMAP_coord[UMAP_coord$cell_type == 'Late Trachea Cells', 'cell_type'] = 'Late Tracheal Cells'
-UMAP_coord[UMAP_coord$cell_type == 'Middle Trachea Cells', 'cell_type'] = 'Middle Tracheal Cells'
+UMAP_coord[UMAP_coord$cell_type == 'Middle Trachea Cells', 'cell_type'] = 'Interm. Tracheal Cells'
 UMAP_coord[UMAP_coord$cell_type == 'Early Trachea Cells', 'cell_type'] = 'Early Tracheal Cells'
 
 # plotting umaps and violin plots -----------------------------------------
@@ -66,11 +66,13 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
+
+UMAP_coord$cell_type = factor(UMAP_coord$cell_type, levels = c('Early Tracheal Cells', 'Late Tracheal Cells', 'Interm. Tracheal Cells', 'Tracheal Tip Cells'))
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
   guides(color=guide_legend(title="")) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_color_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 10, height = 6)
 
@@ -82,7 +84,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -trh), y=trh, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("trh normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -94,7 +96,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi6), y=Osi6, fill = cell_type
   guides(fill=guide_legend(title="")) +
   #geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("Osi6 normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -106,7 +108,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Osi17), y=Osi17, fill = cell_ty
   guides(fill=guide_legend(title="")) +
   #geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("Osi17 normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -118,7 +120,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -btl), y=btl, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("btl normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -130,7 +132,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Mipp1), y=Mipp1, fill = cell_ty
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("Mipp1 normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -142,7 +144,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -bnl), y=bnl, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("bnl normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -154,7 +156,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -pnt), y=pnt, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("pnt normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -166,7 +168,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -sty), y=sty, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("sty normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -178,7 +180,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -shg), y=shg, fill = cell_type))
   guides(fill=guide_legend(title="")) +
   geom_boxplot(width=0.1) +
   theme_minimal() +
-  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Middle Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
+  scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
   ylab("shg normalized expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
