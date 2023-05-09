@@ -324,3 +324,81 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
   ggtitle("")
 ggsave(filename = file.path(TARGET_dir, "plasmatocytes_comparison.png"), plot = p, width = 14, height = 7)
+
+
+##### focus plotting of the supplementary #####
+big_plot_df = data.frame()
+for(temp_cat in c("antimicrobial")) {
+  
+  temp_plot_df = modified_dotPlot_df(wt13_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
+  #temp_plot_df$avg.exp.scaled = NULL
+  temp_plot_df$matrisome_type = temp_cat 
+  
+  big_plot_df = rbind(big_plot_df, temp_plot_df)
+}
+
+big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), decreasing = TRUE))
+p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
+  geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
+  #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
+  guides(size = guide_legend(title = 'Percent Expressed')) +
+  guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
+  scale_colour_viridis_c() + 
+  labs(
+    x = '',
+    y = 'Cell Types'
+  ) + 
+  theme_classic()  + 
+  facet_grid(
+    cols = vars(matrisome_type),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  scale_size(limits = c(0, 100)) +
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
+  ggtitle("Stage 13-16 Embryos")
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_wt13_focus.png"), plot = p, width = 14, height = 7)
+
+# this is for plotting out the early plasmatocytes 
+big_plot_df = data.frame()
+for(temp_cat in c("antimicrobial")) {
+  
+  temp_plot_df = modified_dotPlot_df(early_wt12_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
+  #temp_plot_df$avg.exp.scaled = NULL
+  temp_plot_df$matrisome_type = temp_cat 
+  
+  big_plot_df = rbind(big_plot_df, temp_plot_df)
+}
+
+big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), decreasing = TRUE))
+p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
+  geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
+  #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
+  guides(size = guide_legend(title = 'Percent Expressed')) +
+  guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
+  scale_colour_viridis_c() + 
+  labs(
+    x = '',
+    y = 'Cell Types'
+  ) + 
+  scale_size(limits = c(0, 100)) +
+  theme_classic()  + 
+  facet_grid(
+    cols = vars(matrisome_type),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
+  ggtitle("Stage 10-12 Embryos")
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_earl_wt12_focus.png"), plot = p, width = 14, height = 7)
+

@@ -331,13 +331,13 @@ p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cel
 ggsave(filename = file.path(TARGET_dir, 'male_germ_markers.png'), plot = p, width = 12, height = 5)
 
 # female germ genes 
-set_genes = c("ovo", "otu")
+set_genes = c("ovo", "otu", "Sxl")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, 'female_germ_markers.png'), plot = p, width = 8, height = 5)
+ggsave(filename = file.path(TARGET_dir, 'female_germ_markers.png'), plot = p, width = 8, height = 5.5)
 
 # death genes
 set_genes = c("wun2", "Lsd-1", 'Lsd-2')

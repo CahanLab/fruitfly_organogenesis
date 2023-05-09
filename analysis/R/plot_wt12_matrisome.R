@@ -5,12 +5,6 @@ TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'early_wt12_
 object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_early_wt12/manual_celltype_object1.rds"))
 
 matrisome_df = read.csv("accessory_data/matrisome_data/drosophila_matrisome.csv")
-
-##### plot the big pan-matrisome plot #####
-interesting_cat_list = c("Basement Membrane", "Basement Membrane; Laminin", "Other", "Prolyl 4-Hydroxylase", 'Insulin Family')
-
-# the below function as a modification from Seurat Dotplot https://github.com/satijalab/seurat/blob/HEAD/R/visualization.R
-# only return the plotting DF 
 modified_dotPlot_df <- function(
     object,
     assay = NULL,
@@ -194,7 +188,12 @@ modified_dotPlot_df <- function(
   }
   return(data.plot)
 }
+##### plot the big pan-matrisome plot #####
 
+interesting_cat_list = c("Basement Membrane", "Basement Membrane; Laminin", "Other", "Prolyl 4-Hydroxylase", 'Insulin Family')
+
+# the below function as a modification from Seurat Dotplot https://github.com/satijalab/seurat/blob/HEAD/R/visualization.R
+# only return the plotting DF 
 filter_genes <- function(plot_df) {
   good_genes = c()
   for(temp_gene in unique(plot_df$features.plot)) {
@@ -258,6 +257,57 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
   ggtitle("Stage 10-12 Embryos")
 ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes.png"), plot = p, width = 12, height = 6)
+
+##### plot new main figure for plasmatocytes #####
+gene_list = list()
+gene_list[['collagen']] = c("vkg", "Col4a1")
+gene_list[['Hydroxylase']] = c("Plod", "PH4alphaEFB")
+gene_list[['laminins']] = c("LanA", "LanB1", "LanB2")
+gene_list[['basement']] = c("Ppn", "Pxn", "SPARC", 'Tig')
+gene_list[['phagocytic_receptor']] = c("drpr", 'crq', 'NimC4', 'Sr-CI', 'PGRP-LC')
+gene_list[['Thioester-containing']] = c("NimB1", 'NimB3', "NimB4", "NimB5")
+gene_list[['engulfment']] = c("SCAR", "Rac1", "Rac2", 'chic')
+gene_list[['rabs']] = c("Rab5", "Rab7", "Lamp1")
+gene_list[['cathepsin']] = c("cathD", "CtsB1")
+gene_list[['insulin']] = c("Ilp4", "Ilp6")
+
+big_plot_df = data.frame()
+for(temp_cat in names(gene_list)) {
+  
+  temp_plot_df = modified_dotPlot_df(object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
+  #temp_plot_df$avg.exp.scaled = NULL
+  temp_plot_df$matrisome_type = temp_cat 
+  
+  big_plot_df = rbind(big_plot_df, temp_plot_df)
+}
+
+reordered_categories = c("collagen", "Hydroxylase", "laminins", "basement", "phagocytic_receptor", "Thioester-containing", "engulfment", "rabs", "cathepsin", "insulin")
+big_plot_df$matrisome_type = factor(big_plot_df$matrisome_type, levels = reordered_categories)
+big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), decreasing = TRUE))
+p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
+  geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
+  #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
+  guides(size = guide_legend(title = 'Percent Expressed')) +
+  guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
+  scale_colour_viridis_c() + 
+  labs(
+    x = '',
+    y = 'Cell Types'
+  ) + 
+  theme_classic()  + 
+  facet_grid(
+    cols = vars(matrisome_type),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
+  ggtitle("Stage 10-12 Embryos")
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_focused.png"), plot = p, width = 14, height = 7)
 
 ##### this is to plot out the insulin downstream #####
 # Akt - Akt1
