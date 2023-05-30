@@ -77,17 +77,15 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv
 # here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)", 
                "regulation of transcription, DNA-templated (GO:0006355)",
-               "mitotic cytokinesis (GO:0000281)", 
                "negative regulation of translation (GO:0017148)", 
                "salivary gland morphogenesis (GO:0007435)", 
-               "dorsal closure (GO:0007391)", 
                "Golgi vesicle transport (GO:0048193)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
 sub_GSEA_results$pathway = stringr::str_replace_all(sub_GSEA_results$pathway, "\\(", "\n\\(\\")
 
-p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
+p = ggplot2::ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval)) +
   geom_bar(stat="identity", fill = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + coord_flip() + 
   xlab("GO Biological Processes") + 
   ylab("-log10(adj p-value)") + 

@@ -157,14 +157,15 @@ GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_2_GSEA_results.csv"))
 
 focus_gsea = c("proteasomal protein catabolic process (GO:0010498)", 
-               "regulation of oskar mRNA translation (GO:0046011)", 
+               "female gamete generation (GO:0007292)", 
                "negative regulation of translation (GO:0017148)", 
                'pole cell migration (GO:0007280)', 
-               'negative regulation of transcription, DNA-templated (GO:0045892)')
+               'male gamete generation (GO:0048232)', 
+               'ATP hydrolysis coupled cation transmembrane transport (GO:0099132)')
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
-sub_GSEA_results[sub_GSEA_results$pathway == "negative regulation of transcription, DNA-templated (GO:0045892)", 'pathway'] = 'negative regulation of transcription, \nDNA-templated (GO:0045892)'
+sub_GSEA_results[sub_GSEA_results$pathway == "ATP hydrolysis coupled cation transmembrane transport (GO:0099132)", 'pathway'] = 'ATP hydrolysis coupled \n cation transmembrane transport (GO:0099132)'
 
 sub_GSEA_results$pathway = stringr::str_replace_all(sub_GSEA_results$pathway, "\\(", "\n\\(\\")
 
@@ -175,7 +176,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   ggtitle("") +
   theme_bw() +   
   theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, "middle_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 4.7)
+ggsave(filename = file.path(TARGET_dir, "middle_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 5.5)
 
 term = "negative regulation of translation (GO:0017148)"
 target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
@@ -199,7 +200,7 @@ focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
                "cytoskeleton-dependent cytokinesis (GO:0061640)", 
                "mitotic cytokinesis (GO:0000281)", 
                "cytoplasmic translation (GO:0002181)", 
-               "DNA packaging (GO:0006323)")
+               "protein catabolic process (GO:0030163)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
@@ -212,7 +213,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   ggtitle("") +
   theme_bw() + 
   theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, "middle_1_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
+ggsave(filename = file.path(TARGET_dir, "middle_1_Cells_GSEA_results.png"), plot = p, width = 9.5, height = 4)
 
 # early stage
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "5_gsea_results.csv"), row.names = 1)
@@ -293,14 +294,14 @@ cds@colData$cell_type = NA
 cds@colData[clusters(cds) == '1', 'cell_type'] = 'Unknown 1'
 cds@colData[clusters(cds) == '3', 'cell_type'] = 'Unknown 2'
 cds@colData[clusters(cds) == '5', 'cell_type'] = 'Early Germ Cells'
-cds@colData[clusters(cds) == '6', 'cell_type'] = 'Middle Germ Cells 1'
-cds@colData[clusters(cds) == '2', 'cell_type'] = 'Middle Germ Cells 2'
+cds@colData[clusters(cds) == '6', 'cell_type'] = 'Interm. Germ Cells 1'
+cds@colData[clusters(cds) == '2', 'cell_type'] = 'Interm. Germ Cells 2'
 cds@colData[clusters(cds) == '4', 'cell_type'] = 'Late Germ Cells'
 
 p = plot_genes_by_group(cds, markers = c('nos', 'gcl', 'pgc', 'vas'), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 
-  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, 'germ_stem_cell_markers.png'), plot = p, width = 10, height = 5)
 
@@ -309,7 +310,7 @@ set_genes = c("Ote", "eff", "aurB", "pelo", "twin", "eIF4A")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 
-  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
 
 # somatic female genes
@@ -317,16 +318,16 @@ set_genes = c("Sxl", "tra")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 
-  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, 'female_somatic_markers.png'), plot = p, width = 8, height = 5)
 
 # male germ genes 
-set_genes = c("dpa", "Rs1", "Mcm5", "CG9253", "CG6693", "nclb", "Klp61F")
+set_genes = c("dpa", "Rs1", "Mcm5", "CG9253", "CG6693", "nclb", "Klp61F", "CG6701", "Pp2C1")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 
-  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, 'male_germ_markers.png'), plot = p, width = 12, height = 5)
 
@@ -335,7 +336,7 @@ set_genes = c("ovo", "otu", "Sxl")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
   coord_flip() + 
-  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, 'female_germ_markers.png'), plot = p, width = 8, height = 5.5)
 
@@ -365,10 +366,16 @@ UMAP_coord$cell_type = UMAP_coord$clusters
 UMAP_coord[UMAP_coord$clusters == '1', 'cell_type'] = 'Unknown 1'
 UMAP_coord[UMAP_coord$clusters == '3', 'cell_type'] = 'Unknown 2'
 UMAP_coord[UMAP_coord$clusters == '5', 'cell_type'] = 'Early Germ Cells'
-UMAP_coord[UMAP_coord$clusters == '6', 'cell_type'] = 'Middle Germ Cells 1'
-UMAP_coord[UMAP_coord$clusters == '2', 'cell_type'] = 'Middle Germ Cells 2'
+UMAP_coord[UMAP_coord$clusters == '6', 'cell_type'] = 'Interm. Germ Cells 1'
+UMAP_coord[UMAP_coord$clusters == '2', 'cell_type'] = 'Interm. Germ Cells 2'
 UMAP_coord[UMAP_coord$clusters == '4', 'cell_type'] = 'Late Germ Cells'
 
+UMAP_coord$clusters <- factor(UMAP_coord$clusters, levels = c("Early Germ Cells", 
+                                                                "Interm. Germ Cells 1", 
+                                                                "Interm. Germ Cells 2", 
+                                                                "Late Germ Cells", 
+                                                                "Unknown 1", 
+                                                                "Unknown 2"))
 UMAP_coord$log10_ngenes = log(cds@colData$nCount_RNA)
 UMAP_coord$ngenes = cds@colData$nCount_RNA
 
@@ -378,15 +385,15 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -log10_ngenes), y=log10_ngenes, 
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
-  ylab("log10(UMI Counts)") + 
+  ylab("log(UMI Counts)") + 
   xlab("cell type") + 
   theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
   geom_signif(comparisons = list(c("Unknown 2", "Late Germ Cells"), 
-                                 c("Unknown 2", "Middle Germ Cells 1"), 
-                                 c("Unknown 2", "Middle Germ Cells 2"), 
+                                 c("Unknown 2", "Interm. Germ Cells 1"), 
+                                 c("Unknown 2", "Interm. Germ Cells 2"), 
                                  c('Late Germ Cells', 'Unknown 1'), 
-                                 c('Middle Germ Cells 1', 'Unknown 1'),
-                                 c('Middle Germ Cells 2', 'Unknown 1'),
+                                 c('Interm. Germ Cells 1', 'Unknown 1'),
+                                 c('Interm. Germ Cells 2', 'Unknown 1'),
                                  c('Unknown 1', 'Early Germ Cells'), 
                                  c('Unknown 2', 'Early Germ Cells')), map_signif_level=TRUE, step_increase = 0.075)
 ggsave(filename = file.path(TARGET_dir, 'read_depth.png'), plot = p, width = 10, height = 5)

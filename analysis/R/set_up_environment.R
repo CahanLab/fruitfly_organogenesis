@@ -3,11 +3,12 @@ RESULTS = file.path("results", ANALYSIS_VERSION, SAMPLE)
 dir.create(RESULTS, recursive = T, showWarnings = F)
 
 # Set up working environment
-library("Seurat")
 library("ggplot2")
 library("dplyr")
 library("magrittr")
 library("Matrix")
+library("Seurat")
+
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")
 print(sessionInfo())

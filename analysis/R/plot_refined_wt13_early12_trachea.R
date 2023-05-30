@@ -197,10 +197,11 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_branching_GSEA_results
 
 # here are the interesting results that are not overlapping and are related to salivary gland development
 focus_gsea = c("cell morphogenesis involved in differentiation (GO:0000904)", 
+               'axon guidance (GO:0007411)',
                "cell-cell adhesion mediated by cadherin (GO:0044331)", 
-               "calcium-dependent cell-cell adhesion via plasma membrane cell adhesion molecules (GO:0016339)", 
                "positive regulation of intracellular signal transduction (GO:1902533)", 
-               "apical junction assembly (GO:0043297)")
+               "apical junction assembly (GO:0043297)", 
+               "establishment of epithelial cell apical/basal polarity (GO:0045198)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
@@ -214,7 +215,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   ggtitle("") +
   theme_bw() + 
   theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, "Tip_Cells_GSEA_results.png"), plot = p, width = 10.4, height = 4.5)
+ggsave(filename = file.path(TARGET_dir, "Tip_Cells_GSEA_results.png"), plot = p, width = 10.4, height = 5)
 
 # plot out all the genes associated with the terms 
 for(term in sub_GSEA_results$pathway) { 
@@ -237,7 +238,8 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_early_GSEA_results.csv
 focus_gsea = c("mRNA splicing, via spliceosome (GO:0000398)",
                "regulation of gene expression (GO:0010468)", 
                "regulation of mitotic cell cycle (GO:0007346)", 
-               "tracheal outgrowth, open tracheal system (GO:0007426)")
+               "tracheal outgrowth, open tracheal system (GO:0007426)", 
+               "Notch signaling pathway (GO:0007219)")
 
 sub_GSEA_results = GSEA_results[GSEA_results$pathway %in% focus_gsea, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
@@ -273,7 +275,6 @@ write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_middle_GSEA_results.cs
 focus_gsea = c("regulation of tube size, open tracheal system (GO:0035151)", 
                "septate junction assembly (GO:0019991)", 
                "regulation of translation (GO:0006417)", 
-               "dorsal closure (GO:0007391)", 
                "Golgi vesicle transport (GO:0048193)", 
                "chitin-based cuticle development (GO:0040003)")
 
@@ -289,7 +290,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   theme_bw() + 
   theme(text = element_text(size = 24), plot.margin = margin(0,0,0,0.1, "cm"))
 
-ggsave(filename = file.path(TARGET_dir, "Middle_Cells_GSEA_results.png"), plot = p, width = 10, height = 5)
+ggsave(filename = file.path(TARGET_dir, "Middle_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
 for(term in sub_GSEA_results$pathway) { 
   target_genes = sub_GSEA_results[sub_GSEA_results$pathway == term, 'leadingEdge']

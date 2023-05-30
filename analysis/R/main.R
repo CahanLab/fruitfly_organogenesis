@@ -147,3 +147,5 @@ source("R/wt13_compare_Calderon.R")
 # late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
 source("R/wt13_compare_Seroka.R")
 
+# make hte supplementary tables 
+source("R/make_supp_tabs.R")
