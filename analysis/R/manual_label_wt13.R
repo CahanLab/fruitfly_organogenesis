@@ -1,10 +1,7 @@
-library(Seurat)
-library(harmony)
-library(magrittr)
-library(ggplot2)
-library(stringr)
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13")
+
+##### first round of cell typing #####
 object = readRDS(file.path("results", ANALYSIS_VERSION, "wt13_integrated/BDGP_automated_annotation_object.rds"))
 
 manual_tab = read.csv(file.path(TARGET_dir, 'manualCellType.csv'))
@@ -28,14 +25,13 @@ for(unique_ct in unique(marker_genes$annotation)) {
 }
 
 FeaturePlot(object, features = 'Glia_ModuleScore1')
-
 VlnPlot(object, features = 'Glia_Midline_ModuleScore1', pt.size = 0)
 object@meta.data[object@meta.data$seurat_clusters == 26, 'manual_celltypes'] = "Muscle System"
 p = DimPlot(object, group.by = 'manual_celltypes', label = TRUE)
 ggsave(filename = file.path(TARGET_dir, 'cell_type_UMAP.png'), plot = p, width = 18, height = 9)
-
 saveRDS(object, file = file.path(TARGET_dir, 'manual_celltype_object.rds'))
 
+##### second round of cell typing #####
 object = readRDS(file.path(TARGET_dir, 'manual_celltype_object.rds'))
 Seurat::DimPlot(object, group.by = 'manual_celltypes')
 
@@ -51,7 +47,7 @@ ggsave(filename = file.path(TARGET_dir, 'cell_type_UMAP2.png'), plot = p, width 
 
 saveRDS(object, file.path(TARGET_dir, 'manual_celltype_object2.rds'))
 
-# rename some of the muscle groups 
+##### third round of cell typing ##### 
 object = readRDS(file.path(TARGET_dir, "manual_celltype_object2.rds"))
 object@meta.data[object@meta.data$seurat_clusters == 26, 'manual_celltypes'] = 'Hindgut Muscle'
 object@meta.data[object@meta.data$seurat_clusters == 13, 'manual_celltypes'] = 'Pharyngeal Muscle'
@@ -59,7 +55,7 @@ p = DimPlot(object, group.by = 'manual_celltypes', label = TRUE)
 ggsave(filename = file.path(TARGET_dir, 'cell_type_UMAP3.png'), plot = p, width = 18, height = 9)
 saveRDS(object, file.path(TARGET_dir, 'manual_celltype_object3.rds'))
 
-# I think we should preserve the old cell typing
+##### fourth round of cell typing #####
 object = readRDS(file.path(TARGET_dir, 'manual_celltype_object.rds'))
 object@meta.data[object@meta.data$seurat_clusters == 26, 'manual_celltypes'] = 'Hindgut Muscle'
 object@meta.data[object@meta.data$seurat_clusters == 13, 'manual_celltypes'] = 'Pharyngeal Muscle'
