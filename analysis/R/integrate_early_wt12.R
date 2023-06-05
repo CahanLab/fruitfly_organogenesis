@@ -1,13 +1,9 @@
-library(Seurat)
-library(harmony)
-library(magrittr)
-library(ggplot2)
-library(stringr)
-
+# integrate the stage 10-12 embryos 
 SAMPLETYPE = "wt_early"
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "early_wt12_integrated")
 dir.create(TARGET_dir)
 
+##### compile the two replicates #####
 rep1 = readRDS(file.path("results", ANALYSIS_VERSION, paste0(SAMPLETYPE, "_rep1"), "BDGP_automated_annotation_object.rds"))
 rep1@meta.data$batch = 'rep_1'
 
@@ -21,6 +17,7 @@ raw_object@meta.data = merged_seurat@meta.data
 
 saveRDS(raw_object, file = file.path(TARGET_dir, paste0(SAMPLETYPE, "_raw_merged.rds")))
 
+##### naive integration ##### 
 object = Seurat::NormalizeData(raw_object)
 cellCycleMarkers = read.csv("accessory_data/cellCycleMarkers.csv", skip = 1, header = T)
 object %<>% CellCycleScoring(s.features = cellCycleMarkers$S.phase.markers., g2m.features = cellCycleMarkers$G2.M.phase.markers.)
@@ -64,7 +61,7 @@ pdf(file = file.path(TARGET_dir, "naive_integration.pdf"))
 DimPlot(object, group.by = "batch")
 dev.off()
 
-# harmony integration 
+##### harmony integration #####
 object %<>% harmony::RunHarmony("batch")
 object %<>% FindNeighbors(reduction = "harmony", dims = 1:num_pc)
 object %<>% RunUMAP(reduction = "harmony", dim = 1:num_pc)
@@ -75,11 +72,10 @@ dev.off()
 
 saveRDS(object, file = file.path(TARGET_dir, 'object.rds'))
 
-#######################################################
-# cell type the clusters using BDGP 
+##### auto-annotation the clusters using BDGP #####
 object = readRDS(file.path(TARGET_dir, 'object.rds'))
 
-# Crank out cluster markers
+# Crank out top 20 cluster markers
 withr::with_dir(
   file.path(TARGET_dir), 
   {
@@ -97,7 +93,7 @@ withr::with_dir(
   }
 )
 
-# Crank out cluster markers
+# Crank out top 50 cluster markers
 withr::with_dir(
   file.path(TARGET_dir), 
   {
@@ -132,58 +128,11 @@ names(gene_converter) = as.vector(gene_metadata$symbol)
 
 BDGP_database_ct = read.csv("accessory_data/BDGP_marker_genes/insitu_annot.csv", header = FALSE)
 colnames(BDGP_database_ct) = c("gene_name1", "gene_name2", 'fly_base_id', 'stage', 'cell_type')
-BDGP_ct_assign <- function(BDGP_database_ct, stage_name = 'stage11-12', gene_name = 'FBgn0003254') { 
-  stage_list = list()
-  stage_list[['stage13-16']] = 6
-  stage_list[['stage11-12']] = 5
-  stage_list[['stage9-10']] = 4
-  stage_list[['stage7-8']] = 3
-  stage_list[['stage4-6']] = 2
-  stage_list[['stage1-3']] = 1
-  
-  sub_BDGP = BDGP_database_ct[BDGP_database_ct$fly_base_id == gene_name, ]
-  sub_BDGP = sub_BDGP[sub_BDGP$stage == stage_list[[stage_name]], ]
-  
-  if(nrow(sub_BDGP) > 0) {
-    return(as.vector(sub_BDGP$cell_type))
-  } else {
-    return('None')
-  }
-}
 
 BDGP_database_image = read.csv("accessory_data/BDGP_marker_genes/insitu_images.csv", header = FALSE)
 BDGP_database_image = BDGP_database_image[, seq(1, 7)]
-BDGP_image_assign <- function(BDGP_database_image, stage_name = 'stage13-16', gene_name = 'FBgn0003254') {
-  
-  colnames(BDGP_database_image) = c("gene_name1", "gene_name2", 'gene_name3',
-                                    'fly_base_id', 'project_name', 'links', 
-                                    'stage')
-  stage_list = list()
-  stage_list[['stage13-16']] = 6
-  stage_list[['stage11-12']] = 5
-  stage_list[['stage9-10']] = 4
-  stage_list[['stage7-8']] = 3
-  stage_list[['stage4-6']] = 2
-  stage_list[['stage1-3']] = 1
-  
-  sub_BDGP_image = BDGP_database_image[BDGP_database_image$fly_base_id == gene_name, ]
-  sub_BDGP_image = sub_BDGP_image[sub_BDGP_image$stage == stage_list[[stage_name]], ]
-  
-  link_string_button = '<summary>see images</summary>'
-  link_string = ''
-  
-  if(nrow(sub_BDGP_image) > 0) { 
-    links = paste0('https://insitu.fruitfly.org/insitu_image_storage/', sub_BDGP_image$links)
-    for(link in links) { 
-      link_string = paste0(link_string, '<img src="', link, '" height=200></img>')
-    }
-  }
-  link_string = paste0('<p>', link_string, '</p>')
-  link_string = paste0(link_string_button, link_string)
-  link_string = paste0('<details>', link_string, "</details>")
-  return(link_string)
-}
 
+# find tentative cell types 
 withr::with_dir(
   file.path(TARGET_dir), 
   {
@@ -276,6 +225,7 @@ withr::with_dir(
   }
 )
 
+# make the web-app for the marker genes 
 withr::with_dir(
   file.path(TARGET_dir), 
   {
@@ -302,6 +252,7 @@ withr::with_dir(
   }
 )
 
+# assign tentative cell types 
 object@meta.data$tentativeCellType = NULL
 for(temp_cluster in unique(clusterAnnotation$cluster)) { 
   object@meta.data[object@meta.data$seurat_clusters == temp_cluster, 'Integrated_tentativeCellType'] = clusterAnnotation[clusterAnnotation$cluster == temp_cluster, 'annotation']

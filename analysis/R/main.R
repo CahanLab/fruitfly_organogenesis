@@ -55,14 +55,14 @@ source("R/wt13_GSEA.R")
 # Fig. 2D 
 source("R/plot_wt13_GSEA.R")
 
-# plot out the marker genes for rare cell types - refactoring in this file
+# plot out the marker genes for rare cell types 
 # Supp Fig. 17 - 28 
 source("R/plot_selected_marker_genes_wt13.R")
 
-# this is to integrate and cell type wild-type early rep 1 and rep 2
+# this is to integrate and cell type wild-type early rep 1 and rep 2 
 source("R/integrate_early_wt12.R") 
 
-# this is to manually label wildtype 1 and wildtype 2 early integrated data 
+# this is to manually label wildtype 1 and wildtype 2 early integrated data - refactoring in this file
 source("R/manual_label_early_wt12.R") 
 
 # perform GSEA on the early wildtype data 
@@ -117,6 +117,7 @@ source("R/wt13_matrisome.R")
 # perform analysis of matrisome in early wildtype 
 source("R/early_wt12_matrisome.R")
 
+# plot out the plasmatocytes genes 
 source("R/plot_plasmatocytes_genes.R")
 
 # make the supplementary tables 
