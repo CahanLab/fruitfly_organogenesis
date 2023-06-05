@@ -20,6 +20,9 @@ write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
 
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "monocle3_no_batch_correct_object.rds"))
 plot_cells(cds, genes = 'BigH1', cell_size = 1) 
+plot_cells(cds, genes = c("lncRNA:roX1", "lncRNA:roX2"), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
+plot_cells(cds, genes = c("CG6701", "Pp2C1", 'ovo', 'otu', 'Sxl'), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
+
 # this is to plot out the dead cells 
 plot_cells(cds, genes = c('nos', 'wun2', 'Lsd-1', 'Lsd-2'), cell_size = 1, show_trajectory_graph = FALSE) 
 
@@ -111,6 +114,21 @@ for(gene_interest in gene_interest_list) {
 }
 
 gene_interest_list = c('bam', 'bgcn', 'zpg', 'stg', 'esg', 'kmg', 'Rbp4', 'Pp2C1', 'CG6701', 'Parp16', 'Glut3')
+for(gene_interest in gene_interest_list) {
+  UMAP_coord$gene_exp = norm_exp[gene_interest, ]
+  p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -gene_exp), y=gene_exp, fill = cell_type)) + 
+    geom_violin() +
+    guides(fill=guide_legend(title="")) +
+    geom_boxplot(width=0.1) +
+    theme_minimal() +
+    scale_fill_brewer(palette = 'Set2') + 
+    ylab(paste0(gene_interest, " normalized expression")) + 
+    xlab("cell type") + 
+    theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  ggsave(filename = file.path(TARGET_dir, paste0("violin_", gene_interest, ".png")), plot = p, width = 8, height = 6)
+}
+
+gene_interest_list = c("lncRNA:roX1", "lncRNA:roX2")
 for(gene_interest in gene_interest_list) {
   UMAP_coord$gene_exp = norm_exp[gene_interest, ]
   p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -gene_exp), y=gene_exp, fill = cell_type)) + 

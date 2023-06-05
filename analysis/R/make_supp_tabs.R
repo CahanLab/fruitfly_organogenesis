@@ -40,7 +40,6 @@ run_file_list[['Stage10-12_GC']] = file.path("results", ANALYSIS_VERSION, "early
 table_list = list()
 for(temp_name in names(run_file_list)) {
   gsea_results = read.csv(run_file_list[[temp_name]], row.names = 1)
-  #gsea_results = gsea_results[gsea_results$NES > 0, ]
   gsea_results = gsea_results[order(gsea_results$NES, decreasing = TRUE), ]
   table_list[[temp_name]] = gsea_results
 }
