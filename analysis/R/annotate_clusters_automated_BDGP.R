@@ -1,8 +1,7 @@
-library(rvest)
 object=readRDS(file.path(RESULTS, "object.Rdata"))
 Idents(object)=object[["seurat_clusters"]][[1]]
 
-# Crank out cluster markers
+# extract cluster markers
 withr::with_dir(
   file.path(RESULTS), 
   {
@@ -20,7 +19,7 @@ withr::with_dir(
   }
 )
 
-# load in the dictionary to convert the gene names to flybase gene name 
+# load in the dictionary to convert the gene names to flybase name 
 gtf_last_field = unique(read.table("../quantification/reference_genome_info/dmel-all-r6.33.gtf.gz", sep = "\t")[["V9"]])
 gene_metadata = data.frame(
   flybase_id =
@@ -93,78 +92,8 @@ BDGP_image_assign <- function(BDGP_database_image, stage_name = 'stage13-16', ge
   return(link_string)
 }
 
-# NOTE these are legacy robot code that will scrape. To avoid pissing off the people at BDGP, 
-#it's better to just download the database and rn
-# here is a quick robot that will scrape the website for image 
-BDGP_robot_image <- function(stage_name = 'stage13-16', gene_name = 'FBgn0003254') {
-  url = paste0('https://insitu.fruitfly.org/cgi-bin/ex/report.pl?ftype=10&ftext=', gene_name)
-  fly_data <- url %>%
-    rvest::read_html() %>%
-    rvest::html_nodes(xpath='/html/body/div[1]/div[2]/div[1]/table[2]') %>%
-    rvest::html_nodes("tbody") %>% rvest::html_children()
-  
-  if(length(fly_data) == 0) { 
-    return('None')
-  }
-  
-  #link_string_button = paste0('<p><a class="btn btn-primary" data-toggle="collapse" href="#', gene_name, '" role="button" aria-expanded="false" aria-controls="', gene_name, '">Show Images</a></p>')
-  link_string_button = '<summary>see images</summary>'
-  link_string = ''
-  
-  for(temp_index in seq(1, length(fly_data))) { 
-    cur_stage = fly_data[[temp_index]] %>% 
-      html_nodes("th") %>% 
-      html_text()
-    if(cur_stage == stage_name) { 
-      links = fly_data[[temp_index]] %>% 
-        rvest::html_nodes("td") %>% 
-        rvest::html_nodes('a') %>% 
-        rvest::html_attr("href")
-      links = links[grepl("cgi-bin", links) == FALSE]
-      links = paste0('https://insitu.fruitfly.org', links)
-      
-      for(link in links) { 
-        link_string = paste0(link_string, '<img src="', link, '" height=200></img>')
-      }
-    }
-  }
-  link_string = paste0('<p>', link_string, '</p>')
-  link_string = paste0(link_string_button, link_string)
-  link_string = paste0('<details>', link_string, "</details>")
-  return(link_string)
-}
-# here is a quick robot that will scrape the website 
-BDGP_robot <- function(stage_name = 'stage13-16', gene_name = 'FBgn0003254') { 
-  url = paste0('https://insitu.fruitfly.org/cgi-bin/ex/report.pl?ftype=10&ftext=', gene_name)
-  fly_data <- url %>%
-    rvest::read_html() %>%
-    rvest::html_nodes(xpath='/html/body/div[1]/div[2]/div[1]/table[2]') %>%
-    rvest::html_nodes("tbody") %>% rvest::html_children()
-  
-  if(length(fly_data) == 0) { 
-    return(vector())
-  }
-  
-  for(temp_index in seq(1, length(fly_data))) { 
-    cur_stage = fly_data[[temp_index]] %>% 
-      html_nodes("th") %>% 
-      html_text()
-    if(cur_stage == stage_name) { 
-      item = fly_data[[temp_index]] %>% 
-        html_nodes("td") %>% 
-        html_text()
-      item_string = paste(item, collapse = '')
-      item_string = stringr::str_remove_all(item_string, "\t")
-      cell_types = stringr::str_split(item_string, "\n")[[1]]
-      cell_types = cell_types[cell_types != ""]
-      cell_types = trimws(cell_types)
-    }
-  }
-  return(unique(cell_types))
-}
-
-
-# add 
+# based on the marker genes in BDGP and the expression of differentially expressed genes 
+# assign a tentative cell type 
 withr::with_dir(
   file.path(RESULTS), 
   {
@@ -219,11 +148,11 @@ withr::with_dir(
       num_genes_list = num_genes_list[names(num_genes_list) != 'no staining']
       score_list = score_list[names(score_list) != 'no staining']
       
-      # remove the no ubiquitous 
+      # remove the ubiquitous 
       num_genes_list = num_genes_list[names(num_genes_list) != 'ubiquitous']
       score_list = score_list[names(score_list) != 'ubiquitous']
       
-      # remove the no ubiquitous 
+      # remove the ubiquitous 
       num_genes_list = num_genes_list[names(num_genes_list) != 'None']
       score_list = score_list[names(score_list) != 'None']
       
@@ -257,7 +186,8 @@ withr::with_dir(
   }
 )
 
-# to add the image links for each 
+# to add the image links for each gene 
+# construct a web-app of top DE genes for each cluster of cells. 
 withr::with_dir(
   file.path(RESULTS), 
   {
@@ -289,7 +219,7 @@ for(temp_cluster in unique(clusterAnnotation$cluster)) {
   object@meta.data[object@meta.data$seurat_clusters == temp_cluster, 'tentativeCellType'] = clusterAnnotation[clusterAnnotation$cluster == temp_cluster, 'annotation']
 }
 
-# remove the embryonic status 
+# remove 'embryonic'  
 object@meta.data$tentativeCellType = stringr::str_remove(object@meta.data$tentativeCellType, "embryonic ")
 object@meta.data$tentativeCellType = stringr::str_remove(object@meta.data$tentativeCellType, "embryonic/larval ")
 
