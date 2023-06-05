@@ -19,6 +19,7 @@ metadata = read.table(header = T, text=
 SAMPLE = "all"
 source("R/set_up_environment.R")
 
+# do a quick automated preprocessing of the samples individually 
 for(i in 1:4){ 
   SAMPLE = metadata$sample[i]  
   CELLRANGER = metadata$cellranger[i] 

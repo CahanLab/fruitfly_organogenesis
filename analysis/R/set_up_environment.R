@@ -8,6 +8,8 @@ library("dplyr")
 library("magrittr")
 library("Matrix")
 library("Seurat")
+library("stringr")
+library("harmony")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

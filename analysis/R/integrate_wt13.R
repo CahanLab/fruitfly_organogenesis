@@ -1,9 +1,6 @@
-library(Seurat)
-library(harmony)
-library(magrittr)
-library(ggplot2)
-library(stringr)
-
+# integrate stage 13-16 wild type samples 
+# we are integrating replicate 1 and replicate 3 because replicate 2 has quality issues 
+# in the manuscript, replicate 3 is renamed as replicate 2 to avoid confusions 
 SAMPLETYPE = "wt"
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "wt13_integrated")
 dir.create(TARGET_dir)
@@ -75,11 +72,10 @@ dev.off()
 
 saveRDS(object, file = file.path(TARGET_dir, 'object.rds'))
 
-#######################################################
 # cell type the clusters using BDGP 
 object = readRDS(file.path(TARGET_dir, 'object.rds'))
 
-# Crank out cluster markers
+# extract top 20 cluster markers
 withr::with_dir(
   file.path(TARGET_dir), 
   {
@@ -94,21 +90,6 @@ withr::with_dir(
     } else { 
       differentially_expressed = read.csv("top_marker_genes_1-20.csv", row.names = 1)
     }
-  }
-)
-
-# Crank out cluster markers
-withr::with_dir(
-  file.path(TARGET_dir), 
-  {
-    if('top_marker_genes_1-50.csv' %in% list.files() == FALSE) { 
-      differentially_expressed = read.csv("marker_genes.csv", row.names = 1)
-      differentially_expressed %>%
-        dplyr::group_by(cluster) %>%
-        dplyr::top_n(n=50, wt = avg_log2FC) %>%
-        dplyr::arrange(cluster) %>%
-        write.csv("top_marker_genes_1-50.csv")      
-    } 
   }
 )
 
