@@ -1,7 +1,6 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
-library(viridis)
+# plot out the cross study comparisons results for stage 13-16 wildtypes 
+# Fig. 7c
+# Supp Fig 12b, 30, 31
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'cross_study_comparison_wt13')
 dir.create(TARGET_dir, recursive = TRUE)
@@ -28,7 +27,7 @@ p = ggplot(seroka_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
   ggtitle("Stage 13-16: SCN Classification Proportion using cell types from Seroka et al") 
 ggsave(filename = file.path(TARGET_dir, 'Seroka_SCN_proportion.png'), plot = p, width = 14, height = 10)
 
-# this is to plot out cell type proportion 
+# this is to plot out cell type across different studies 
 total_plot_df = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_wt13/stage_13_16_proportion.rds"))
 total_plot_df[total_plot_df$data_type == 'our data', 'data_type'] = 'Stage 13-16 Embryonic Data'
 total_plot_df[total_plot_df$data_type == 'Calderon et al, 2022', 'data_type'] = 'Calderon et al (stage 14-16)'
@@ -43,7 +42,7 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
   theme(text = element_text(size = 24), legend.title=element_blank(), plot.title.position = "plot")
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 9)
 
-# plot the reverse SCN results 
+# plot the reverse SCN results for Seroka data 
 dir.create(file.path(TARGET_dir, 'reverse_SCN_seroka'), recursive = TRUE)
 reverse_seroka_object = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_wt13/reverse_seroka_SCN_object.rds"))
 

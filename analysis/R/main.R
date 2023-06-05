@@ -40,13 +40,15 @@ source("R/manual_label_wt13.R")
 # Supp Fig 1a, 1b
 source("R/plot_wt13_UMAP_proportion.R")
 
-# cross study comparison for stage 13-16 wildtype - refactoring in this file
+# cross study comparison for stage 13-16 wildtype 
 source("R/cross_study_comparison_wt13.R")
 
 # plot out cross study comparison for late wildtype 
+# Fig. 7c
+# Supp Fig 12b, 30, 31
 source("R/plot_cross_study_comparison_wt13.R")
 
-# perform GSEA on the data 
+# perform GSEA on the data - refactoring in this file
 source("R/wt13_GSEA.R")
 
 # plot out the results for late wildtype 3 GSEA 
