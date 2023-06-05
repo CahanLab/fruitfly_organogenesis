@@ -1,7 +1,4 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
-
+# plot out nfeatures and log10_ncounts across batches 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_late_statistics')
 dir.create(TARGET_dir, recursive = TRUE)
 

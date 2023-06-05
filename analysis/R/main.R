@@ -32,11 +32,8 @@ for(i in 1:4){
 # this is to integrate and cell type wild-type rep 1 and rep 3 - DONE 
 source("R/integrate_wt13.R") 
 
-# manually label the wt13 integrated data 
+# manually label the wt13 integrated data - DONE
 source("R/manual_label_wt13.R")
-
-# plot out statistics for for wt13
-source("R/plot_wt13_statistics.R")
 
 # plot out UMAP and proportion for for wt13
 source("R/plot_wt13_UMAP_proportion.R")
@@ -118,6 +115,14 @@ source("R/wt13_matrisome.R")
 source("R/early_wt12_matrisome.R")
 
 source("R/plot_plasmatocytes_genes.R")
+
+# make the supplementary tables 
+source("R/make_supp_tabs.R")
+
+##### scripts that were not used #####
+# plot out statistics for for wt13
+source("R/plot_wt13_statistics.R")
+
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 
@@ -148,5 +153,4 @@ source("R/wt13_compare_Calderon.R")
 # late wt13 celltyping compare with the celltyping in Seroka et al, 2022 DOI: https://doi.org/10.1016/j.ydbio.2022.05.018
 source("R/wt13_compare_Seroka.R")
 
-# make hte supplementary tables 
-source("R/make_supp_tabs.R")
+

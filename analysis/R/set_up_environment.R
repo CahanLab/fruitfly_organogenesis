@@ -10,6 +10,8 @@ library("Matrix")
 library("Seurat")
 library("stringr")
 library("harmony")
+library("RColorBrewer")
+library("ggdendroplot")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")
