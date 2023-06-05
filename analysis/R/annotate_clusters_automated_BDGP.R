@@ -40,57 +40,8 @@ names(gene_converter) = as.vector(gene_metadata$symbol)
 BDGP_database_ct = read.csv("accessory_data/BDGP_marker_genes/insitu_annot.csv", header = FALSE)
 colnames(BDGP_database_ct) = c("gene_name1", "gene_name2", 'fly_base_id', 'stage', 'cell_type')
 
-BDGP_ct_assign <- function(BDGP_database_ct, stage_name = 'stage13-16', gene_name = 'FBgn0003254') { 
-  stage_list = list()
-  stage_list[['stage13-16']] = 6
-  stage_list[['stage11-12']] = 5
-  stage_list[['stage9-10']] = 4
-  stage_list[['stage7-8']] = 3
-  stage_list[['stage4-6']] = 2
-  stage_list[['stage1-3']] = 1
-  
-  sub_BDGP = BDGP_database_ct[BDGP_database_ct$fly_base_id == gene_name, ]
-  sub_BDGP = sub_BDGP[sub_BDGP$stage == stage_list[[stage_name]], ]
-  
-  if(nrow(sub_BDGP) > 0) {
-    return(as.vector(sub_BDGP$cell_type))
-  } else {
-    return('None')
-  }
-}
-
 BDGP_database_image = read.csv("accessory_data/BDGP_marker_genes/insitu_images.csv", header = FALSE)
 BDGP_database_image = BDGP_database_image[, seq(1, 7)]
-BDGP_image_assign <- function(BDGP_database_image, stage_name = 'stage13-16', gene_name = 'FBgn0003254') {
-
-  colnames(BDGP_database_image) = c("gene_name1", "gene_name2", 'gene_name3',
-                                    'fly_base_id', 'project_name', 'links', 
-                                    'stage')
-  stage_list = list()
-  stage_list[['stage13-16']] = 6
-  stage_list[['stage11-12']] = 5
-  stage_list[['stage9-10']] = 4
-  stage_list[['stage7-8']] = 3
-  stage_list[['stage4-6']] = 2
-  stage_list[['stage1-3']] = 1
-  
-  sub_BDGP_image = BDGP_database_image[BDGP_database_image$fly_base_id == gene_name, ]
-  sub_BDGP_image = sub_BDGP_image[sub_BDGP_image$stage == stage_list[[stage_name]], ]
-  
-  link_string_button = '<summary>see images</summary>'
-  link_string = ''
-  
-  if(nrow(sub_BDGP_image) > 0) { 
-    links = paste0('https://insitu.fruitfly.org/insitu_image_storage/', sub_BDGP_image$links)
-    for(link in links) { 
-      link_string = paste0(link_string, '<img src="', link, '" height=200></img>')
-    }
-  }
-  link_string = paste0('<p>', link_string, '</p>')
-  link_string = paste0(link_string_button, link_string)
-  link_string = paste0('<details>', link_string, "</details>")
-  return(link_string)
-}
 
 # based on the marker genes in BDGP and the expression of differentially expressed genes 
 # assign a tentative cell type 

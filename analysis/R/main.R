@@ -29,7 +29,7 @@ for(i in 1:4){
   source("R/annotate_clusters_automated_BDGP.R") # perform a quick annotation using genes from BDGP 
 }
 
-# this is to integrate and cell type wild-type rep 1 and rep 3
+# this is to integrate and cell type wild-type rep 1 and rep 3 - DONE 
 source("R/integrate_wt13.R") 
 
 # manually label the wt13 integrated data 
