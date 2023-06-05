@@ -1,8 +1,8 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
+# make plots for the GSEA results for stage 13-16 embryos 
+# Fig. 2D 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt13_GSEA')
 
+##### NOT USED -- plot out the highest GSEA categories for salivary gland, trachea and germ cells ######
 gsea_results = read.csv(file.path("results", ANALYSIS_VERSION, "wt13_enrichment/Salivary Gland/gsea_results_wt.csv"), row.names = 1)
 gsea_results = gsea_results[gsea_results$padj < 0.05, ]
 gsea_results = gsea_results[gsea_results$NES > 0, ]
@@ -86,7 +86,7 @@ p = ggplot(gsea_results, aes(x = reorder(pathway, -padj), y = NES)) +
 ggsave(filename = file.path(TARGET_dir, "stage13-16_gc.png"), width = 16, height = 10)
 
 
-##### this is to plot out a individual barplot #####
+##### plot out selected GSEA categories for SG, trachea and GCs #####
 gsea_results = read.csv(file.path("results", ANALYSIS_VERSION, "wt13_enrichment/Salivary Gland/gsea_results_wt.csv"), row.names = 1)
 gsea_results = gsea_results[gsea_results$padj < 0.05, ]
 gsea_results = gsea_results[gsea_results$NES > 0, ]
@@ -137,17 +137,9 @@ temp_plot_df = data.frame("pathway" = sub_gsea_results$pathway,
                           'celltype' = 'germ \n cells')
 big_plot_df = rbind(big_plot_df, temp_plot_df)
 big_plot_df$pathway = stringr::str_remove_all(big_plot_df$pathway, " \\\n.*")
-#big_plot_df[big_plot_df$pathway == "cell morphogenesis involved in differentiation", "pathway"] = "cell morphogenesis \n involved in differentiation"
-#big_plot_df[big_plot_df$pathway == "establishment or maintenance of apical/basal cell polarity", "pathway"] = "establishment or maintenance of \n apical/basal cell polarity"
-#big_plot_df[big_plot_df$pathway == "proteasomal ubiquitin-independent protein catabolic process", "pathway"] = "proteasomal ubiquitin-independent \n protein catabolic process"
-
 big_plot_df$celltype = factor(big_plot_df$celltype, levels = c("salivary \n gland", "trachea", "germ \n cells"))
 p <- ggplot(data = big_plot_df, aes(y = reorder(pathway, log10_adj), x = log10_adj, fill = celltype)) +
   geom_bar(stat="identity") +
-  #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
-  #guides(size = guide_legend(title = 'Percent Expressed')) +
-  #guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
-  #scale_colour_viridis_c() + 
   labs(
     x = '-log10 adjusted p-value',
     y = ''

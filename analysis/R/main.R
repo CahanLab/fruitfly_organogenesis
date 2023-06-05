@@ -48,13 +48,14 @@ source("R/cross_study_comparison_wt13.R")
 # Supp Fig 12b, 30, 31
 source("R/plot_cross_study_comparison_wt13.R")
 
-# perform GSEA on the data - refactoring in this file
+# perform GSEA on the data 
 source("R/wt13_GSEA.R")
 
 # plot out the results for late wildtype 3 GSEA 
+# Fig. 2D 
 source("R/plot_wt13_GSEA.R")
 
-# plot out the marker genes for rare cell types 
+# plot out the marker genes for rare cell types - refactoring in this file
 source("R/plot_selected_marker_genes_wt13.R")
 
 # plot out all the marker genes for the cell types 

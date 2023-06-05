@@ -1,21 +1,13 @@
-library(fgsea)
-library(ggplot2)
-library(Seurat)
-library(stringr)
-library(singleCellNet)
-library(Matrix)
-library(pheatmap)
-library(enrichR)
-library(RColorBrewer)
-
-enrichR::setEnrichrSite("FlyEnrichr")
+# perform GSEA on all the cell types in stage 13-16 wild-type embryos 
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "wt13_enrichment")
 dir.create(TARGET_dir)
 
+# load in the necessary data 
 object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13", "manual_celltype_object4.rds"))
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
 
+# write all the results 
 withr::with_dir(TARGET_dir, {
   for(celltype in unique(object$manual_celltypes)) {
     if(stringr::str_replace_all(celltype, "/", "-") %in% list.dirs(".", recursive = FALSE, full.names = FALSE)) {
@@ -61,6 +53,7 @@ withr::with_dir(TARGET_dir, {
   }
 })
 
+# make the preliminary plots 
 all_folders = list.dirs(TARGET_dir, recursive = FALSE)
 for(my_folder in all_folders) {
   print(my_folder)

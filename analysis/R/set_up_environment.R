@@ -13,6 +13,11 @@ library("harmony")
 library("RColorBrewer")
 library("ggdendroplot")
 library("viridis")
+library("fgsea")
+library("singleCellNet")
+library("Matrix")
+library("pheatmap")
+library("enrichR")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")
