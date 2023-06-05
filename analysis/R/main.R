@@ -56,10 +56,8 @@ source("R/wt13_GSEA.R")
 source("R/plot_wt13_GSEA.R")
 
 # plot out the marker genes for rare cell types - refactoring in this file
+# Supp Fig. 17 - 28 
 source("R/plot_selected_marker_genes_wt13.R")
-
-# plot out all the marker genes for the cell types 
-source("R/plot_all_marker_genes_wt13.R")
 
 # this is to integrate and cell type wild-type early rep 1 and rep 2
 source("R/integrate_early_wt12.R") 
@@ -127,6 +125,9 @@ source("R/make_supp_tabs.R")
 ##### scripts that were not used #####
 # plot out statistics for for wt13
 source("R/plot_wt13_statistics.R")
+
+# plot out all the marker genes for the cell types 
+source("R/plot_all_marker_genes_wt13.R")
 
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 

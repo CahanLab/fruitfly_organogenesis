@@ -1,6 +1,5 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
+# make violin and UMAP (NOT USED) plots of marker genes for rare cell types in stage 13-16 embryos 
+# Supp Fig. 17 - 28 
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_late_selected_marker_genes')
 dir.create(TARGET_dir, recursive = TRUE)
@@ -36,7 +35,6 @@ withr::with_dir(TARGET_dir, {
           ggtitle(paste0(gene, " (", ct, ")")) + 
           theme(text = element_text(size = 16), legend.text=element_text(size=24), legend.position = 'none')
         ggsave(filename = paste0("UMAP_", ct, "_", gene, ".png"), plot = p, width = 10, height = 10)
-        
       }
     }
   }
