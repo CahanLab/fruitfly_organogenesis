@@ -29,16 +29,18 @@ for(i in 1:4){
   source("R/annotate_clusters_automated_BDGP.R") # perform a quick annotation using genes from BDGP 
 }
 
-# this is to integrate and cell type wild-type rep 1 and rep 3 - DONE 
+# this is to integrate and cell type wild-type rep 1 and rep 3 (in the manuscript rep 3 is labelled as rep 2) 
 source("R/integrate_wt13.R") 
 
-# manually label the wt13 integrated data - DONE
+# manually label the wt13 integrated data 
 source("R/manual_label_wt13.R")
 
-# plot out UMAP and proportion for for wt13
+# plot out UMAP and proportion plots for for wt13
+# Fig 1b, 1c
+# Supp Fig 1a, 1b
 source("R/plot_wt13_UMAP_proportion.R")
 
-# cross study comparison for late wildtype
+# cross study comparison for stage 13-16 wildtype - refactoring in this file
 source("R/cross_study_comparison_wt13.R")
 
 # plot out cross study comparison for late wildtype 

@@ -12,6 +12,7 @@ library("stringr")
 library("harmony")
 library("RColorBrewer")
 library("ggdendroplot")
+library("viridis")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

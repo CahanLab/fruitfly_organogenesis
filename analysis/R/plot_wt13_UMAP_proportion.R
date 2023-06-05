@@ -1,5 +1,5 @@
 # Make plots of stage 13-16 wild-type embryos  
-# Figure 1b
+# Figure 1b, 1c
 # Supp Fig 1a, 1b
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_late_UMAP_proportion')
