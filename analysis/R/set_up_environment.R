@@ -19,6 +19,9 @@ library("Matrix")
 library("pheatmap")
 library("enrichR")
 enrichR::setEnrichrSite("FlyEnrichr")
+library("monocle3")
+library("presto")
+library("tradeSeq")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")
