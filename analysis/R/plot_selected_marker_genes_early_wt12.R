@@ -1,6 +1,5 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
+# make plots of rare cell types in stage 10-12 
+# Supp Fig 13-16
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_early_selected_marker_genes')
 dir.create(TARGET_dir, recursive = TRUE)

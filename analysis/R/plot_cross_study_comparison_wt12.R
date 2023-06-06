@@ -1,11 +1,11 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
-library(viridis)
+# plot comparisons of stage 10-12 embryos in our data and other data 
+# Fig 7C
+# Supp Fig 12A, 29
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'cross_study_comparison_early_wt12')
 dir.create(TARGET_dir, recursive = TRUE)
 
+##### plot heatmap summarizing the SCN classification trained on Seroka and Calderon data and applied to ours #####
 calderon_SCN_matrix = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_early_wt12/calderon_proportion.rds"))
 calderon_SCN_matrix$our_ct = as.character(calderon_SCN_matrix$our_ct)
 calderon_SCN_matrix[calderon_SCN_matrix$our_ct == 'Unknown', 'our_ct'] = 'Unknown (CNS)'
@@ -33,7 +33,7 @@ p = ggplot(seroka_SCN_matrix, aes(our_ct, other_ct, fill= class_proportion)) +
   ggtitle("Stage 10-12: SCN Classification Proportion using cell types from Seroka et al")
 ggsave(filename = file.path(TARGET_dir, 'Seroka_SCN_proportion.png'), plot = p, width = 14, height = 10)
 
-# this is to plot out cell type proportion 
+##### this is to plot out cell type proportion across different data #####
 total_plot_df = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_early_wt12/stage_10_12_proportion.rds"))
 total_plot_df[total_plot_df$data_type == 'our data', 'data_type'] = 'Stage 10-12 Embryonic Data'
 total_plot_df[total_plot_df$data_type == 'Calderon et al, 2022', 'data_type'] = 'Calderon et al (stage 10-12)'
@@ -48,7 +48,7 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
 
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 10, height = 9)
 
-# plot the reverse SCN results 
+##### plot the reverse SCN classification trained on our data and applied to seroka et al #####
 dir.create(file.path(TARGET_dir, 'reverse_SCN_seroka'), recursive = TRUE)
 reverse_seroka_object = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_early_wt12/reverse_seroka_SCN_object.rds"))
 
@@ -73,7 +73,7 @@ withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_seroka'), {
   }
 })
 
-# plot the reverse SCN results for Calderon data
+##### plot the reverse SCN classification trained on our data and applied to calderon et al #####
 dir.create(file.path(TARGET_dir, 'reverse_SCN_calderon'), recursive = TRUE)
 reverse_calderon_object = readRDS(file.path('results', ANALYSIS_VERSION, "cross_study_comparison_early_wt12/reverse_calderon_SCN_object.rds"))
 

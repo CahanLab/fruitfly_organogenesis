@@ -76,14 +76,20 @@ source("R/plot_early_wt12_GSEA.R")
 # Supp Fig 1C, 1D
 source("R/plot_early_wt12_UMAP_proportion.R")
 
-# cross study comparison for early wildtype - refactoring in this file
-# will need to run this manually because you would have to run some python scripts 
+# cross study comparison for early wildtype 
+# will need to run this manually because you would have to run some python scripts in the middle 
 source("R/cross_study_comparison_early_wt12.R")
 
-#plot the cross study comparisons for early wild type 2
+#plot the cross study comparisons for early wild type 2 
+# Fig 7C
+# Supp Fig 12A, 29
 source("R/plot_cross_study_comparison_wt12.R")
 
-# refined analysis of early + late salivary gland 
+# plot out the marker genes for rare cell types 
+# Supp Fig 13-16
+source("R/plot_selected_marker_genes_early_wt12.R")
+
+# refined analysis of early + late salivary gland - refactoring in this file
 source("R/refined_wt13_early12_salivary_gland.R")
 
 # make figures for the in depth analysis of salivary glands
@@ -100,12 +106,6 @@ source("R/refined_wt13_early12_germ.R")
 
 # make figures for the in depth analysis of germ cells 
 source("R/plot_refined_wt13_early12_germ.R")
-
-# match similarity between wild-type early samples and late samples 
-source("R/match_early_clusters_to_late_clusters.R")
-
-# compare cell cycle cells 
-source("R/plot_compare_cell_cycle_wt13_early_12.R")
 
 # plot out the quality metrics for all 4 batches 
 source("R/plot_quality_metrics_4_batches.R")
@@ -131,6 +131,12 @@ source("R/plot_all_marker_genes_wt13.R")
 
 # plot out statistics for for early wt12 
 source("R/plot_early_wt12_statistics.R")
+
+# match similarity between wild-type early samples and late samples 
+source("R/match_early_clusters_to_late_clusters.R")
+
+# compare cell cycle cells 
+source("R/plot_compare_cell_cycle_wt13_early_12.R")
 
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 
