@@ -98,13 +98,13 @@ source("R/refined_wt13_early12_salivary_gland.R")
 # Supp Fig 2
 source("R/plot_refined_wt13_early12_salivary_gland.R")
 
-# refined analysis of early + late trachea cells - refactoring in this file
+# refined analysis of early + late trachea cells 
 source("R/refined_wt13_early12_trachea.R")
 
 # make figures for the in depth analysis of trachea 
 source("R/plot_refined_wt13_early12_trachea.R")
 
-# refined analysis of early + late germ cells 
+# refined analysis of early + late germ cells - refactoring in this file
 source("R/refined_wt13_early12_germ.R")
 
 # make figures for the in depth analysis of germ cells 

@@ -1,8 +1,6 @@
-library(monocle3)
-library(ggplot2)
-library(RColorBrewer)
-library(dbplyr)
-
+# make plots for trachea analysis 
+# Fig 4
+# Supp Fig 3, 4
 
 # Load in files -----------------------------------------------------------
 # this section of code is there to load in all the appropriate files needed to make plots 
@@ -352,8 +350,6 @@ plot_heatmap <- function(cds, target_genes, bandwidth = 3) {
   norm_exp = monocle3::normalized_counts(cds)
   norm_exp = as.matrix(norm_exp)
   norm_exp = norm_exp[c(target_genes), ]
-  # this will change 
-  #norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
   pt = monocle3::pseudotime(cds)
   pt = data.frame(pseudotime = pt)
   plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
@@ -522,35 +518,3 @@ norm_exp_1 = plot_heatmap(cds, target_genes)
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1300, res = 200)
 pheatmap(norm_exp_1, cluster_cols = FALSE, cluster_rows = FALSE, main = stringr::str_split(term, ' \\(')[[1]][1], fontsize = 14)
 dev.off()
-
-
-##### plot out the transcription factors #####
-cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "monocle3_no_batch_correct_object.rds"))
-early_DE_genes = read.csv("results/v18/early_wt12_enrichment/Trachea/markers_genes.csv", row.names = 1)
-late_DE_genes = read.csv("results/v18/wt13_enrichment/Trachea/markers_genes.csv", row.names = 1)
-late_DE_genes = late_DE_genes[late_DE_genes$p_val_adj < 0.05 & late_DE_genes$avg_log2FC > 0, ]
-early_DE_genes = early_DE_genes[early_DE_genes$p_val_adj < 0.05 & early_DE_genes$avg_log2FC > 0, ]
-
-late_DE_genes$symbol = rownames(late_DE_genes)
-early_DE_genes$symbol = rownames(early_DE_genes)
-
-late_DE_genes$type = 'late'
-early_DE_genes$type = 'early'
-combined_DE_genes = rbind(late_DE_genes, early_DE_genes)
-combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'] = 
-  paste0(combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'], "_", "both")
-
-TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
-TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
-
-i_TFs = intersect(TF_tab$symbol, combined_DE_genes$symbol)
-
-combined_DE_genes = combined_DE_genes[combined_DE_genes$symbol %in% i_TFs, ]
-
-p = plot_genes_by_group(cds, markers = i_TFs, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
-  xlab("Cell Types") + 
-  coord_flip() + 
-  theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, 'dynamic_TF.png'), plot = p, width = 30, height = 6)
-
-
