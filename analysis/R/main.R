@@ -71,10 +71,12 @@ source("R/early_wt12_GSEA.R")
 # plot out the results for late wildtype 3 GSEA 
 source("R/plot_early_wt12_GSEA.R")
 
-# plot out UMAP and proportion for for early wt12 - refactoring in this file
+# plot out UMAP and proportion for for early wt12 
+# Fig 1D, 1E
+# Supp Fig 1C, 1D
 source("R/plot_early_wt12_UMAP_proportion.R")
 
-# cross study comparison for early wildtype
+# cross study comparison for early wildtype - refactoring in this file
 # will need to run this manually because you would have to run some python scripts 
 source("R/cross_study_comparison_early_wt12.R")
 
@@ -130,7 +132,6 @@ source("R/plot_all_marker_genes_wt13.R")
 # plot out statistics for for early wt12 
 source("R/plot_early_wt12_statistics.R")
 
-######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
 # going into the final manuscript 
 

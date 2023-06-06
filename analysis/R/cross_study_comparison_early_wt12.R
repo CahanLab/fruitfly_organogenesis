@@ -1,11 +1,12 @@
-library(Seurat)
-library(viridis)
+# perform comparisons between our data and data from Calderon et al, Seroka et al. 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "cross_study_comparison_early_wt12")
 dir.create(TARGET_dir)
 
+##### harmonize the cell types #####
+# load in our data 
 our_object = readRDS(file.path('results', ANALYSIS_VERSION, 'manual_annotation_early_wt12/manual_celltype_object1.rds'))
 
-# load in Seroka data
+# load in Seroka data and only select stage 12
 Seroka_object = readRDS("accessory_data/Doe_Drosophila_Embryo_Atlas/script/curated_embryo_Doe.rds")
 Seroka_object = Seroka_object[, Seroka_object$dataset == 'stg12']
 
@@ -13,8 +14,16 @@ Seroka_object = Seroka_object[, Seroka_object$dataset == 'stg12']
 Calderon_object = readRDS("accessory_data/continuum_drosophila_embryonic_development_RNA/processed_data/continuum_exploration/10-12_celltyped.rds")
 Calderon_object@meta.data$cell_type = stringr::str_trim(Calderon_object@meta.data$cell_type)
 
+# load in the harmonization table of embryo cell types 
 label_map = read.csv("accessory_data/cross_study_harmonization/early_wt_stage10-12.csv")
 
+#' @title harmonization of data
+#' @description
+#' harmonize the different cell types across datasets 
+#' @param seurat_object the seurat object 
+#' @param author the last name of the first author 
+#' @param label_map dataframe that maps all the different cell types into a unified cell type 
+#' @return seurat object with a harmonized cell type column in the meta data 
 add_harmonize_ct <- function(seurat_object, author = 'Peng', label_map) {
   if(author == 'Peng') {
     col_id = 'Our.Data'
@@ -42,16 +51,15 @@ add_harmonize_ct <- function(seurat_object, author = 'Peng', label_map) {
 
 # harmonize our data 
 our_object = add_harmonize_ct(our_object, author = 'Peng', label_map = label_map)
-DimPlot(our_object, group.by = 'harmonized_celltypes', label = TRUE)
 
 # harmonize seroka data
 Seroka_object = add_harmonize_ct(Seroka_object, author = 'Seroka', label_map = label_map)
-DimPlot(Seroka_object, group.by = 'harmonized_celltypes', label = TRUE)
 
+# harmonize calderon data 
 Calderon_object = add_harmonize_ct(Calderon_object, author = 'Calderon', label_map = label_map)
-DimPlot(Calderon_object, group.by = 'harmonized_celltypes', label = TRUE)
-DimPlot(Calderon_object, group.by = 'cell_type', label = TRUE)
 
+##### calculate the proportion of cell types across different data ######
+# calculate the various proportion of cell types in our data 
 our_proportion_df = data.frame(cell_types = names(table(our_object@meta.data$harmonized_celltypes)), 
                                number = as.vector(table(our_object@meta.data$harmonized_celltypes)), 
                                data_type = 'our data')
@@ -62,6 +70,7 @@ zero_proportion_df = data.frame(cell_types = setdiff(unique(label_map$Unified.La
                                 proportion = 0)
 our_proportion_df = rbind(our_proportion_df, zero_proportion_df)
 
+# calculate the various proportion of cell types in Seroka data 
 Seroka_proportion_df = data.frame(cell_types = names(table(Seroka_object@meta.data$harmonized_celltypes)), 
                                   number = as.vector(table(Seroka_object@meta.data$harmonized_celltypes)), 
                                   data_type = 'Seroka et al, 2022')
@@ -72,6 +81,7 @@ zero_proportion_df = data.frame(cell_types = setdiff(unique(label_map$Unified.La
                                 proportion = 0)
 Seroka_proportion_df = rbind(Seroka_proportion_df, zero_proportion_df)
 
+# calculate the various proportion of cell types in Calderon data 
 Calderon_proportion_df = data.frame(cell_types = names(table(Calderon_object@meta.data$harmonized_celltypes)), 
                                   number = as.vector(table(Calderon_object@meta.data$harmonized_celltypes)), 
                                   data_type = 'Calderon et al, 2022')
@@ -92,8 +102,13 @@ p<-ggplot(data=total_plot_df, aes(x=reorder(cell_types, proportion), y=proportio
 ggsave(filename = file.path(TARGET_dir, 'comparison_cell_proportion.png'), plot = p, width = 14, height = 6)
 saveRDS(total_plot_df, file = file.path(TARGET_dir, "stage_10_12_proportion.rds"))
 
-#############################################################################
-# compare the similarity between the datasets 
+##### NOT USED -- compare spearman correlation between cell typing results across different data sets #####
+
+#' @title calculate spearman correlation between cells types in our data and other data 
+#' @param other_data the seurat object for other datasets 
+#' @param our_data the seurat object for our dataset 
+#' @param other_col the column of harmonized cell types for the other data 
+#' @param our_col the column of harmonized cell types for our data 
 calc_spearman_correlation <- function(other_data, our_data, other_col, our_col) {
   other_meta = other_data@meta.data
   other_exp = other_data@assays$RNA@data
@@ -162,8 +177,7 @@ p = ggplot(seroka_correlation, aes(our_ct, other_ct, fill= spearman_correlation)
   ggtitle("Stage 10-12: Correlation similarity between cell types' centroids")
 ggsave(filename = file.path(TARGET_dir, 'Seroka_cell_correlation.png'), plot = p, width = 14, height = 6)
 
-###########################
-# this is to look at the calderon
+
 Calderon_correlation = calc_spearman_correlation(Calderon_object, our_object, other_col = 'harmonized_celltypes', our_col =  'harmonized_celltypes')
 saveRDS(Calderon_correlation, file = file.path(TARGET_dir, "calderon_correlation.rds"))
 
@@ -178,8 +192,8 @@ p = ggplot(Calderon_correlation, aes(our_ct, other_ct, fill= spearman_correlatio
   ggtitle("Stage 10-12: Correlation similarity between cell types' centroids")
 ggsave(filename = file.path(TARGET_dir, 'Calderon_cell_correlation.png'), plot = p, width = 14, height = 6)
 
-###############################################
-# pySCN the Seroka 
+##### compare agreement between our data's cell types and Seroka et al's cell types via pySCN #####
+# write the training data (Seroka et al)
 dir.create(file.path(TARGET_dir, 'Seroka_comparison_scn'))
 withr::with_dir(
   file.path(TARGET_dir, 'Seroka_comparison_scn'), 
@@ -192,6 +206,7 @@ withr::with_dir(
     write.csv(raw_stTrain, file = 'raw_meta_tab.csv')
   }
 )
+# write the query data (our data)
 withr::with_dir(
   file.path(TARGET_dir, 'Seroka_comparison_scn'), 
   {
@@ -202,12 +217,18 @@ withr::with_dir(
   }
 )
 
-##################################################
-# run the python scripts in the seroka 
+# in the terminal run the python scripts in analysis/results/v18/cross_study_early_comparison_wt12/Seroka_comparison_scn
+# load in the pySCN classification results
 SCN_classification = read.csv(file.path(TARGET_dir, 'Seroka_comparison_scn', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(our_object@meta.data), ]
 our_object@meta.data$seroka_scn = SCN_classification$SCN_class
 
+#' @title calculate the proportion of cells in our cell type classified as cell types from other studies 
+#' @description
+#' To assess the agreement between our cell typing results and those from other studies 
+#' @param our_object our seruat object with pySCN classification results 
+#' @param our_ct_col harmonized cell type column name 
+#' @param other_ct_col pySCN classification column name
 calc_class_proportion <- function(our_object, our_ct_col, other_ct_col) {
   our_meta = our_object@meta.data
   combination_df = expand.grid(unique(our_meta[, our_ct_col]), unique(our_meta[, other_ct_col]))
@@ -235,6 +256,7 @@ seroka_proportion$other_ct = as.vector(seroka_proportion$other_ct)
 seroka_proportion[seroka_proportion$other_ct == 'rand', 'other_ct'] = 'Unknown (SCN rand)'
 
 # check if all the cell types are in there 
+# if a cell type other than "Unknown" is not there, add it in and set the number to 0. This is mainly for plotting 
 setdiff(c(unique(Seroka_object@meta.data$harmonized_celltypes), 'Unknown (SCN rand)'), unique(seroka_proportion$other_ct))
 # [1] "Unknown"
 
@@ -251,8 +273,8 @@ p = ggplot(seroka_proportion, aes(our_ct, other_ct, fill= class_proportion)) +
 ggsave(filename = file.path(TARGET_dir, 'Seroka_cell_proportion.png'), plot = p, width = 14, height = 6)
 
 
-# pySCN the Calderon 
-dir.create(file.path(TARGET_dir, 'Calderon_comparison_scn'))
+##### compare agreement between our data's cell types and Calderon et al's cell types via pySCN #####
+# write the training data dir.create(file.path(TARGET_dir, 'Calderon_comparison_scn'))
 withr::with_dir(
   file.path(TARGET_dir, 'Calderon_comparison_scn'), 
   { 
@@ -264,6 +286,7 @@ withr::with_dir(
     write.csv(raw_stTrain, file = 'raw_meta_tab.csv')
   }
 )
+# write the query data 
 withr::with_dir(
   file.path(TARGET_dir, 'Calderon_comparison_scn'), 
   {
@@ -274,7 +297,7 @@ withr::with_dir(
   }
 )
 
-# run the python scripts in the Calderon 
+# in the terminal run the python scripts in analysis/results/v18/cross_study_comparison_early_wt12/Calderon_comparison_scn
 SCN_classification = read.csv(file.path(TARGET_dir, 'Calderon_comparison_scn', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(our_object@meta.data), ]
 our_object@meta.data$calderon_scn = SCN_classification$SCN_class
@@ -286,6 +309,8 @@ calderon_proportion[calderon_proportion$other_ct == 'rand', 'other_ct'] = 'Unkno
 # check if all the cell types are in there 
 setdiff(c(unique(Calderon_object@meta.data$harmonized_celltypes), 'Unknown (SCN rand)'), unique(calderon_proportion$other_ct))
 # [1] "Unknown" "Unknown (SCN rand)"
+# we are missing "Unknown (SCN rand)" which means none of the cells got classified as that 
+# to be consistent in our plotting, we will artifically add it in with class_proportion of 0 
 
 # add in zero unknown (SCN rand)
 zero_df = data.frame(our_ct = unique(calderon_proportion$our_ct),
@@ -304,8 +329,9 @@ p = ggplot(calderon_proportion, aes(our_ct, other_ct, fill= class_proportion)) +
   ggtitle("Stage 10-12: SCN Classification Proportion (Calderon et al)")
 ggsave(filename = file.path(TARGET_dir, 'Calderon_cell_proportion.png'), plot = p, width = 14, height = 6)
 
-########################################
-# to run the reverse SCN 
+##### run the pySCN classifier trained using our data's cell type label and applied to Seroka's dataset #####
+# idea is to see if we can identify the rare cell types in our dataset in other datasets 
+# write the training data (our data ) 
 dir.create(file.path(TARGET_dir, 'Our_data_comparison_Seroka'))
 withr::with_dir(
   file.path(TARGET_dir, 'Our_data_comparison_Seroka'), 
@@ -321,6 +347,7 @@ withr::with_dir(
   }
 )
 
+# write the query data
 withr::with_dir(
   file.path(TARGET_dir, 'Our_data_comparison_Seroka'), 
   { 
@@ -331,13 +358,15 @@ withr::with_dir(
   }
 )
 
-# run the python scripts in the Our_data_comparison_Seroka
+# in the terminal run the python scripts in analysis/results/v18/cross_study_comparison_early_wt12/Our_data_comparison_Seroka
 SCN_classification = read.csv(file.path(TARGET_dir, 'Our_data_comparison_Seroka', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(Seroka_object@meta.data), ]
 Seroka_object@meta.data = cbind(Seroka_object@meta.data, SCN_classification)
 saveRDS(Seroka_object, file = file.path(TARGET_dir, 'reverse_seroka_SCN_object.rds'))
 
-#################
+##### run the pySCN classifier trained using our data's cell type label and applied to Calderon's dataset #####
+# idea is to see if we can identify the rare cell types in our dataset in other datasets 
+
 dir.create(file.path(TARGET_dir, 'Our_data_comparison_Calderon'))
 #use the same classifier that was used to classify seroka
 withr::with_dir(
@@ -350,7 +379,7 @@ withr::with_dir(
   }
 )
 
-# run the python scripts in the Our_data_comparison_Seroka 
+# in the terminal run the python scripts in analysis/results/v18/cross_study_comparison_early_wt12/Our_data_comparison_Calderon
 SCN_classification = read.csv(file.path(TARGET_dir, 'Our_data_comparison_Calderon', 'SCN_classification.csv'), row.names = 1)
 SCN_classification = SCN_classification[rownames(Calderon_object@meta.data), ]
 Calderon_object@meta.data = cbind(Calderon_object@meta.data, SCN_classification)
