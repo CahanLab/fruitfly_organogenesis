@@ -18,6 +18,7 @@ library("singleCellNet")
 library("Matrix")
 library("pheatmap")
 library("enrichR")
+enrichR::setEnrichrSite("FlyEnrichr")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

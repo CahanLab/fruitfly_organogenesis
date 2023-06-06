@@ -22,6 +22,7 @@ cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ
 plot_cells(cds, genes = 'BigH1', cell_size = 1) 
 plot_cells(cds, genes = c("lncRNA:roX1", "lncRNA:roX2"), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
 plot_cells(cds, genes = c("CG6701", "Pp2C1", 'ovo', 'otu', 'Sxl'), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
+plot_cells(cds, genes = c("FDY"), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
 
 # this is to plot out the dead cells 
 plot_cells(cds, genes = c('nos', 'wun2', 'Lsd-1', 'Lsd-2'), cell_size = 1, show_trajectory_graph = FALSE) 

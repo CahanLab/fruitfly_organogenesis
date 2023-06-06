@@ -62,13 +62,13 @@ source("R/plot_selected_marker_genes_wt13.R")
 # this is to integrate and cell type wild-type early rep 1 and rep 2 
 source("R/integrate_early_wt12.R") 
 
-# this is to manually label wildtype 1 and wildtype 2 early integrated data - refactoring in this file
+# this is to manually label wildtype 1 and wildtype 2 early integrated data 
 source("R/manual_label_early_wt12.R") 
 
 # perform GSEA on the early wildtype data 
 source("R/early_wt12_GSEA.R")
 
-# plot out the results for late wildtype 3 GSEA 
+# plot out the results for late wildtype 3 GSEA - refactoring in this file
 source("R/plot_early_wt12_GSEA.R")
 
 # plot out statistics for for early wt12

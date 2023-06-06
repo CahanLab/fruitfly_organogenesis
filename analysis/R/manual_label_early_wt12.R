@@ -1,9 +1,4 @@
-library(Seurat)
-library(harmony)
-library(magrittr)
-library(ggplot2)
-library(stringr)
-
+# manually annotate stage 10-12 embryos 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "manual_annotation_early_wt12")
 dir.create(TARGET_dir)
 
@@ -11,16 +6,6 @@ object = readRDS(file.path("results", ANALYSIS_VERSION, "early_wt12_integrated/B
 
 manual_tab = read.csv(file.path(TARGET_dir, 'manualCellType_3.csv'))
 object@meta.data$manual_celltypes = NULL
-
-# dorsal epidermis
-VlnPlot(object, features = 'yellow-e3', pt.size = 0)
-FeaturePlot(object, features = 'yellow-e3')
-
-VlnPlot(object, features = 'ft', pt.size = 0)
-FeaturePlot(object, features = 'ft')
-
-VlnPlot(object, features = 'CG7296', pt.size = 0)
-FeaturePlot(object, features = 'CG7296')
 
 for(temp_cluster in unique(manual_tab$cluster)) { 
   object@meta.data[object@meta.data$seurat_clusters == temp_cluster, 'manual_celltypes'] = trimws(manual_tab[manual_tab$cluster == temp_cluster, 'annotation'])
