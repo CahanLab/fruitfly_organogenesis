@@ -1,8 +1,6 @@
-library(ggplot2)
-library(RColorBrewer)
-library(ggdendroplot)
-library(Seurat)
-
+# plot out UMAP and cell type proportion 
+# Fig 1D, 1E
+# Supp Fig 1C, 1D
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_early_UMAP_proportion')
 dir.create(TARGET_dir, recursive = TRUE)
 
@@ -16,8 +14,8 @@ col_vector = col_vector[col_vector != col_vector[4]]
 
 wt_object = readRDS(file.path('results', ANALYSIS_VERSION, 'manual_annotation_early_wt12/manual_celltype_object1.rds'))
 
+# plot the UMAP with cell type labels, seurat clusters and batch information
 withr::with_dir(TARGET_dir, {
-  # modifying the 
   p = DimPlot(wt_object, group.by = 'manual_celltypes', label = FALSE, label.size = 5) +
     ggtitle("Stage 10 – 12 Drosophila Embryonic Cell Type Labels") + 
     theme(text = element_text(size = 18))
@@ -40,7 +38,7 @@ withr::with_dir(TARGET_dir, {
   
 })
 
-# plot out the proportion of each cell type 
+# plot out the proportion of each cell type in the stage 10-12 embryos 
 withr::with_dir(TARGET_dir, {
   proportion_df = data.frame("cell_types" = names(table(wt_object@meta.data$manual_celltypes)), 
                              "number_cells" = as.vector(table(wt_object@meta.data$manual_celltypes)))
@@ -55,21 +53,4 @@ withr::with_dir(TARGET_dir, {
   ggsave(filename = file.path("cell_proportion_bar.png"), plot = p, width = 10, height = 10)
 })
 
-# plot out the proportion of each cell type per batch
-withr::with_dir(TARGET_dir, {
-  proportion_df = data.frame()
-  for(batch in unique(wt_object@meta.data$batch)) {
-    sub_wt_object = wt_object[, wt_object$batch == batch]
-    temp_proportion_df = data.frame("cell_types" = names(table(sub_wt_object@meta.data$manual_celltypes)), 
-                                    "number_cells" = as.vector(table(sub_wt_object@meta.data$manual_celltypes)))
-    temp_proportion_df$cell_proportion = temp_proportion_df$number_cells / sum(temp_proportion_df$number_cells)
-    temp_proportion_df$batch = batch
-    proportion_df = rbind(proportion_df, temp_proportion_df)
-  }
-  p<-ggplot(data=proportion_df, aes(x=reorder(cell_types, cell_proportion), y=cell_proportion, fill = batch)) +
-    scale_fill_discrete(name = "Cell Types") +
-    geom_bar(stat="identity", position = 'dodge') + theme_bw() + coord_flip() + 
-    ylab("Total Cell Proportion") + 
-    xlab("Cell Types")
-  ggsave(filename = file.path("batch_cell_proportion_bar.png"), plot = p, width = 14, height = 6)
-})
+

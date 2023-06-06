@@ -68,13 +68,10 @@ source("R/manual_label_early_wt12.R")
 # perform GSEA on the early wildtype data 
 source("R/early_wt12_GSEA.R")
 
-# plot out the results for late wildtype 3 GSEA - refactoring in this file
+# plot out the results for late wildtype 3 GSEA 
 source("R/plot_early_wt12_GSEA.R")
 
-# plot out statistics for for early wt12
-source("R/plot_early_wt12_statistics.R")
-
-# plot out UMAP and proportion for for early wt12
+# plot out UMAP and proportion for for early wt12 - refactoring in this file
 source("R/plot_early_wt12_UMAP_proportion.R")
 
 # cross study comparison for early wildtype
@@ -129,6 +126,9 @@ source("R/plot_wt13_statistics.R")
 
 # plot out all the marker genes for the cell types 
 source("R/plot_all_marker_genes_wt13.R")
+
+# plot out statistics for for early wt12 
+source("R/plot_early_wt12_statistics.R")
 
 ######################################################
 # down below are experimental scripts that I am trying out for testings. The results may or may not end up 
