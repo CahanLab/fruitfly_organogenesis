@@ -1,10 +1,8 @@
-library(monocle3)
-library(ggplot2)
-library(RColorBrewer)
-library(dbplyr)
-library(pheatmap)
+# make plots for the analysis of salivary gland cells  
+# Fig 3
+# Supp Fig 2
 
-##### Plotting UMAPS and violin plots ######
+##### load in data  ######
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')
 dir.create(TARGET_dir, recursive = TRUE)
 
@@ -16,6 +14,7 @@ rank_sum[rank_sum$group == 1, 'group'] = "Later Salivary Gland Cells"
 write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
 
+##### make umap and violin plots #####
 UMAP_coord = cds@int_colData$reducedDims$UMAP
 colnames(UMAP_coord) = c("UMAP_1", "UMAP_2")
 UMAP_coord = as.data.frame(UMAP_coord)
@@ -31,6 +30,7 @@ UMAP_coord[UMAP_coord$batch == 'late_rep_3', 'batch'] = 'Stage 13-16 rep 2'
 UMAP_coord[UMAP_coord$clusters == 2, 'clusters'] = "Early Salivary Gland Cells"
 UMAP_coord[UMAP_coord$clusters == 1, 'clusters'] = "Late Salivary Gland Cells"
 
+# make umap plots with pseudotime
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   geom_point() + 
   theme_minimal() + 
@@ -39,6 +39,7 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, height = 6)
 
+# make umap plots with batch information 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
@@ -46,6 +47,7 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
+# make umap plot with cell types 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   geom_point() + 
   guides(color=guide_legend(title="")) +
@@ -54,6 +56,7 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 10, height = 6)
 
+# make violin plots with batch and pseudotime information
 p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
   geom_violin() +
   geom_boxplot(width=0.1) +
@@ -65,7 +68,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
 ###### plotting out GSEA results in bar plots ######
-# plot out the GSEA results for early  
+# plot out the GSEA results for early cells 
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "early_gsea_results.csv"))
 GSEA_results = GSEA_results[!is.na(GSEA_results$padj), ]
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
@@ -94,7 +97,7 @@ p = ggplot2::ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=l
   theme(text = element_text(size = 24), plot.title.position = "plot") 
 ggsave(filename = file.path(TARGET_dir, "early_SG_GSEA_results.png"), plot = p, width = 10, height = 6)
 
-# plot out the GSEA results for later  
+# plot out the GSEA results for later cells  
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "late_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[!is.na(GSEA_results$padj), ]
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
@@ -102,9 +105,6 @@ GSEA_results = GSEA_results[GSEA_results$NES > 0, ]
 
 write.csv(GSEA_results, file = file.path(TARGET_dir, "sig_late_GSEA_results.csv"))
 
-# remove neuropeptide signaling pathway (GO:0007218) because the leading edge is too small 
-
-#sub_GSEA_results = GSEA_results[GSEA_results$pathway != 'neuropeptide signaling pathway (GO:0007218)', ]
 GSEA_results = GSEA_results[order(GSEA_results$padj), ]
 sub_GSEA_results = GSEA_results[1:5, ]
 sub_GSEA_results$log_pval = -log10(sub_GSEA_results$padj)
@@ -121,7 +121,14 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
 ggsave(filename = file.path(TARGET_dir, "later_SG_GSEA_results.png"), plot = p, width = 10, height = 6)
 
 
-##### plotting function for the heatmap #####
+##### making a function scale + smoothing expression profiles #####
+#' @title make scaled and average expression pattern of genes across pseudotime 
+#' @description
+#' make scaled and smoothed expression profile of target genes across pseudotime. 
+#' @param cds monocle3 object 
+#' @param target_genes genes of interest 
+#' @param bandwidth the bandwidth for ksmooth 
+#' @return scaled expression profile
 plot_heatmap <- function(cds, target_genes, bandwidth = 3) {
   norm_exp = monocle3::normalized_counts(cds)
   norm_exp = as.matrix(norm_exp)
@@ -161,74 +168,12 @@ GSEA_results = read.csv(file.path(TARGET_dir, "sig_early_GSEA_results.csv"), row
 target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
 target_genes = eval(parse(text = target_genes))
 
-norm_exp = monocle3::normalized_counts(cds)
-norm_exp = as.matrix(norm_exp)
-norm_exp = norm_exp[c('CrebA', target_genes), ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
+scaled_exp = plot_heatmap(cds, target_genes)
 sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
 no_tf_scaled = scaled_exp[sorted_genes[sorted_genes != 'CrebA'], ]
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
 pheatmap(no_tf_scaled, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
-
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-plot_df = convert_line_plot(scaled_exp)
-tf_plot_df = plot_df[plot_df$gene == 'CrebA', ]
-
-scaled_exp = scaled_exp[rownames(scaled_exp) != 'CrebA', ]
-plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                     scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'Golgi vesicle transport related genes (average)')
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-plot_df = rbind(plot_df, tf_plot_df)
-
-no_tf_plot = plot_df[plot_df$gene != 'CrebA', ]
-p<-ggplot(no_tf_plot, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[1]) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
-
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("smoothed and scaled expression") +
-  ggtitle(paste0('genes in ', term)) +
-  geom_line(aes(color=gene)) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_CrebA_dynamic_gene_line_avg.png")), plot = p, width = 12, height = 8)
-
 
 # plot out the Cytoplasmic translation
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
@@ -241,75 +186,17 @@ target_genes = eval(parse(text = target_genes))
 norm_exp = monocle3::normalized_counts(cds)
 norm_exp = as.matrix(norm_exp)
 norm_exp = norm_exp[c('rib', target_genes), ]
-# this will change 
-#norm_exp = norm_exp[apply(norm_exp, MARGIN = 1, FUN = max) > 1, ]
-pt = monocle3::pseudotime(cds)
-pt = data.frame(pseudotime = pt)
-plot_df = cbind(pt, t(norm_exp[, rownames(pt)]))
-smoothed_df = data.frame()
-for(gene in colnames(plot_df)) {
-  if(gene == 'pseudotime') {
-    next
-  }
-  else {
-    yy = ksmooth(plot_df[, 'pseudotime'], plot_df[, gene], kernel="normal", bandwidth = 3, x.points=plot_df[, 'pseudotime'])
-    if(nrow(smoothed_df) == 0) {
-      smoothed_df = data.frame('pseudotime' = yy$x)
-    }
-    smoothed_df[, gene] = yy$y
-  }
-}
-smoothed_df$pseudotime = NULL
-smoothed_df = t(smoothed_df)
-scaled_exp = t(scale(t(smoothed_df)))
+
+scaled_exp = plot_heatmap(cds, target_genes)
 sorted_genes = names(sort(apply(scaled_exp, MARGIN = 1, FUN = which.max)))
 no_tf_scaled = scaled_exp[sorted_genes[sorted_genes != 'rib'], ]
 png(filename = file.path(TARGET_dir, paste0(term, "_dynamic_gene_heatmap.png")), height = 2000, width = 1000, res = 200)
 pheatmap(no_tf_scaled, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
-convert_line_plot <- function(scaled_exp) {
-  plot_df = data.frame()
-  for(gene in rownames(scaled_exp)) {
-    temp_plot = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                           scaled_exp = scaled_exp[gene, ], 
-                           gene = gene)
-    plot_df = rbind(plot_df, temp_plot)
-  }
-  
-  plot_df$pseudotime = plot_df$pseudotime / max(plot_df$pseudotime)
-  return(plot_df)
-}
-
-plot_df = convert_line_plot(scaled_exp)
-tf_plot_df = plot_df[plot_df$gene == 'rib', ]
-
-scaled_exp = scaled_exp[rownames(scaled_exp) != 'rib', ]
-plot_df = data.frame(pseudotime = seq(1, ncol(scaled_exp)), 
-                     scaled_exp =   apply(scaled_exp, MARGIN = 2, FUN = mean), 
-                     gene = 'translation related genes (average)')
-plot_df$pseudotime = (plot_df$pseudotime - min(plot_df$pseudotime)) / max(plot_df$pseudotime)
-plot_df = rbind(plot_df, tf_plot_df)
-
-no_tf_plot = plot_df[plot_df$gene != 'rib', ]
-p<-ggplot(no_tf_plot, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("average expression") +
-  ggtitle(paste0('Average Gene Expression in ', term)) +
-  geom_line(color = RColorBrewer::brewer.pal(n = 4, 'Set2')[2]) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_dynamic_gene_line_avg.png")), plot = p, width = 8, height = 5)
-
-p<-ggplot(plot_df, aes(x=pseudotime, y=scaled_exp, group=gene)) +
-  xlab("pseudotime") + 
-  ylab("smoothed and scaled expression") +
-  ggtitle(paste0('genes in ', term)) +
-  geom_line(aes(color=gene)) + theme_bw() 
-ggsave(file.path(TARGET_dir, paste0(term, "_rib_dynamic_gene_line_avg.png")), plot = p, width = 10, height = 8)
-
-
 ##### look at salivary gland specific genes #####
-early_DE_genes = read.csv("results/v18/early_wt12_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
-late_DE_genes = read.csv("results/v18/wt13_enrichment/Salivary Gland/markers_genes.csv", row.names = 1)
+early_DE_genes = read.csv(file.path("results", ANALYSIS_VERSION, "early_wt12_enrichment/Salivary Gland/markers_genes.csv"), row.names = 1)
+late_DE_genes = read.csv(file.path("results", ANALYSIS_VERSION, "wt13_enrichment/Salivary Gland/markers_genes.csv"), row.names = 1)
 
 late_DE_genes = late_DE_genes[late_DE_genes$p_val_adj < 0.05 & late_DE_genes$avg_log2FC > 0, ]
 early_DE_genes = early_DE_genes[early_DE_genes$p_val_adj < 0.05 & early_DE_genes$avg_log2FC > 0, ]
@@ -329,21 +216,8 @@ sub_type_rank_sum = sub_type_rank_sum[sub_type_rank_sum$padj < 0.05, ]
 early_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Earlier Salivary Gland Cells', ]
 early_sum_test = early_sum_test[early_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'early', 'symbol'], ]
 
-##### plot out the salivary gland specific genes in dynamic heatmap #####
-heatmap_df = plot_heatmap(cds, early_sum_test$feature, bandwidth = 3)
-
-png(filename = file.path(TARGET_dir, paste0("early_SG_dynamic_gene_heatmap.png")), height = 2500, width = 1000, res = 200)
-pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
-
 late_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Later Salivary Gland Cells', ]
 late_sum_test = late_sum_test[late_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'late', 'symbol'], ]
-
-heatmap_df = plot_heatmap(cds, late_sum_test$feature, bandwidth = 3)
-
-png(filename = file.path(TARGET_dir, paste0("late_SG_dynamic_gene_heatmap.png")), height = 1500, width = 1000, res = 200)
-pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
 
 ##### Plotting out the TFs #####
 # look at TFs 
@@ -388,25 +262,4 @@ p = plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'l
   theme(text = element_text(size = 24))
 
 ggsave(filename = file.path(TARGET_dir, 'dynamic_TF.png'), plot = p, width = 15, height = 4.5)
-
-##### plot out the dynamic heatmaps for the TFs#####
-zmeta_tab = cds@colData
-norm_data = normalized_counts(cds)
-meta_tab$sens = norm_data['sens', ]
-meta_tab$fkh = norm_data['fkh', ]
-meta_tab$CrebA = norm_data['CrebA', ]
-meta_tab$sage = norm_data['sage', ]
-meta_tab$toe = norm_data['toe', ]
-meta_tab$eyg = norm_data['eyg', ]
-meta_tab$trh = norm_data['trh', ]
-meta_tab$rib = norm_data['rib', ]
-
-meta_tab = as.data.frame(meta_tab)
-p <- ggplot(meta_tab, aes(x=cell_type, y=rib)) + 
-  geom_violin()
-
-heatmap_df = plot_heatmap(cds, early_TFs, bandwidth = 3)
-png(filename = file.path(TARGET_dir, paste0("early_TF_SG_dynamic_gene_heatmap.png")), height = 500, width = 1000, res = 200)
-pheatmap::pheatmap(heatmap_df, cluster_cols = FALSE, cluster_rows = FALSE)
-dev.off()
 

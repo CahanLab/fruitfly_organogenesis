@@ -51,7 +51,7 @@ source("R/plot_cross_study_comparison_wt13.R")
 # perform GSEA on the data 
 source("R/wt13_GSEA.R")
 
-# plot out the results for late wildtype 3 GSEA 
+# plot out the results for late wildtype 13 GSEA 
 # Fig. 2D 
 source("R/plot_wt13_GSEA.R")
 
@@ -68,7 +68,8 @@ source("R/manual_label_early_wt12.R")
 # perform GSEA on the early wildtype data 
 source("R/early_wt12_GSEA.R")
 
-# plot out the results for late wildtype 3 GSEA 
+# TODO clean up this code 
+# plot out the results for early wildtype GSEA 
 source("R/plot_early_wt12_GSEA.R")
 
 # plot out UMAP and proportion for for early wt12 
@@ -89,10 +90,12 @@ source("R/plot_cross_study_comparison_wt12.R")
 # Supp Fig 13-16
 source("R/plot_selected_marker_genes_early_wt12.R")
 
-# refined analysis of early + late salivary gland - refactoring in this file
+# refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
 
-# make figures for the in depth analysis of salivary glands
+# make figures for the in depth analysis of salivary glands - refactoring in this file
+# Fig 3
+# Supp Fig 2
 source("R/plot_refined_wt13_early12_salivary_gland.R")
 
 # refined analysis of early + late trachea cells 
@@ -121,6 +124,10 @@ source("R/plot_plasmatocytes_genes.R")
 
 # make the supplementary tables 
 source("R/make_supp_tabs.R")
+
+# TODO 
+# make a script that cleans up seurat object and monocle 3 object 
+# also converts all the raw counts into txt and meta table into txt 
 
 ##### scripts that were not used #####
 # plot out statistics for for wt13
