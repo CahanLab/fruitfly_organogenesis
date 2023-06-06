@@ -68,8 +68,8 @@ source("R/manual_label_early_wt12.R")
 # perform GSEA on the early wildtype data 
 source("R/early_wt12_GSEA.R")
 
-# TODO clean up this code 
 # plot out the results for early wildtype GSEA 
+# Fig 2D
 source("R/plot_early_wt12_GSEA.R")
 
 # plot out UMAP and proportion for for early wt12 
@@ -93,12 +93,12 @@ source("R/plot_selected_marker_genes_early_wt12.R")
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
 
-# make figures for the in depth analysis of salivary glands - refactoring in this file
+# make figures for the in depth analysis of salivary glands 
 # Fig 3
 # Supp Fig 2
 source("R/plot_refined_wt13_early12_salivary_gland.R")
 
-# refined analysis of early + late trachea cells 
+# refined analysis of early + late trachea cells - refactoring in this file
 source("R/refined_wt13_early12_trachea.R")
 
 # make figures for the in depth analysis of trachea 
