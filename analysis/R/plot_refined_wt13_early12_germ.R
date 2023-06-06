@@ -1,12 +1,11 @@
-library(monocle3)
-library(ggplot2)
-library(RColorBrewer)
-library(dbplyr)
-library(ggsignif)
+# make plots for germ cells analysis 
+# Fig 5 
+# Supp Fig 5, 6
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_germ')
 dir.create(TARGET_dir, recursive = TRUE)
 
+##### load in the appropriate data 
 rank_sum = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "rank_sum_test.csv"), row.names = 1)
 rank_sum = rank_sum[rank_sum$logFC > 0, ]
 rank_sum[rank_sum$group == '1', 'group'] = 'Unknown 1'
@@ -19,13 +18,6 @@ rank_sum[rank_sum$group == '4', 'group'] = 'Late Germ Cells'
 write.csv(rank_sum, file = file.path(TARGET_dir, 'DE_genes.csv'))
 
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "monocle3_no_batch_correct_object.rds"))
-plot_cells(cds, genes = 'BigH1', cell_size = 1) 
-plot_cells(cds, genes = c("lncRNA:roX1", "lncRNA:roX2"), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
-plot_cells(cds, genes = c("CG6701", "Pp2C1", 'ovo', 'otu', 'Sxl'), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
-plot_cells(cds, genes = c("FDY"), cell_size = 1, scale_to_range = FALSE, show_trajectory_graph = FALSE) 
-
-# this is to plot out the dead cells 
-plot_cells(cds, genes = c('nos', 'wun2', 'Lsd-1', 'Lsd-2'), cell_size = 1, show_trajectory_graph = FALSE) 
 
 UMAP_coord = cds@int_colData$reducedDims$UMAP
 
@@ -48,7 +40,7 @@ UMAP_coord[UMAP_coord$clusters == '6', 'cell_type'] = 'Interm. Germ Cells 1'
 UMAP_coord[UMAP_coord$clusters == '2', 'cell_type'] = 'Interm. Germ Cells 2'
 UMAP_coord[UMAP_coord$clusters == '4', 'cell_type'] = 'Late Germ Cells'
 
-
+##### make the UMAPs and violin plots #####
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   geom_point() + 
   theme_minimal() + 
@@ -96,7 +88,7 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 8, height = 6)
 
-##### plotting the gene sets results #####
+##### plotting the gene sets results -- some are not used in the manuscript #####
 norm_exp = monocle3::normalized_counts(cds)
 gene_interest_list = c('eya', 'wg', 'tkv', 'Dl', 'shg', 'Prosalpha5', 'Sod1', 'BigH1', 'bru1', 'dsx', 'dhd', 'vas', 'pum', 
                        'nos', 'bam', 'osk', 'pgc', 'gcl', 'nos', 'dpp', 'N', 'Pomp')
@@ -197,18 +189,6 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "middle_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 5.5)
 
-term = "negative regulation of translation (GO:0017148)"
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
-genes_translation = target_genes
-
-term = "negative regulation of transcription, DNA-templated (GO:0045892)"
-target_genes = GSEA_results[GSEA_results$pathway == term, 'leadingEdge']
-target_genes = eval(parse(text = target_genes))
-genes_transcription = target_genes
-
-length(intersect(genes_transcription, genes_translation))
-
 # middle stage 1
 GSEA_results = read.csv(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "6_gsea_results.csv"), row.names = 1)
 GSEA_results = GSEA_results[GSEA_results$padj < 0.05, ]
@@ -307,7 +287,7 @@ p = ggplot(data=sub_GSEA_results, aes(x=reorder(pathway, log_pval), y=log_pval))
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, "unknown_2_Cells_GSEA_results.png"), plot = p, width = 10, height = 4)
 
-##### make some dotplots #####
+##### make the dotplots #####
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "monocle3_no_batch_correct_object.rds"))
 cds@colData$cell_type = NA
 cds@colData[clusters(cds) == '1', 'cell_type'] = 'Unknown 1'
@@ -420,27 +400,3 @@ ggsave(filename = file.path(TARGET_dir, 'read_depth.png'), plot = p, width = 10,
 median(UMAP_coord[UMAP_coord$cell_type == 'Unknown 1', 'ngenes'])
 median(UMAP_coord[UMAP_coord$cell_type == 'Unknown 2', 'ngenes'])
 
-##### check ribosomal biogenesis genes ##### 
-ribo_genesis_df = read.csv("accessory_data/Sanchez_et_al_2015/differentiation_enrichment.csv")
-# load in the necessary code to cell type 
-gtf_last_field = unique(read.table("../quantification/reference_genome_info/dmel-all-r6.33.gtf.gz", sep = "\t")[["V9"]])
-gene_metadata = data.frame(
-  flybase_id =
-    gtf_last_field %>%
-    strsplit(";") %>%
-    sapply(extract2, 1) %>%
-    gsub("^.*gene_id ", "", .),
-  symbol =
-    gtf_last_field %>%
-    strsplit(";") %>%
-    sapply(extract2, 2) %>%
-    gsub("^.*gene_symbol ", "", .)
-)
-gene_metadata = gene_metadata %>% dplyr::distinct()
-gene_converter = as.vector(gene_metadata$symbol)
-names(gene_converter) = as.vector(gene_metadata$flybase_id)
-
-ribo_genes = ribo_genesis_df[ribo_genesis_df$GO.term == 'translation', "Genes..Flybase.ID."]
-ribo_genes = stringr::str_split(ribo_genes, ", ")[[1]]
-ribo_genes = stringr::str_replace_all(ribo_genes, "GN", "gn")
-gene_converter[ribo_genes]

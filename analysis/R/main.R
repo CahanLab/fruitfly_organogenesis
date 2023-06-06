@@ -104,13 +104,13 @@ source("R/refined_wt13_early12_trachea.R")
 # make figures for the in depth analysis of trachea 
 source("R/plot_refined_wt13_early12_trachea.R")
 
-# refined analysis of early + late germ cells - refactoring in this file
+# refined analysis of early + late germ cells 
 source("R/refined_wt13_early12_germ.R")
 
 # make figures for the in depth analysis of germ cells 
 source("R/plot_refined_wt13_early12_germ.R")
 
-# plot out the quality metrics for all 4 batches 
+# plot out the quality metrics for all 4 batches - refactoring in this file
 source("R/plot_quality_metrics_4_batches.R")
 
 # perform analysis of matrisome in late wildtype 
