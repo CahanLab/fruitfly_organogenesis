@@ -47,7 +47,7 @@ withr::with_dir(TARGET_dir, {
   p<-ggplot(data=proportion_df, aes(x=reorder(cell_types, cell_proportion), y=cell_proportion, fill = cell_types)) +
     scale_fill_discrete(name = "Cell Types") +
     geom_bar(stat="identity") + theme_bw() + coord_flip() + 
-    ylab("Stage 10 - 12: Total Cell Proportion") + 
+    ylab("Stage 10 - 12: total cell proportion") + 
     xlab("Cell Types") + 
     theme(text = element_text(size = 24), legend.position="none")
   ggsave(filename = file.path("cell_proportion_bar.png"), plot = p, width = 10, height = 10)

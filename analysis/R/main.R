@@ -108,9 +108,11 @@ source("R/plot_refined_wt13_early12_trachea.R")
 source("R/refined_wt13_early12_germ.R")
 
 # make figures for the in depth analysis of germ cells 
+# Fig 5 
+# Supp Fig 5, 6
 source("R/plot_refined_wt13_early12_germ.R")
 
-# plot out the quality metrics for all 4 batches - refactoring in this file
+# plot out the sequencing depth for all 4 batches 
 source("R/plot_quality_metrics_4_batches.R")
 
 # perform analysis of matrisome in late wildtype 
@@ -120,14 +122,25 @@ source("R/wt13_matrisome.R")
 source("R/early_wt12_matrisome.R")
 
 # plot out the plasmatocytes genes 
+# Fig 6
+# Supp Fig 7, 9, 10 
 source("R/plot_plasmatocytes_genes.R")
 
-# make the supplementary tables 
+# correlation cell lines bulk expression with single cell clusters 
+# Fig 7A
+# Supp Fig 11 
+source("R/assess_celllines.R")
+
+# make the supplementary tables and tables shown in the manuscript
 source("R/make_supp_tabs.R")
 
-# TODO 
-# make a script that cleans up seurat object and monocle 3 object 
-# also converts all the raw counts into txt and meta table into txt 
+# identify the expressed genes in Seroka et al 
+# Fig 7D
+source("R/seroka_sg_genes.R")
+
+# clean up the scRNA-seq data for sharing
+source("R/clean_sharable_data.R")
+
 
 ##### scripts that were not used #####
 # plot out statistics for for wt13

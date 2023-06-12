@@ -1,9 +1,13 @@
-library(ggplot2)
-
+# making plots for matrisome 
+# Fig 6
+# Supp Fig 7, 9, 10 
 ##### set up for plotting of various things #####
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'plasmatocytes_matrisome')
 dir.create(TARGET_dir, recursive = TRUE)
 
+# the script below was taken from Seurat's package 
+# https://github.com/satijalab/seurat/blob/master/R/visualization.R
+# commit b23ae2e
 modified_dotPlot_df <- function(
     object,
     assay = NULL,
@@ -191,6 +195,7 @@ modified_dotPlot_df <- function(
 wt13_object = readRDS("results/v18/manual_annotation_wt13/manual_celltype_object4.rds")
 early_wt12_object = readRDS("results/v18/manual_annotation_early_wt12/manual_celltype_object1.rds")
 
+# curate the matrisome gene list for different categories 
 gene_list = list()
 gene_list[['phagocytic_receptor']] = c("drpr", 'crq', 'NimC4', 'Sr-CI', 'PGRP-LC')
 gene_list[['opsinin']] = c("Tep2", 'Tep4')
@@ -208,7 +213,6 @@ big_plot_df = data.frame()
 for(temp_cat in names(gene_list)) {
   
   temp_plot_df = modified_dotPlot_df(wt13_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
-  #temp_plot_df$avg.exp.scaled = NULL
   temp_plot_df$matrisome_type = temp_cat 
   
   big_plot_df = rbind(big_plot_df, temp_plot_df)
@@ -277,7 +281,7 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   ggtitle("Stage 10-12 Embryos")
 ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_early_wt12.png"), plot = p, width = 14, height = 7)
 
-##### this is to compare the genes between early and late #####
+##### NOT USED --  this is to compare the genes between early and late #####
 sub_wt_early_object = subset(early_wt12_object, subset = manual_celltypes == "Plasmatocytes")
 sub_wt_late_object = subset(wt13_object, subset = manual_celltypes == 'Plasmatocytes')
 sub_wt_late_object$experimental_condition = 'stage 13-16'
@@ -326,7 +330,7 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
 ggsave(filename = file.path(TARGET_dir, "plasmatocytes_comparison.png"), plot = p, width = 14, height = 7)
 
 
-##### focus plotting of the supplementary #####
+##### plotting of the supplementary #####
 big_plot_df = data.frame()
 for(temp_cat in c("antimicrobial")) {
   

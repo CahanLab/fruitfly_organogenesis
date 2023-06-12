@@ -44,7 +44,7 @@ ggsave(file.path(TARGET_dir, 'monocle3_no_batch_corrected_cluster.png'), width =
 rank_sum_results = presto::wilcoxauc(normalized_counts(cds), cds@clusters$UMAP$clusters)
 write.csv(rank_sum_results, file = file.path(TARGET_dir, "rank_sum_test.csv"))
 
-cds <- learn_graph(cds, use_partition = TRUE)
+cds <- learn_graph(cds, use_partition = FALSE)
 plot_cells(cds,
            color_cells_by = "batch",
            label_groups_by_cluster=FALSE,

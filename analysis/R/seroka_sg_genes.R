@@ -1,5 +1,4 @@
-library(Seurat)
-library(viridis)
+# identify SG expressed genes in seroka et al
 
 Seroka_object = readRDS("accessory_data/Doe_Drosophila_Embryo_Atlas/script/curated_embryo_Doe.rds")
 DimPlot(Seroka_object)

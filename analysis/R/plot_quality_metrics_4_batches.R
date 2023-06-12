@@ -1,4 +1,4 @@
-library(Seurat)
+# figure out the sequencing depth for each batch 
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'quality_metric_4_batches')
 dir.create(TARGET_dir, recursive = TRUE)

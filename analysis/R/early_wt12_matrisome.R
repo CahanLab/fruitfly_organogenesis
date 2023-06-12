@@ -1,7 +1,5 @@
-library(Seurat)
-library(ggplot2)
-library(viridis)
-
+# a systematic screening of matrisome genes 
+# if you somehow arrived at this script, feel free to explore other genes in the matrisome 
 matrisome_df = read.csv("accessory_data/matrisome_data/drosophila_matrisome.csv")
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "early_wt12_matrisome")

@@ -1,4 +1,6 @@
-library(ggplot2)
+# correlate cell line bulk expression with cell types in embryos 
+# Fig 7A
+# Supp Fig 11 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, 'identify_celllines')
 dir.create(TARGET_dir)
 
@@ -6,7 +8,7 @@ dir.create(TARGET_dir)
 object_wt13 = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13/manual_celltype_object4.rds"))
 object_early_wt12 = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_early_wt12/manual_celltype_object1.rds"))
 
-###### get the marker genes ######
+###### get the marker genes across different cell types in both early and late embryos ######
 all_marker_genes = c()
 for(temp_path in list.dirs("results/v18/wt13_enrichment", recursive = FALSE)) {
   marker_genes = read.csv(file.path(temp_path, "markers_genes.csv"), row.names = 1)
@@ -22,7 +24,7 @@ for(temp_path in list.dirs("results/v18/early_wt12_enrichment", recursive = FALS
 }
 all_marker_genes = unique(all_marker_genes)
 
-##### make the summary table #####
+##### make the reference expression matrix #####
 make_avg_tab <- function(object, all_marker_genes) {
   our_exp = object@assays$RNA@data
   our_exp = our_exp[all_marker_genes, ]
@@ -56,7 +58,7 @@ saveRDS(avg_tab_early_wt12, file = file.path(TARGET_dir, "avg_tab_early_wt12.rds
 
 big_avg_tab = cbind(avg_tab_wt13, avg_tab_early_wt12)
 
-##### load in the RPKM of cell lines #####
+##### load in the RPKM of cell lines and perform correlation between cell lines and reference matrix #####
 cell_lines_df = read.csv("accessory_data/Drosophila_CellLines_FlyBase/gene_rpkm_matrix_fb_2023_02_modified.tsv", sep = '\t', row.names = 1)
 cell_lines_df = cell_lines_df[all_marker_genes, ]
 
@@ -99,8 +101,6 @@ scale_correlation_df <- function(my_filtered_df) {
   my_filtered_df$scale_spearman_correlation = NA
   returned_df = data.frame()
   for(ct in unique(my_filtered_df$cell_line)) {
-    #scaled_correlation = scale(my_filtered_df[my_filtered_df$cell_line == ct, "spearman_correlation"])
-    #scaled_correlation = scaled_correlation[, 1]
     temp_filtered_df = my_filtered_df[my_filtered_df$cell_line == ct, ]
     scaled_correlation = scale_values(temp_filtered_df[, 'spearman_correlation'])
     temp_filtered_df$scale_spearman_correlation = scaled_correlation
@@ -171,7 +171,7 @@ p <- ggplot(data= scaled_df, aes(y = cell_line, x = cell_types, fill = top_cat))
   ggtitle("Drosophila Embryonic Cell Lines")
 ggsave(filename = file.path(TARGET_dir, "Cell_lines_top.png"), plot = p, width = 15, height = 3)
 
-##### plotting out the cell line results #####
+##### plotting out the adult correlation #####
 adult_tissue = combination_df[grepl("RNA.Seq_Profile_FlyAtlas2_", combination_df$cell_lines), ]
 adult_tissue$tissue = stringr::str_remove_all(adult_tissue$cell_lines, "RNA.Seq_Profile_FlyAtlas2_")
 adult_tissue$tissue = stringr::str_remove_all(adult_tissue$tissue, "_\\..*")
