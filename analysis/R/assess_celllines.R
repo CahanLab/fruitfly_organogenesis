@@ -113,13 +113,10 @@ scaled_df = scale_correlation_df(my_filtered_df)
 saveRDS(scaled_df, file = file.path(TARGET_dir, 'scaled_df.rds'))
 
 scaled_df = readRDS(file.path(TARGET_dir, 'scaled_df.rds'))
-#picked_scaled_df = scaled_df[scaled_df$cell_line == 'S3', ]
-#scaled_df$scale_spearman_correlation = round(scaled_df$scale_spearman_correlation, digits = 3)
 scaled_df$scale_spearman_correlation = as.numeric(scaled_df$scale_spearman_correlation)
 scaled_df$cell_line = stringr::str_remove_all(scaled_df$cell_line, "_")
 p <- ggplot(data= scaled_df, mapping = aes_string(y = 'cell_line', x = 'cell_types')) +
   geom_tile(mapping = aes_string(fill = 'scale_spearman_correlation')) +
-  #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
   guides(fill = guide_colourbar(title = 'Scaled Spearman Correlation')) +
   scale_fill_viridis_c(option = "plasma") + 
   labs(
@@ -149,7 +146,6 @@ for(ct in unique(scaled_df$cell_line)) {
 
 p <- ggplot(data= scaled_df, aes(y = cell_line, x = cell_types, fill = top_cat)) +
   geom_tile(color = "black") +
-  #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
   guides(fill = guide_legend(title = 'Top Correlated Cell Type')) +
   scale_fill_brewer(palette = 'Set2') +
   labs(
