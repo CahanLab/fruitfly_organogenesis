@@ -62,8 +62,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set1') + 
-  ylab("pseudotime") + 
-  xlab("batch") + 
+  ylab("Pseudotime") + 
+  xlab("Batch") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 

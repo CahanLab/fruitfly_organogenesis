@@ -68,8 +68,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set1') + 
-  ylab("pseudotime") + 
-  xlab("batch") + 
+  ylab("Pseudotime") + 
+  xlab("Batch") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
@@ -299,6 +299,7 @@ cds@colData[clusters(cds) == '4', 'cell_type'] = 'Late Germ Cells'
 
 p = plot_genes_by_group(cds, markers = c('nos', 'gcl', 'pgc', 'vas'), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Genes") +
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
@@ -308,6 +309,7 @@ ggsave(filename = file.path(TARGET_dir, 'germ_stem_cell_markers.png'), plot = p,
 set_genes = c("Ote", "eff", "aurB", "pelo", "twin", "eIF4A")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Genes") +
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
@@ -316,6 +318,7 @@ p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cel
 set_genes = c("Sxl", "tra")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Genes") +
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
@@ -325,6 +328,7 @@ ggsave(filename = file.path(TARGET_dir, 'female_somatic_markers.png'), plot = p,
 set_genes = c("dpa", "Rs1", "Mcm5", "CG9253", "CG6693", "nclb", "Klp61F", "CG6701", "Pp2C1")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Genes") +
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
@@ -334,6 +338,7 @@ ggsave(filename = file.path(TARGET_dir, 'male_germ_markers.png'), plot = p, widt
 set_genes = c("ovo", "otu", "Sxl")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Genes") +
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Interm. Germ Cells 2', 'Interm. Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
@@ -343,10 +348,10 @@ ggsave(filename = file.path(TARGET_dir, 'female_germ_markers.png'), plot = p, wi
 set_genes = c("wun2", "Lsd-1", 'Lsd-2')
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Genes") +
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
-ggsave(filename = file.path(TARGET_dir, 'female_germ_markers.png'), plot = p, width = 8, height = 5)
 
 ##### test the sequencing depth #####
 UMAP_coord = cds@int_colData$reducedDims$UMAP
@@ -385,7 +390,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -log10_ngenes), y=log10_ngenes, 
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2') + 
   ylab("log(UMI Counts)") + 
-  xlab("cell type") + 
+  xlab("Cell Types") + 
   theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
   geom_signif(comparisons = list(c("Unknown 2", "Late Germ Cells"), 
                                  c("Unknown 2", "Interm. Germ Cells 1"), 

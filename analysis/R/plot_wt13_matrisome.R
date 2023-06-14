@@ -195,6 +195,16 @@ modified_dotPlot_df <- function(
   return(data.plot)
 }
 
+filter_genes <- function(plot_df) {
+  good_genes = c()
+  for(temp_gene in unique(plot_df$features.plot)) {
+    subset_plot_df = plot_df[plot_df$features.plot == temp_gene, ]
+    if(max(subset_plot_df$pct.exp) > 1) {
+      good_genes = c(good_genes, temp_gene)
+    }
+  }
+  return(good_genes)
+}
 ##### this is to plot out the focused plasmatocytes data #####
 gene_list = list()
 gene_list[['collagen']] = c("vkg", "Col4a1")
@@ -245,14 +255,14 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   ggtitle("Stage 13-16 Embryos")
 ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_focused.png"), plot = p, width = 14, height = 7)
 
-##### this is for the anti-microbial shit #####
+##### this is for the anti-microbial genes #####
 gene_list[['antimicrobial']] = c("Drs", "Dro", "DptA", "DptB",'CecA1', "CecA2", 
                                  "Def", 'Mtk', 'BomS4', 'BomBc2', 'BomT1', 'BomS3', 
                                  'BomBc1', 'BomS2', 'BomT3', 'BomBc3', 'BomS6', 
                                  'BomS1', 'BomT2', 'BomS5')
 big_plot_df = data.frame()
 for(temp_cat in c("antimicrobial")) {
-  temp_plot_df = modified_dotPlot_df(wt13_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
+  temp_plot_df = modified_dotPlot_df(object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
   temp_plot_df$matrisome_type = temp_cat 
   big_plot_df = rbind(big_plot_df, temp_plot_df)
 }
@@ -264,7 +274,7 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   guides(color = guide_colorbar(title = 'scaled average expression')) +
   scale_colour_viridis_c() + 
   labs(
-    x = 'Genes',
+    x = 'Anti-microbial Genes',
     y = 'Cell Types'
   ) + 
   theme_classic()  + 
@@ -281,7 +291,7 @@ p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plo
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1)) +
   ggtitle("Stage 13-16 Embryos")
-ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_wt13_antimicrobial.png"), plot = p, width = 14, height = 7)
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_anti-microbial_wt13.png"), plot = p, width = 14, height = 7)
 
 ##### This is to get the genes for Chitin cuticle genes #####
 interesting_cat_list = c("Cuticle; Tweedle", "Cuticle", "Chitin-binding-domain-containing Proteins", "Cuticle; R&R Chitin-binding-domain-containing Proteins")
