@@ -257,6 +257,7 @@ sort(diff_count)
 # dot plot
 p = plot_genes_by_group(cds, markers = names(sort(diff_count)), norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 
+  ylab("Transcription Factors") +
   coord_flip() + 
   scale_x_discrete(limits = c('Late Salivary Gland Cells', 'Early Salivary Gland Cells')) + 
   theme(text = element_text(size = 24))
