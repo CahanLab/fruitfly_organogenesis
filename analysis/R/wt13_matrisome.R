@@ -41,7 +41,7 @@ p = ggplot(big_df, aes(cell_type, ECM_type, fill= scaled_module_score)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
   scale_fill_viridis(discrete=FALSE) + 
   xlab("Cell Type (Stage 13-16)") + 
-  ylab("Matrisome Type") + 
+  ylab("Matrisome Genes") + 
   labs(fill='Scaled Gene Module Score') 
 ggsave(file.path(TARGET_dir, "Matrisome_category_score.png"), plot = p, height = 4, width = 10)
 

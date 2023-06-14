@@ -119,7 +119,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -btl), y=btl, fill = cell_type))
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
-  ylab("btl normalized expression") + 
+  ylab("btl Normalized Expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_btl.png"), plot = p, width = 10, height = 6)
@@ -131,7 +131,7 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -Mipp1), y=Mipp1, fill = cell_ty
   geom_boxplot(width=0.1) +
   theme_minimal() +
   scale_fill_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 
-  ylab("Mipp1 normalized expression") + 
+  ylab("Mipp1 Normalized Expression") + 
   xlab("cell type") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_Mipp1.png"), plot = p, width = 10, height = 6)

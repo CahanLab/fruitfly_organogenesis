@@ -211,7 +211,9 @@ gene_list[['antimicrobial']] = c("Drs", "Dro", "DptA", "DptB",'CecA1', "CecA2",
 ##### make plots for the genes listed wt13 #####
 big_plot_df = data.frame()
 for(temp_cat in names(gene_list)) {
-  
+  if(temp_cat == 'antimicrobial') {
+    next
+  }
   temp_plot_df = modified_dotPlot_df(wt13_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
   temp_plot_df$matrisome_type = temp_cat 
   
@@ -222,11 +224,11 @@ big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), de
 p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
   geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
   #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
-  guides(size = guide_legend(title = 'Percent Expressed')) +
-  guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
+  guides(size = guide_legend(title = 'percent expressed')) +
+  guides(color = guide_colorbar(title = 'scaled average expression')) +
   scale_colour_viridis_c() + 
   labs(
-    x = '',
+    x = 'Matrisome Genes',
     y = 'Cell Types'
   ) + 
   theme_classic()  + 
@@ -247,7 +249,9 @@ ggsave(filename = file.path(TARGET_dir, "plasmatocytes_genes_wt13.png"), plot = 
 ##### make plots for the genes listed early_wt12 #####
 big_plot_df = data.frame()
 for(temp_cat in names(gene_list)) {
-  
+  if(temp_cat == 'antimicrobial') {
+    next
+  }
   temp_plot_df = modified_dotPlot_df(early_wt12_object, features = gene_list[[temp_cat]], group.by = 'manual_celltypes')
   #temp_plot_df$avg.exp.scaled = NULL
   temp_plot_df$matrisome_type = temp_cat 
@@ -259,11 +263,11 @@ big_plot_df$id = factor(big_plot_df$id, levels = sort(unique(big_plot_df$id), de
 p <- ggplot(data = big_plot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
   geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
   #scale.func(range = c(0, 100), limits = c(scale.min, scale.max)) +
-  guides(size = guide_legend(title = 'Percent Expressed')) +
-  guides(color = guide_colorbar(title = 'Scaled Average Expression')) +
+  guides(size = guide_legend(title = 'percent expressed')) +
+  guides(color = guide_colorbar(title = 'scaled average expression')) +
   scale_colour_viridis_c() + 
   labs(
-    x = '',
+    x = 'Matrisome Genes',
     y = 'Cell Types'
   ) + 
   theme_classic()  + 

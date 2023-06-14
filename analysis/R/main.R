@@ -121,10 +121,15 @@ source("R/wt13_matrisome.R")
 # perform analysis of matrisome in early wildtype 
 source("R/early_wt12_matrisome.R")
 
-# plot out the plasmatocytes genes 
-# Fig 6
-# Supp Fig 7, 9, 10 
-source("R/plot_plasmatocytes_genes.R")
+# plot out matrisome genes 
+# Fig 6A 
+# Supp Fig 7A, 9
+source("R/plot_wt12_matrisome.R")
+
+# plot out matrisome genes 
+# Fig 6B
+# Supp Fig 7B, 10
+source("R/plot_wt13_matrisome.R")
 
 # correlation cell lines bulk expression with single cell clusters 
 # Fig 7A
