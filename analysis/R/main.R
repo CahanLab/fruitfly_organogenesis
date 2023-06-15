@@ -1,5 +1,5 @@
 # To reproduce our work, run this script. 
-# We used Ubuntu 20.04 with an R package environment managed by renv. 
+# We used MacOS 13.3.1 (a) with an R package environment managed by renv. 
 # We used R version 4.1.2.
 
 # Make it work on each of our computers
