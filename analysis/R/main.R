@@ -43,14 +43,6 @@ source("R/manual_label_wt13.R")
 # Supp Fig 1a, 1b
 source("R/plot_wt13_UMAP_proportion.R")
 
-# cross study comparison for stage 13-16 wildtype 
-source("R/cross_study_comparison_wt13.R")
-
-# plot out cross study comparison for late wildtype 
-# Fig. 7c
-# Supp Fig 12b, 30, 31
-source("R/plot_cross_study_comparison_wt13.R")
-
 # perform GSEA on the data 
 source("R/wt13_GSEA.R")
 
@@ -79,15 +71,6 @@ source("R/plot_early_wt12_GSEA.R")
 # Fig 1D, 1E
 # Supp Fig 1C, 1D
 source("R/plot_early_wt12_UMAP_proportion.R")
-
-# cross study comparison for early wildtype 
-# will need to run this manually because you would have to run some python scripts in the middle 
-source("R/cross_study_comparison_early_wt12.R")
-
-#plot the cross study comparisons for early wild type 2 
-# Fig 7C
-# Supp Fig 12A, 29
-source("R/plot_cross_study_comparison_wt12.R")
 
 # plot out the marker genes for rare cell types 
 # Supp Fig 13-16
@@ -148,6 +131,28 @@ source("R/seroka_sg_genes.R")
 
 # clean up the scRNA-seq data for sharing
 source("R/clean_sharable_data.R")
+
+##### scripts to run line by line #####
+# these scripts require the user to run python scripts somewhere in the middle
+# I could have streamline this better, but I am lazy. 
+# cross study comparison for stage 13-16 wildtype 
+# run this script individually 
+source("R/cross_study_comparison_wt13.R")
+
+# plot out cross study comparison for late wildtype 
+# Fig. 7c
+# Supp Fig 12b, 30, 31
+source("R/plot_cross_study_comparison_wt13.R")
+
+# cross study comparison for early wildtype 
+# will need to run this manually because you would have to run some python scripts in the middle 
+source("R/cross_study_comparison_early_wt12.R")
+
+#plot the cross study comparisons for early wild type 2 
+# Fig 7C
+# Supp Fig 12A, 29
+source("R/plot_cross_study_comparison_wt12.R")
+
 
 ##### unused scripts #####
 
