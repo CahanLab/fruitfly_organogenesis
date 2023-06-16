@@ -1,7 +1,7 @@
 library(reticulate)
 library(sceasy)
 
-use_condaenv('OneCC_dev')
+use_condaenv('scanpy')
 loompy <- reticulate::import('loompy')
 
 object = readRDS("results/v18/manual_annotation_wt13/manual_celltype_object4.rds")

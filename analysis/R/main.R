@@ -155,4 +155,29 @@ source("R/plot_cross_study_comparison_wt12.R")
 
 
 ##### unused scripts #####
+# here are the scripts that were used for general exploration, 
+# but did not make it in the main manuscript. 
+# These scripts are also semi-interesting enough that I don't want to delete them. 
 
+# verify whether or not the unknown clusters found in our germ cell 
+# populations are also present in seroka et al data
+source("R/check_seroka_germ.R")
+
+# convert the Seurat objects (R) into anndata (python)
+# we used Seurat to anndata mainly to help us explore the data interactively 
+# on CellXGenes 
+source("R/convert_to_h5ad.R")
+
+# to explore the x chromosome gene expressions in our germ cell populations 
+# and also explore the sex determination genes found in 
+# https://genome.cshlp.org/content/31/6/1011.long
+source("R/x_chromosome_exp.R")
+
+# find the genes expressed in SG classified cells from Seroka et al data
+source("R/seroka_sg_genes.R")
+
+# make the plots for the quality of the 4 batches 
+source("R/plot_quality_metrics_4_batches.R")
+
+# match cell typing results of stage 10-12 with cell typing results of stage 13-16 
+source("match_early_clusters_to_late_clusters.R")
