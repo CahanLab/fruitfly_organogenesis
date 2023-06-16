@@ -3,7 +3,6 @@ RESULTS = file.path("results", ANALYSIS_VERSION, SAMPLE)
 dir.create(RESULTS, recursive = T, showWarnings = F)
 
 # Set up working environment
-library("ggplot2")
 library("dplyr")
 library("magrittr")
 library("Matrix")
@@ -21,6 +20,8 @@ library("monocle3")
 library("presto")
 library("dbplyr")
 library("ggsignif")
+library("ggplot2")
+
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

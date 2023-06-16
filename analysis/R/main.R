@@ -9,6 +9,8 @@ try({setwd("c:/Users/DAndrewLab/Desktop/fruitfly_organogenesis/analysis/")}, sil
 renv::activate()
 
 ANALYSIS_VERSION = "v18" # Where to put output
+
+# wildtype rep 3 is presented as wildtype stage 13-16 rep 2 in the manuscript 
 metadata = read.table(header = T, text=
   "sample cellranger
    wt_rep1 2021-10-27_scRNA_10x_3prime 
@@ -29,6 +31,7 @@ for(i in 1:4){
   source("R/annotate_clusters_automated_BDGP.R") # perform a quick annotation using genes from BDGP 
 }
 
+##### the main ordering of scripts to reproduce the figures/analysis in the manuscript #####
 # this is to integrate and cell type wild-type rep 1 and rep 3 (in the manuscript rep 3 is labelled as rep 2) 
 source("R/integrate_wt13.R") 
 
@@ -145,4 +148,6 @@ source("R/seroka_sg_genes.R")
 
 # clean up the scRNA-seq data for sharing
 source("R/clean_sharable_data.R")
+
+##### unused scripts #####
 
