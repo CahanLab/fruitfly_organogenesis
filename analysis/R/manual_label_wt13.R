@@ -4,7 +4,8 @@ TARGET_dir = file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13")
 ##### first round of cell typing #####
 object = readRDS(file.path("results", ANALYSIS_VERSION, "wt13_integrated/BDGP_automated_annotation_object.rds"))
 
-manual_tab = read.csv(file.path(TARGET_dir, 'manualCellType.csv'))
+manual_tab = read.csv(file.path('accessory_data/manual_annotations_v18/wt13/', 'manualCellType.csv'))
+
 object@meta.data$manual_celltypes = NULL
 
 for(temp_cluster in unique(manual_tab$cluster)) { 

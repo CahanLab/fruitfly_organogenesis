@@ -4,7 +4,8 @@ dir.create(TARGET_dir)
 
 object = readRDS(file.path("results", ANALYSIS_VERSION, "early_wt12_integrated/BDGP_automated_annotation_object.rds"))
 
-manual_tab = read.csv(file.path(TARGET_dir, 'manualCellType_3.csv'))
+manual_tab = read.csv(file.path('accessory_data/manual_annotations_v18/early_wt12/', 'manualCellType_3.csv'))
+
 object@meta.data$manual_celltypes = NULL
 
 for(temp_cluster in unique(manual_tab$cluster)) { 
