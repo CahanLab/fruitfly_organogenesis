@@ -54,7 +54,7 @@ cds@colData[cds@colData$cell_type == 'Middle Trachea Cells', 'subtypes'] = 'Inte
 cds@colData[cds@colData$cell_type == 'Early Trachea Cells', 'subtypes'] = 'Early Tracheal Cells'
 cds@colData$cell_type = NULL  
 dir.create(file.path(TARGET_dir, 'trachea_specific'), recursive = TRUE)
-saveRDS(object = cds, file = file.path(TARGET_dir, 'SG_specific', 'trachea_monocle3_object.rds'))
+saveRDS(object = cds, file = file.path(TARGET_dir, 'trachea_specific', 'trachea_monocle3_object.rds'))
 ##### clean data for germ cells monocle3 #####
 cds = readRDS(file.path('results', ANALYSIS_VERSION, "refined_wt_late_early_germ/monocle3_no_batch_correct_object.rds"))
 cds@colData$subtypes = NA
