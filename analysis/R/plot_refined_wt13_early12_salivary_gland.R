@@ -32,7 +32,7 @@ UMAP_coord[UMAP_coord$clusters == 1, 'clusters'] = "Late Salivary Gland Cells"
 
 # make umap plots with pseudotime
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
-  geom_point() + 
+  geom_point(size = 3) + 
   theme_minimal() + 
   scale_color_viridis_c(option = "plasma") + 
   guides(fill=guide_legend(title="pseudo-time")) + 
@@ -41,19 +41,21 @@ ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, 
 
 # make umap plots with batch information 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
-  geom_point() + 
+  geom_point(size = 3) + 
   theme_minimal() + 
   scale_color_brewer(palette = 'Set1') + 
-  theme(text = element_text(size = 24))
+  theme(text = element_text(size = 24)) + 
+  guides(color = guide_legend(override.aes = list(size = 10)))
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 # make umap plot with cell types 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
-  geom_point() + 
+  geom_point(size = 3) + 
   guides(color=guide_legend(title="")) +
   theme_minimal() + 
   scale_color_brewer(palette = 'Set2') + 
-  theme(text = element_text(size = 24))
+  theme(text = element_text(size = 24)) + 
+  guides(color = guide_legend(override.aes = list(size = 10)))
 ggsave(filename = file.path(TARGET_dir, "celltypes.png"), plot = p, width = 10, height = 6)
 
 # make violin plots with batch and pseudotime information

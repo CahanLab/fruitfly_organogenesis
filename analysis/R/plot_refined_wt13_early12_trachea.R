@@ -44,14 +44,16 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
   geom_point() + 
   theme_minimal() + 
   scale_color_brewer(palette = 'Set1') + 
-  theme(text = element_text(size = 24))
+  theme(text = element_text(size = 24)) + 
+  guides(color = guide_legend(override.aes = list(size = 10)))
 ggsave(filename = file.path(TARGET_dir, "batch.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = clusters)) +
   geom_point() + 
   theme_minimal() + 
   scale_color_brewer(palette = 'Set3') + 
-  theme(text = element_text(size = 24))
+  theme(text = element_text(size = 24)) + 
+  guides(color = guide_legend(override.aes = list(size = 10)))
 ggsave(filename = file.path(TARGET_dir, "cluster.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
@@ -67,7 +69,7 @@ ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, widt
 
 UMAP_coord$cell_type = factor(UMAP_coord$cell_type, levels = c('Early Tracheal Cells', 'Late Tracheal Cells', 'Interm. Tracheal Cells', 'Tracheal Tip Cells'))
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
-  guides(color=guide_legend(title="")) +
+  guides(color=guide_legend(title="", override.aes = list(size = 10))) +
   geom_point() + 
   theme_minimal() + 
   scale_color_brewer(palette = 'Set2', breaks=c('Early Tracheal Cells', 'Interm. Tracheal Cells', 'Late Tracheal Cells', 'Tracheal Tip Cells')) + 

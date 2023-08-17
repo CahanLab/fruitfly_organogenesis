@@ -21,7 +21,7 @@ library("presto")
 library("dbplyr")
 library("ggsignif")
 library("ggplot2")
-
+library("cowplot")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

@@ -1,4 +1,5 @@
-# set the directory 
+# this script contain analysis to address reviewer comments 
+# but the end results may not end up in the manuscript 
 set.seed(123)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "reviewer_comments")
 dir.create(TARGET_dir)
