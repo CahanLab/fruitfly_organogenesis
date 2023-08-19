@@ -22,6 +22,7 @@ library("dbplyr")
 library("ggsignif")
 library("ggplot2")
 library("cowplot")
+library("ggsignif")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

@@ -400,8 +400,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -log10_ngenes), y=log10_ngenes, 
                                  c('Late Germ Cells', 'Unknown 1'), 
                                  c('Interm. Germ Cells 1', 'Unknown 1'),
                                  c('Interm. Germ Cells 2', 'Unknown 1'),
-                                 c('Unknown 1', 'Early Germ Cells'), 
-                                 c('Unknown 2', 'Early Germ Cells')), map_signif_level=TRUE, step_increase = 0.075)
+                                 c('Unknown 2', 'Early Germ Cells')), map_signif_level=TRUE, step_increase = 0.085, 
+                                 textsize=8, vjust = 0.5) 
 ggsave(filename = file.path(TARGET_dir, 'read_depth.png'), plot = p, width = 10, height = 5)
 
 median(UMAP_coord[UMAP_coord$cell_type == 'Unknown 1', 'ngenes'])
