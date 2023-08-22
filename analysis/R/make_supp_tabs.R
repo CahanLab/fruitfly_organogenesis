@@ -120,3 +120,30 @@ stats_df$Calderon_stg14_16 = output_statistics(Calderon_object)
 stats_df$This_data_stg13_16 = output_statistics(our_object)
 
 write.csv(stats_df, file = file.path(TARGET_dir, "Table_7.csv"))
+
+##### make tables for genes for the different subtypes #####
+# get the trachea 
+DE_genes = read.csv("results/v18/refined_wt_late_early_trachea/rank_sum_test.csv", row.names = 1)
+DE_genes[DE_genes$group == 'Branching Trachea Cells', 'group'] = 'Tracheal Tip Cells'
+DE_genes[DE_genes$group == 'Late Trachea Cells', 'group'] = 'Late Tracheal Cells'
+DE_genes[DE_genes$group == 'Middle Trachea Cells', 'group'] = 'Interm. Tracheal Cells'
+DE_genes[DE_genes$group == 'Early Trachea Cells', 'group'] = 'Early Tracheal Cells'
+write.csv(DE_genes, file.path(TARGET_dir, "trachea_subtype_genes.csv"))
+
+# get the salivary 
+DE_genes = read.csv("results/v18/refined_wt_late_early_salivary_gland/rank_sum_test.csv", row.names = 1)
+DE_genes[DE_genes$group == 2, 'group'] = "Earlier Salivary Gland Cells"
+DE_genes[DE_genes$group == 1, 'group'] = "Later Salivary Gland Cells"
+write.csv(DE_genes, file.path(TARGET_dir, "salivary_subtype_genes.csv"))
+
+# get the salivary 
+DE_genes = read.csv("results/v18/refined_wt_late_early_germ/rank_sum_test.csv", row.names = 1)
+DE_genes[DE_genes$group == '1', 'group'] = 'Unknown 1'
+DE_genes[DE_genes$group == '3', 'group'] = 'Unknown 2'
+DE_genes[DE_genes$group == '5', 'group'] = 'Early Germ Cells'
+DE_genes[DE_genes$group == '6', 'group'] = 'Interm. Germ Cells 1'
+DE_genes[DE_genes$group == '2', 'group'] = 'Interm. Germ Cells 2'
+DE_genes[DE_genes$group == '4', 'group'] = 'Late Germ Cells'
+write.csv(DE_genes, file.path(TARGET_dir, "germ_subtype_genes.csv"))
+
+
