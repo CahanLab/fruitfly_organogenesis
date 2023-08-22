@@ -93,3 +93,21 @@ gene_ratio['1', ] / gene_ratio['0', ]
 
 gene_ratio = get_x_ratio(sub_wt_early_object, genes_chrom)
 gene_ratio['32', ] / gene_ratio['24', ]
+
+##### get Y chromosome genes #####
+genes_chrom = read.csv("../quantification/reference_genome_info/dmel-all-r6.33.gtf", header = FALSE, sep = '\t')
+y_genes_chrom = genes_chrom[genes_chrom$V1 == 'Y', ]
+genes_symbol = stringr::str_split(y_genes_chrom$V9, ";", simplify = TRUE)
+genes_symbol = as.data.frame(genes_symbol)
+genes_symbol = stringr::str_remove_all(genes_symbol$V2, " gene_symbol ")
+interest_genes = unique(genes_symbol)
+
+norm_exp = monocle3::exprs(monocle3_obj)
+norm_exp = norm_exp[interest_genes, ]
+apply(norm_exp, MARGIN = 1, FUN = max)
+p = plot_genes_by_group(monocle3_obj, markers = interest_genes, norm_method = 'log', group_cells_by = 'subtypes', ordering_type = 'none') + 
+  xlab("Cell Types") + 
+  ylab("Genes") +
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  theme(text = element_text(size = 20))
+ggsave(filename = file.path(TARGET_dir, "Y_chromosome_genes.png"), height = 20, width = 10)

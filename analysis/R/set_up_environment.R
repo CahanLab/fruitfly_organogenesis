@@ -23,6 +23,7 @@ library("ggsignif")
 library("ggplot2")
 library("cowplot")
 library("ggsignif")
+library("viridis")
 
 # This logs package versions etc; good for reproducibility
 sink("sessioninfo.txt")

@@ -54,13 +54,15 @@ withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_seroka'), {
     reverse_seroka_object@meta.data[reverse_seroka_object@meta.data$SCN_class == scn_ct, 'cur_ct'] = scn_ct
     reverse_seroka_object@meta.data[reverse_seroka_object@meta.data$SCN_class != scn_ct, 'cur_ct'] = 'Other'
     
-    color_label = RColorBrewer::brewer.pal(n = 3, name = 'Set2')
-    color_label = color_label[2:3]
+    color_label = c(RColorBrewer::brewer.pal(n = 3, name = 'Set1')[1], RColorBrewer::brewer.pal(n = 3, name = 'Set2')[3])
+    
     names(color_label) = c(scn_ct, 'Other')
     p = DimPlot(reverse_seroka_object, group.by = 'cur_ct') + 
         scale_colour_manual(values = color_label) + 
-        ggtitle(paste0("Stage 14-16 from Seroka et al, 2022: SCN classified ", scn_ct)) + 
-        theme(text = element_text(size = 18), plot.title.position = "plot")
+        #ggtitle(paste0("Stage 14-16 from Seroka et al, 2022: SCN classified ", scn_ct)) + 
+        ggtitle("") +  
+      theme(text = element_text(size = 18), plot.title.position = "plot", legend.text = element_text(size=18)) + 
+      guides(color = guide_legend(override.aes = list(size = 10)))
     ggsave(paste(scn_ct, "_umap.png"), width = 10, height = 8)
     
   }
@@ -77,13 +79,14 @@ withr::with_dir(file.path(TARGET_dir, 'reverse_SCN_calderon'), {
     reverse_calderon_object@meta.data[reverse_calderon_object@meta.data$SCN_class == scn_ct, 'cur_ct'] = scn_ct
     reverse_calderon_object@meta.data[reverse_calderon_object@meta.data$SCN_class != scn_ct, 'cur_ct'] = 'Other'
     
-    color_label = RColorBrewer::brewer.pal(n = 3, name = 'Set2')
-    color_label = color_label[2:3]
+    color_label = c(RColorBrewer::brewer.pal(n = 3, name = 'Set1')[1], RColorBrewer::brewer.pal(n = 3, name = 'Set2')[3])
     names(color_label) = c(scn_ct, 'Other')
     p = DimPlot(reverse_calderon_object, group.by = 'cur_ct') + 
       scale_colour_manual(values = color_label) + 
-      ggtitle(paste0("Stage 14-16 from Calderon et al, 2022: SCN classified ", scn_ct)) + 
-      theme(text = element_text(size = 14), plot.title.position = "plot")
+      #ggtitle(paste0("Stage 14-16 from Calderon et al, 2022: SCN classified ", scn_ct)) + 
+      ggtitle("") +  
+      theme(text = element_text(size = 18), plot.title.position = "plot", legend.text = element_text(size=18)) + 
+      guides(color = guide_legend(override.aes = list(size = 10)))
     ggsave(paste(scn_ct, "_umap.png"), width = 10, height = 8)
     
   }

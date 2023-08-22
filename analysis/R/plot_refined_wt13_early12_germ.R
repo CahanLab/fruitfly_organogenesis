@@ -123,6 +123,20 @@ for(gene_interest in gene_interest_list) {
   ggsave(filename = file.path(TARGET_dir, paste0("violin_", gene_interest, ".png")), plot = p, width = 8, height = 6)
 }
 
+gene_interest_list = c('FDY')
+for(gene_interest in gene_interest_list) {
+  UMAP_coord$gene_exp = norm_exp[gene_interest, ]
+  p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -gene_exp), y=gene_exp, fill = cell_type)) + 
+    geom_violin() +
+    guides(fill=guide_legend(title="")) +
+    geom_boxplot(width=0.1) +
+    theme_minimal() +
+    scale_fill_brewer(palette = 'Set2') + 
+    ylab(paste0(gene_interest, " normalized expression")) + 
+    xlab("cell type") + 
+    theme(text = element_text(size = 18), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  ggsave(filename = file.path(TARGET_dir, paste0("violin_", gene_interest, ".png")), plot = p, width = 8, height = 6)
+}
 gene_interest_list = c("lncRNA:roX1", "lncRNA:roX2")
 for(gene_interest in gene_interest_list) {
   UMAP_coord$gene_exp = norm_exp[gene_interest, ]
@@ -354,6 +368,25 @@ p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cel
   coord_flip() + 
   scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
   theme(text = element_text(size = 24))
+
+set_genes = c("eya", "abd-A", 'Abd-B', 'tj')
+p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
+  xlab("Cell Types") + 
+  ylab("Genes") +
+  coord_flip() + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  theme(text = element_text(size = 24))
+ggsave(filename = file.path(TARGET_dir, 'somatic_gonadal_precursor_markers.png'), plot = p, width = 8, height = 5.5)
+
+# Y chromosome genes 
+set_genes = c('FDY', 'Ppr-Y')
+p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
+  xlab("Cell Types") + 
+  ylab("Genes") +
+  coord_flip() + 
+  scale_x_discrete(limits = c('Unknown 2', 'Unknown 1', 'Late Germ Cells', 'Middle Germ Cells 2', 'Middle Germ Cells 1', 'Early Germ Cells')) + 
+  theme(text = element_text(size = 24))
+ggsave(filename = file.path(TARGET_dir, 'Y_chromosome_markers.png'), plot = p, width = 8, height = 5.5)
 
 ##### test the sequencing depth #####
 UMAP_coord = cds@int_colData$reducedDims$UMAP
