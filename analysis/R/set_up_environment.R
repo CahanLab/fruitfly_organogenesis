@@ -3,10 +3,10 @@ RESULTS = file.path("results", ANALYSIS_VERSION, SAMPLE)
 dir.create(RESULTS, recursive = T, showWarnings = F)
 
 # Set up working environment
+library("Seurat")
 library("dplyr")
 library("magrittr")
 library("Matrix")
-library("Seurat")
 library("stringr")
 library("harmony")
 library("RColorBrewer")
