@@ -123,7 +123,7 @@ for(gene_interest in gene_interest_list) {
   ggsave(filename = file.path(TARGET_dir, paste0("violin_", gene_interest, ".png")), plot = p, width = 8, height = 6)
 }
 
-gene_interest_list = c('FDY')
+gene_interest_list = c('FDY', 'stg')
 for(gene_interest in gene_interest_list) {
   UMAP_coord$gene_exp = norm_exp[gene_interest, ]
   p = ggplot(UMAP_coord, aes(x=reorder(cell_type, -gene_exp), y=gene_exp, fill = cell_type)) + 
