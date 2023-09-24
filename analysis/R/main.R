@@ -54,6 +54,10 @@ source("R/plot_wt13_GSEA.R")
 # Supp Fig. 17 - 28 
 source("R/plot_selected_marker_genes_wt13.R")
 
+# plot out the UMAPs of marker genes for SG, Tr GC 
+# TODO fill in the supplementary figure number 
+source("R/plot_UMAPS_marker_genes_late_3ct.R")
+
 # this is to integrate and cell type wild-type early rep 1 and rep 2 
 source("R/integrate_early_wt12.R") 
 
@@ -75,6 +79,10 @@ source("R/plot_early_wt12_UMAP_proportion.R")
 # plot out the marker genes for rare cell types 
 # Supp Fig 13-16
 source("R/plot_selected_marker_genes_early_wt12.R")
+
+# plot out the UMAPs of marker genes for SG, Tr GC 
+# TODO fill in the supplementary figure number 
+source("R/plot_UMAPS_marker_genes_early_3ct.R")
 
 # refined analysis of early + late salivary gland 
 source("R/refined_wt13_early12_salivary_gland.R")
@@ -153,9 +161,6 @@ source("R/cross_study_comparison_early_wt12.R")
 # Supp Fig 12A, 29
 source("R/plot_cross_study_comparison_wt12.R")
 
-# the below script is mainly to address reviewers 
-source("R/reviewer_comments.R")
-
 ##### unused scripts #####
 # here are the scripts that were used for general exploration, 
 # but did not make it in the main manuscript. 
@@ -183,3 +188,6 @@ source("R/plot_quality_metrics_4_batches.R")
 
 # match cell typing results of stage 10-12 with cell typing results of stage 13-16 
 source("match_early_clusters_to_late_clusters.R")
+
+# the below script is mainly to address reviewers 
+source("R/reviewer_comments.R")
