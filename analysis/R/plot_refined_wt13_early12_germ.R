@@ -321,7 +321,11 @@ p = plot_genes_by_group(cds, markers = c('nos', 'gcl', 'pgc', 'vas'), norm_metho
   theme(text = element_text(size = 24))
 ggsave(filename = file.path(TARGET_dir, 'germ_stem_cell_markers.png'), plot = p, width = 10, height = 5)
 
-# geensets for germ-line stem cell asymmetric division
+p = plot_cells(cds, genes = c('nos', 'gcl', 'pgc', 'vas'), show_trajectory_graph = FALSE, cell_size = 1) + 
+  theme(text = element_text(size = 24))
+ggsave(filename = file.path(TARGET_dir, 'germ_stem_cell_markers_UMAPS.png'), plot = p, width = 10, height = 8)
+
+# genesets for germ-line stem cell asymmetric division
 set_genes = c("Ote", "eff", "aurB", "pelo", "twin", "eIF4A")
 p = plot_genes_by_group(cds, markers = set_genes, norm_method = 'log', group_cells_by = 'cell_type', ordering_type = 'none') + 
   xlab("Cell Types") + 

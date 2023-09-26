@@ -76,5 +76,8 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime_germ_no_unknown.png"), plot = p, width = 8, height = 6)
 
-
-
+##### look at the TFs in the SG on UMAP #####
+cds = readRDS("results/v18/figure_plots/clean_sharable_data/SG_specific/SG_monocle3_object.rds")
+interesting_genes = c('toe', 'hkb', 'eyg', 'Scr', 'trh', 'Dr', 'sens', 'brk', 'D', 'bowl','fkh','sage', 'SoxN', 'ttk', 'CrebA','rib')
+p = plot_cells(cds, genes = interesting_genes, cell_size = 1, show_trajectory_graph = FALSE)
+ggsave(filename = file.path(TARGET_dir, "TFs_UMAP_SG.png"))
