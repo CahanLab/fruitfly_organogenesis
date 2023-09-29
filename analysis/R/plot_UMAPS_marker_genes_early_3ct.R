@@ -5,7 +5,7 @@ dir.create(TARGET_dir, recursive = TRUE)
 
 object = readRDS(file.path('results', ANALYSIS_VERSION, "manual_annotation_early_wt12/manual_celltype_object1.rds"))
 
-all_genes = c("CG14756", "Tpst", "Papss", "nur", "CG13159", "pip", "toe", "sage", "trh", 'Hs6st', 'CG3777', 'stumps', 'Gasp', 'Osi15', 'wisp', 'stai', 'CG4502', 'pgc', 'nos', 'Prosalpha5', 'piwi', 'Hsp26', 'ZnT49B')
+all_genes = c('CG15743', "CG14756", "Tpst", "Papss", "nur", "CG13159", "pip", "toe", "sage", "trh", 'Hs6st', 'CG3777', 'stumps', 'Gasp', 'Osi15', 'wisp', 'stai', 'CG4502', 'pgc', 'nos', 'Prosalpha5', 'piwi', 'Hsp26', 'ZnT49B')
 for(temp_gene in all_genes) {
   p = FeaturePlot(object, features = temp_gene, order = TRUE) + 
     theme_void() + 

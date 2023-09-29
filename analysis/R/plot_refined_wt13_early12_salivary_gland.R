@@ -197,6 +197,7 @@ pheatmap(no_tf_scaled, cluster_cols = FALSE, cluster_rows = FALSE)
 dev.off()
 
 ##### look at salivary gland specific genes #####
+cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "monocle3_no_batch_correct_object.rds"))
 early_DE_genes = read.csv(file.path("results", ANALYSIS_VERSION, "early_wt12_enrichment/Salivary Gland/markers_genes.csv"), row.names = 1)
 late_DE_genes = read.csv(file.path("results", ANALYSIS_VERSION, "wt13_enrichment/Salivary Gland/markers_genes.csv"), row.names = 1)
 
@@ -212,28 +213,15 @@ combined_DE_genes = rbind(late_DE_genes, early_DE_genes)
 combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'] = 
   paste0(combined_DE_genes[combined_DE_genes$symbol %in% combined_DE_genes$symbol[duplicated(combined_DE_genes$symbol)], 'type'], "_", "both")
 
-sub_type_rank_sum = read.csv(file.path(TARGET_dir, 'DE_genes.csv'), row.names = 1)
-sub_type_rank_sum = sub_type_rank_sum[sub_type_rank_sum$padj < 0.05, ]
-
-early_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Earlier Salivary Gland Cells', ]
-early_sum_test = early_sum_test[early_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'early', 'symbol'], ]
-
-late_sum_test = sub_type_rank_sum[sub_type_rank_sum$group == 'Later Salivary Gland Cells', ]
-late_sum_test = late_sum_test[late_sum_test$feature %in% combined_DE_genes[combined_DE_genes$type == 'late', 'symbol'], ]
-
+combined_DE_genes = combined_DE_genes[combined_DE_genes$pct.1 > 0.15, ]
 ##### Plotting out the TFs #####
 # look at TFs 
 TF_tab = read.csv("accessory_data/Drosophila_TFs/all_candidates.csv", sep = '\t')
 TF_tab = TF_tab[TF_tab$verdict_DNA_BD != "NO", ]
 
-early_TFs = intersect(TF_tab$symbol, early_sum_test$feature)
-late_TFs = intersect(TF_tab$symbol, late_sum_test$feature)
-
-middle_sum_test = combined_DE_genes[grep("both", combined_DE_genes$type), ]
-middle_TF = intersect(TF_tab$symbol, unique(middle_sum_test$symbol))
-
 # this is for the dotplot 
-all_TFs = c(early_TFs, middle_TF, late_TFs)
+all_TFs = unique(intersect(TF_tab$symbol, combined_DE_genes$symbol))
+combined_DE_genes = combined_DE_genes[combined_DE_genes$symbol %in% all_TFs, ]
 cds@colData$cell_type = NA
 cds@colData[clusters(cds) == 2, 'cell_type'] = "Early Salivary Gland Cells"
 cds@colData[clusters(cds) == 1, 'cell_type'] = "Late Salivary Gland Cells"

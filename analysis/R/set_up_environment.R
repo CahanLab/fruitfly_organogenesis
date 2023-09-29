@@ -195,7 +195,12 @@ save3DUMAPCategorical = function(object, group.by, umapkey = "umap3D"){
 
 #' @title Auto assign celltype BDGP reference 
 #' @description
-#' Automatically assigns a cell type for a cluster based on DE genes and BDGP in-situs reference 
+#' Automatically assigns a cell type for a cluster based on DE genes and BDGP in-situs reference. 
+#' One of the limitation of using flybase id to extract celltype information from BDGP is that there may be a
+#' mismatch of gene name an flybase id. For instance on flybase at the moment when this analysis was done, 
+#' betaTub56D's flybase id is FBgn0284243 on flybase. But on BDGP the flybase id for betaTub56D is 	FBgn0003254. 
+#' I think because we are just using this internally as one of many ways to help us assign cell types, this function below should be fine.
+#' Also for some reasons, the downloaded database from BDGP does not necessarily match with what we see on the BDGP website. 
 #' @param BDGP_database_ct downloaded database of BDGP genes corresponding to cell types 
 #' @param stage_name the stage that we are interested in 
 #' @param gene_name flybase ID 

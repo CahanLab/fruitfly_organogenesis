@@ -66,7 +66,6 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
 
-
 UMAP_coord$cell_type = factor(UMAP_coord$cell_type, levels = c('Early Tracheal Cells', 'Late Tracheal Cells', 'Interm. Tracheal Cells', 'Tracheal Tip Cells'))
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = cell_type)) +
   guides(color=guide_legend(title="", override.aes = list(size = 10))) +

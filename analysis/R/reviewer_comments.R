@@ -16,30 +16,6 @@ ggsave(file.path(TARGET_dir, "3D_UMAP1.png"), width = 5, height = 5)
 plot_cells(cds, x = 2, y = 3, cell_size = 0.9, group_label_size = 4, color_cells_by = 'batch')
 ggsave(file.path(TARGET_dir, "3D_UMAP2.png"), width = 5, height = 5)
 
-##### verify if there is a difference between early and late tracheal tip cells #####
-library(cowplot)
-
-cds = readRDS("results/v18/figure_plots/clean_sharable_data/trachea_specific/trachea_monocle3_object.rds")
-norm_exp = monocle3::normalized_counts(cds)
-meta_tab = cds@colData
-meta_tab = meta_tab[meta_tab$subtypes == 'Tracheal Tip Cells', ]
-norm_exp = norm_exp[, rownames(meta_tab)]
-rank_sum_results = presto::wilcoxauc(norm_exp, meta_tab$experimental_condition)
-write.csv(rank_sum_results, file = file.path(TARGET_dir, 'rank_sum_results_early_late_tip.csv'))
-early_sum_results = rank_sum_results[rank_sum_results$group == 'early', ]
-early_sum_results$abs_logFC = abs(early_sum_results$logFC)
-early_sum_results$category = NA
-early_sum_results[early_sum_results$logFC > 0, 'category'] = 'stage10-12 Tip Cells'
-early_sum_results[early_sum_results$logFC < 0, 'category'] = 'stage13-16 Tip Cells'
-early_sum_results = early_sum_results[order(early_sum_results$abs_logFC, decreasing = TRUE), ]
-early_sum_results = early_sum_results[1:20, ]
-p = ggplot(data = early_sum_results, aes(x = reorder(feature, abs_logFC), y = abs_logFC, fill = category)) + 
-  geom_bar(stat = 'identity') + coord_flip() + 
-  ylab("absolute logFC") + 
-  xlab("differentially expressed genes") + 
-  theme_half_open()
-ggsave(filename = file.path(TARGET_dir, "DE_genes_tip_cells.png"), plot = p, width = 5, height = 5)
-
 ##### plot out the violin plot of pseudotime without the extra unknown cells #####
 cds = readRDS(file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ", "monocle3_no_batch_correct_object.rds"))
 UMAP_coord = cds@int_colData$reducedDims$UMAP

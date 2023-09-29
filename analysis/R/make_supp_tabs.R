@@ -435,3 +435,79 @@ for(temp_cat in interesting_cat_list) {
 }
 
 write.csv(genes_df, file = file.path(TARGET_dir, "stage13-16_matrisome.csv"))
+
+##### apply BDGP on marker genes #####
+
+# load in the dictionary to convert the gene names to flybase name 
+
+stage10_12_markers = read.csv("accessory_data/manual_marker_genes_v18/manual_marker_stage_10-12.csv")
+stage10_12_markers$flybase_id = NULL
+stage10_12_markers$BDGP_cell_type = NULL
+
+#' @title Auto assign celltype from BDGP reference by accessing the website 
+#' @description
+#' Automatically assigns a cell type for a cluster based on DE genes and BDGP in-situs reference by accessing the 
+#' BDGP website directly. This is just a programmatic way to copy all the cell types annotation from BDGP systematically without 
+#' me going BDGP and manually copy the cell types.  
+#' @param stage_name the stage that we are interested in 
+#' @param gene_name flybase ID 
+#' @return a vector of cell types that have expression in gene of interest 
+BDGP_robot <- function(stage_name = 'stage13-16', gene_name = 'FBgn0003254') { 
+  # set up a sleep function before we access the website to avoid overloading the server 
+  Sys.sleep(5)
+  url = paste0('https://insitu.fruitfly.org/cgi-bin/ex/report.pl?ftype=1&ftext=', gene_name)
+  fly_data <- url %>%
+    rvest::read_html() %>%
+    rvest::html_nodes(xpath='/html/body/div[1]/div[2]/div[1]/table[2]') %>%
+    rvest::html_nodes("tbody") %>% rvest::html_children()
+  
+  if(length(fly_data) == 0) { 
+    return(vector())
+  }
+  
+  for(temp_index in seq(1, length(fly_data))) { 
+    cur_stage = fly_data[[temp_index]] %>% 
+      rvest::html_nodes("th") %>% 
+      rvest::html_text()
+    if(cur_stage == stage_name) { 
+      item = fly_data[[temp_index]] %>% 
+        rvest::html_nodes("td") %>% 
+        rvest::html_text()
+      item_string = paste(item, collapse = '')
+      item_string = stringr::str_remove_all(item_string, "\t")
+      cell_types = stringr::str_split(item_string, "\n")[[1]]
+      cell_types = cell_types[cell_types != ""]
+      cell_types = trimws(cell_types)
+    }
+  }
+  return(unique(cell_types))
+}
+
+for(gene_interest in stage10_12_markers$gene.abbr.) { 
+  flybase_interest = as.character(gene_converter[gene_interest])
+  stage10_12_markers[stage10_12_markers$gene.abbr. == gene_interest, 'flybase_id'] = flybase_interest
+  BDGP_cellTypes = BDGP_robot(stage_name = 'stage11-12', gene_name = gene_interest)
+  
+  print(gene_interest)
+
+  stage10_12_markers[stage10_12_markers$gene.abbr. == gene_interest, 'BDGP_cell_type'] = paste(BDGP_cellTypes, collapse = ";")
+}
+
+write.csv(stage10_12_markers, file = file.path(TARGET_dir, "stage10_12_markers_bdgp.csv"))
+
+##### make the tables for stage 13-16 markers 
+stage13_16_markers = read.csv("accessory_data/manual_marker_genes_v18/manual_marker_stage_13-16.csv")
+stage13_16_markers$flybase_id = NULL
+stage13_16_markers$BDGP_cell_type = NULL
+
+for(gene_interest in stage13_16_markers$gene.abbr.) { 
+  flybase_interest = as.character(gene_converter[gene_interest])
+  stage13_16_markers[stage13_16_markers$gene.abbr. == gene_interest, 'flybase_id'] = flybase_interest
+  BDGP_cellTypes = BDGP_robot(stage_name = 'stage13-16', gene_name = gene_interest)
+  
+  print(gene_interest)
+  
+  stage13_16_markers[stage13_16_markers$gene.abbr. == gene_interest, 'BDGP_cell_type'] = paste(BDGP_cellTypes, collapse = ";")
+}
+
+write.csv(stage13_16_markers, file = file.path(TARGET_dir, "stage13_16_markers_bdgp.csv"))

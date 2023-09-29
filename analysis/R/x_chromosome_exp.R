@@ -134,11 +134,24 @@ for(sheet_index in sheet_index_list) {
   }
   sex_marker_genes = readxl::read_excel("accessory_data/sex_determining_genes/SupplementalTable_S4.xlsx", sheet = sheet_index)
   monocle3::plot_genes_by_group(monocle3_obj, markers = sex_marker_genes$gene_short_name, group_cells_by = 'subtypes') + coord_flip()
-  ggsave(file.path(TARGET_dir, paste0(type, "_GC.png")), width = 9)
+  ggsave(file.path(TARGET_dir, paste0(type, "_GC.png")), width = 11, height = 4.1)
   monocle3::plot_cells(monocle3_obj, genes = as.vector(sex_marker_genes$gene_short_name), cell_size = 1, show_trajectory_graph = FALSE) + 
     theme(text = element_text(size = 32))
   ggsave(file.path(TARGET_dir, paste0(type, "_UMAP_GC.png")), width = 20, height = 20)
 }
+
+# plot out the intersecting female genes 
+sex_marker_genes_1 = readxl::read_excel("accessory_data/sex_determining_genes/SupplementalTable_S4.xlsx", sheet = 1)
+sex_marker_genes_2 = readxl::read_excel("accessory_data/sex_determining_genes/SupplementalTable_S4.xlsx", sheet = 3)
+female_genes = intersect(sex_marker_genes_1$gene_short_name, sex_marker_genes_2$gene_short_name)
+monocle3::plot_genes_by_group(monocle3_obj, markers = female_genes, group_cells_by = 'subtypes') + coord_flip()
+ggsave(file.path(TARGET_dir, paste0("female_intersecting_GC.png")), width = 8, height = 5)
+
+sex_marker_genes_3 = readxl::read_excel("accessory_data/sex_determining_genes/SupplementalTable_S4.xlsx", sheet = 2)
+sex_marker_genes_4 = readxl::read_excel("accessory_data/sex_determining_genes/SupplementalTable_S4.xlsx", sheet = 4)
+male_genes = intersect(sex_marker_genes_3$gene_short_name, sex_marker_genes_4$gene_short_name)
+monocle3::plot_genes_by_group(monocle3_obj, markers = male_genes, group_cells_by = 'subtypes') + coord_flip()
+ggsave(file.path(TARGET_dir, paste0("male_intersecting_GC.png")), width = 8, height = 5)
 
 genes_chrom = read.csv("../quantification/reference_genome_info/dmel-all-r6.33.gtf", header = FALSE, sep = '\t')
 
