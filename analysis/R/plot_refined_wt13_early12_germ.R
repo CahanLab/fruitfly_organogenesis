@@ -46,7 +46,7 @@ p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = pseudotime)) +
   theme_minimal() + 
   scale_color_viridis_c(option = "plasma") + 
   guides(fill=guide_legend(title="pseudo-time")) + 
-  theme(text = element_text(size = 24)) + 
+  theme(text = element_text(size = 24)) 
 ggsave(filename = file.path(TARGET_dir, "pseudotime.png"), plot = p, width = 8, height = 6)
 
 p = ggplot(UMAP_coord, aes(x=UMAP_1, y=UMAP_2, color = batch)) +
@@ -74,6 +74,17 @@ p = ggplot(UMAP_coord, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = ba
   xlab("Batch") + 
   theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 ggsave(filename = file.path(TARGET_dir, "violin_pseudotime.png"), plot = p, width = 8, height = 6)
+
+UMAP_coord_no_unknown = UMAP_coord[UMAP_coord$cell_type != "Unknown 1" & UMAP_coord$cell_type != "Unknown 2", ]
+p = ggplot(UMAP_coord_no_unknown, aes(x=reorder(batch, pseudotime), y=pseudotime, fill = batch)) + 
+  geom_violin() +
+  geom_boxplot(width=0.1) +
+  theme_minimal() +
+  scale_fill_brewer(palette = 'Set1') + 
+  ylab("Pseudotime") + 
+  xlab("Batch") + 
+  theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+ggsave(filename = file.path(TARGET_dir, "violin_pseudotime_germ_no_unknown.png"), plot = p, width = 8, height = 6)
 
 UMAP_coord$cell_type <- factor(UMAP_coord$cell_type, levels = c("Early Germ Cells", 
                                                                 "Interm. Germ Cells 1", 
