@@ -2,9 +2,15 @@
 This contains all the scripts and codes for the single-cell fruit fly organogenesis paper (ref when published). 
 
 ## Processed Data 
-The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO database]() (will release when the manuscript is accepted). 
+The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO database]() (will release when the manuscript is accepted). The Seurat version is 4.3.0. 
 
-The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland, trachea and germ cells can be found below.
+The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland, trachea and germ cells can be found below. The Monocle3 version is 1.3.1. 
+
+|Cell Types | monocle3 object |
+| --------- | --------------- |
+| salivary gland | [download](https://cahanlab.s3.amazonaws.com/Dan.Peng/Drosophila_Organogenetic_2023/monocle3_objects/SG_monocle3_object.rds) |
+| trachea | [download](https://cahanlab.s3.amazonaws.com/Dan.Peng/Drosophila_Organogenetic_2023/monocle3_objects/trachea_monocle3_object.rds) |
+| germ cells | [download](https://cahanlab.s3.amazonaws.com/Dan.Peng/Drosophila_Organogenetic_2023/monocle3_objects/germ_monocle3_object.rds) |
 
 
 ## Navigating the analysis code 
