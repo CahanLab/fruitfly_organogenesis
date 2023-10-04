@@ -12,5 +12,6 @@ analysis/accessory_data_original/*
 analysis/rough_draft/*
 analysis/results/*
 analysis/notes/*
+analysis/.Rhistory
 .Rproj.user
 reviewer_comments/

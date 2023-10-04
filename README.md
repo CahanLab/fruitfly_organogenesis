@@ -4,7 +4,8 @@ This contains all the scripts and codes for the single-cell fruit fly organogene
 ## Processed Data 
 The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO database]() (will release when the manuscript is accepted). 
 
-The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland, trachea and germ cells can be found [here]() (will release when accepted).
+The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland, trachea and germ cells can be found below.
+
 
 ## Navigating the analysis code 
 All the analysis and figures presented in the manuscript are done on a 2020 Macbook Pro, M1 Chip with macOS Ventura 13.3.1 (a). To run the analysis code, you would need to download several raw data and accessory data files. 
