@@ -1,6 +1,6 @@
 # make plots for germ cells analysis 
 # Fig 5 
-# Supp Fig 5, 6
+# Supp Fig 8, 9
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_germ')
 dir.create(TARGET_dir, recursive = TRUE)

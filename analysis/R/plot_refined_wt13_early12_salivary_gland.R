@@ -1,6 +1,6 @@
 # make plots for the analysis of salivary gland cells  
 # Fig 3
-# Supp Fig 2
+# Supp Fig 3
 
 ##### load in data  ######
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'refined_wt13_early12_salivary_gland')

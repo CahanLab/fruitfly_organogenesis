@@ -1,6 +1,6 @@
 # make plots for trachea analysis 
 # Fig 4
-# Supp Fig 3, 4
+# Supp Fig 5, 6
 
 # Load in files -----------------------------------------------------------
 # this section of code is there to load in all the appropriate files needed to make plots 

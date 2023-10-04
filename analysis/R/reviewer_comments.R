@@ -58,7 +58,7 @@ interesting_genes = c('toe', 'hkb', 'eyg', 'Scr', 'trh', 'Dr', 'sens', 'brk', 'D
 p = plot_cells(cds, genes = interesting_genes, cell_size = 1, show_trajectory_graph = FALSE)
 ggsave(filename = file.path(TARGET_dir, "TFs_UMAP_SG.png"))
 
-##### look at similarity between tissue types #####
+##### look at similarity between adult tissue types #####
 library(reshape2)
 melt(m)
 

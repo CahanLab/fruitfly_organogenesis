@@ -1,5 +1,5 @@
 # make violin and UMAP (NOT USED) plots of marker genes for rare cell types in stage 13-16 embryos 
-# Supp Fig. 17 - 28 
+# Supp Fig. 20 - 31 
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_late_selected_marker_genes')
 dir.create(TARGET_dir, recursive = TRUE)

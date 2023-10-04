@@ -1,6 +1,6 @@
 # correlate cell line bulk expression with cell types in embryos 
 # Fig 7A
-# Supp Fig 11 
+# Supp Fig 14
 TARGET_dir = file.path("results", ANALYSIS_VERSION, 'identify_celllines')
 dir.create(TARGET_dir)
 

@@ -2,7 +2,7 @@ library(openxlsx)
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'supplementary_tabs')
 dir.create(TARGET_dir, recursive = TRUE)
 
-##### make the marker genes with the corresponding cell types #####
+##### output all the differentially expressed genes for each corresponding cell type #####
 marker_gene_list = list()
 marker_gene_tab = read.csv("results/v18/wt13_integrated/marker_genes.csv")
 marker_gene_tab$X = NULL
@@ -29,7 +29,7 @@ marker_gene_list[['stage 10-12']] = marker_gene_tab
 
 write.xlsx(marker_gene_list, file = file.path(TARGET_dir, "Table_2.xlsx"))
 
-##### plot out the SG, trachea and GC #####
+##### output the SG, trachea and GC GSEA results #####
 run_file_list = list()
 run_file_list[['Stage13-16_SG']] = file.path("results", ANALYSIS_VERSION, "wt13_enrichment/Salivary Gland/gsea_results_wt.csv")
 run_file_list[['Stage13-16_Tr']] = file.path("results", ANALYSIS_VERSION, "wt13_enrichment/Trachea/gsea_results_wt.csv")
@@ -43,9 +43,9 @@ for(temp_name in names(run_file_list)) {
   gsea_results = gsea_results[order(gsea_results$NES, decreasing = TRUE), ]
   table_list[[temp_name]] = gsea_results
 }
-write.xlsx(table_list, file = file.path(TARGET_dir, "Table_3.xlsx"))
+write.xlsx(table_list, file = file.path(TARGET_dir, "Table_4.xlsx"))
 
-##### make Table 4 #####
+##### output GSEA results for SG subtypes #####
 run_file_list = list()
 run_file_list[['Early_SG']] = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "early_gsea_results.csv")
 run_file_list[['Late_SG']] = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_salivary_gland", "late_gsea_results.csv")
@@ -56,9 +56,9 @@ for(temp_name in names(run_file_list)) {
   gsea_results = gsea_results[order(gsea_results$NES, decreasing = TRUE), ]
   table_list[[temp_name]] = gsea_results
 }
-write.xlsx(table_list, file = file.path(TARGET_dir, "Table_4.xlsx"))
+write.xlsx(table_list, file = file.path(TARGET_dir, "SG_GSEA_subtypes.xlsx"))
 
-##### make Table 5 #####
+##### output GSEA results for tracheal subtypes #####
 run_file_list = list()
 run_file_list[['Tip_Tr']] = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Branching Trachea Cells_gsea_results.csv")
 run_file_list[['Early_Tr']] = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_trachea", "Early Trachea Cells_gsea_results.csv")
@@ -72,9 +72,9 @@ for(temp_name in names(run_file_list)) {
   gsea_results = gsea_results[order(gsea_results$NES, decreasing = TRUE), ]
   table_list[[temp_name]] = gsea_results
 }
-write.xlsx(table_list, file = file.path(TARGET_dir, "Table_5.xlsx"))
+write.xlsx(table_list, file = file.path(TARGET_dir, "Tr_GSEA_subtypes.xlsx"))
 
-##### make Table 6 #####
+##### output GSEA results for GC subtypes #####
 run_file_list = list()
 run_file_list[['Late_GC']] = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "4_gsea_results.csv")
 run_file_list[['Interm2_GC']] = file.path("results", ANALYSIS_VERSION, "refined_wt_late_early_germ/cluster_process_GSEA", "2_gsea_results.csv")
@@ -90,7 +90,7 @@ for(temp_name in names(run_file_list)) {
   gsea_results = gsea_results[order(gsea_results$NES, decreasing = TRUE), ]
   table_list[[temp_name]] = gsea_results
 }
-write.xlsx(table_list, file = file.path(TARGET_dir, "Table_6.xlsx"))
+write.xlsx(table_list, file = file.path(TARGET_dir, "GC_GSEA_subtypes.xlsx"))
 
 ##### make quality comparisons #####
 output_statistics <- function(seurat_object) {
@@ -119,7 +119,7 @@ stats_df$Seroka_stg14_16 = output_statistics(Seroka_object)
 stats_df$Calderon_stg14_16 = output_statistics(Calderon_object)
 stats_df$This_data_stg13_16 = output_statistics(our_object)
 
-write.csv(stats_df, file = file.path(TARGET_dir, "Table_7.csv"))
+write.csv(stats_df, file = file.path(TARGET_dir, "quality_comparisons_tab.csv"))
 
 ##### make tables for genes for the different subtypes #####
 # get the trachea 
@@ -146,7 +146,7 @@ DE_genes[DE_genes$group == '2', 'group'] = 'Interm. Germ Cells 2'
 DE_genes[DE_genes$group == '4', 'group'] = 'Late Germ Cells'
 write.csv(DE_genes, file.path(TARGET_dir, "germ_subtype_genes.csv"))
 
-##### make table for matrisome #####
+##### make table for matrisome (preparation) #####
 modified_dotPlot_df <- function(
     object,
     assay = NULL,
@@ -436,7 +436,7 @@ for(temp_cat in interesting_cat_list) {
 
 write.csv(genes_df, file = file.path(TARGET_dir, "stage13-16_matrisome.csv"))
 
-##### apply BDGP on marker genes #####
+##### identify BDGP cell types for selected marker genes  #####
 
 # load in the dictionary to convert the gene names to flybase name 
 

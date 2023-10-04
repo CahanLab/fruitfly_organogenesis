@@ -1,6 +1,6 @@
 # making plots for matrisome 
 # Fig 6B
-# Supp Fig 7B, 10 
+# Supp Fig 10B, 13
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt13_matrisome')
 
 object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_wt13/manual_celltype_object4.rds"))

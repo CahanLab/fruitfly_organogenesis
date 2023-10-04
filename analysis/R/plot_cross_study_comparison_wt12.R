@@ -1,6 +1,6 @@
 # plot comparisons of stage 10-12 embryos in our data and other data 
 # Fig 7C
-# Supp Fig 12A, 29
+# Supp Fig 15a, 32
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'cross_study_comparison_early_wt12')
 dir.create(TARGET_dir, recursive = TRUE)

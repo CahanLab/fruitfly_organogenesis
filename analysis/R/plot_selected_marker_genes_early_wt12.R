@@ -1,5 +1,5 @@
 # make plots of rare cell types in stage 10-12 
-# Supp Fig 13-16
+# Supp Fig 16-19
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'wt_early_selected_marker_genes')
 dir.create(TARGET_dir, recursive = TRUE)

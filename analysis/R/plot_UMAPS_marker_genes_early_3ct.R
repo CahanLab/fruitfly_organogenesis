@@ -1,4 +1,5 @@
 # plot out UMAPs of markers genes for SG, Tr, and SG 
+# Supp Fig. 2, 4, 7
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'UMAPS_marker_genes_early_3ct')
 dir.create(TARGET_dir, recursive = TRUE)

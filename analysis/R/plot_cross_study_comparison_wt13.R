@@ -1,6 +1,6 @@
 # plot out the cross study comparisons results for stage 13-16 wildtypes 
 # Fig. 7c
-# Supp Fig 12b, 30, 31
+# Supp Fig 15b, 33, 34
 
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "figure_plots", 'cross_study_comparison_wt13')
 dir.create(TARGET_dir, recursive = TRUE)
