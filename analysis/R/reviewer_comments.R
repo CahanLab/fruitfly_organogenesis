@@ -57,3 +57,24 @@ cds = readRDS("results/v18/figure_plots/clean_sharable_data/SG_specific/SG_monoc
 interesting_genes = c('toe', 'hkb', 'eyg', 'Scr', 'trh', 'Dr', 'sens', 'brk', 'D', 'bowl','fkh','sage', 'SoxN', 'ttk', 'CrebA','rib')
 p = plot_cells(cds, genes = interesting_genes, cell_size = 1, show_trajectory_graph = FALSE)
 ggsave(filename = file.path(TARGET_dir, "TFs_UMAP_SG.png"))
+
+##### look at similarity between tissue types #####
+library(reshape2)
+melt(m)
+
+avg_tab_wt13 = readRDS(file.path("results", ANALYSIS_VERSION, 'identify_celllines', "avg_tab_wt13.rds"))
+avg_tab_early_wt12 = readRDS(file.path("results", ANALYSIS_VERSION, 'identify_celllines', "avg_tab_early_wt12.rds"))
+
+big_avg_tab = cbind(avg_tab_wt13, avg_tab_early_wt12)
+big_corr_tab = cor(big_avg_tab, method = 'spearman')
+long_corr_tab = melt(big_corr_tab)
+long_corr_tab = long_corr_tab[grepl('Plasmatocyte', long_corr_tab$Var1), ]
+long_corr_tab$value = round(long_corr_tab$value, 3)
+p = ggplot(long_corr_tab, aes(Var1, Var2, fill= value)) + 
+  geom_tile() + 
+  scale_fill_viridis() + 
+  xlab("cell types") + 
+  ylab("cell types") + 
+  geom_text(aes(label = value)) +
+  guides(fill=guide_legend(title="Spearman Correlation"))
+ggsave(filename = file.path(TARGET_dir, "plasmatocytes_correlation.png"), plot = p, height = 10, width = 8)
