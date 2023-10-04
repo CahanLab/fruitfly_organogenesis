@@ -16,8 +16,8 @@ The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland
 ## Navigating the analysis code 
 All the analysis and figures presented in the manuscript are done on a 2020 Macbook Pro, M1 Chip with macOS Ventura 13.3.1 (a). To run the analysis code, you would need to download several raw data and accessory data files. 
 
-1. Create a folder named `quantification` in this directory and extract all the content from [here]() (will share when manuscript is accepted) into *quantification* directory. In short, these files contain the raw count matrices outputted by CellRanger. 
+1. Download and extract all the content from [here](https://cnobjects.s3.amazonaws.com/drosophila_2023/quantification.tar.gz). Place the folder `quantification` in the this directory. In short, these files are outputted by CellRanger. 
 
-2. Create a folder named `accessory_data` in `analysis` directory and extract all content from [here]() (will share when manuscript is accepted) into `/analysis/accessory_data` directory. In short, these files are accessory data (e.g matrisome genes, expression profiles from Seroka et al and Calderon et al) that help us perform the downstream analysis. 
+2. Download and extract all content from [here](https://cnobjects.s3.amazonaws.com/drosophila_2023/accessory_data.tar.gz) and place the folder called `accessory_data` in `analysis` directory creating a `/analysis/accessory_data` directory. In short, these files are accessory data (e.g matrisome genes, expression profiles from Seroka et al and Calderon et al) that help us perform the downstream analysis. 
 
 3. After all the raw data and accessory data are downloaded and placed in the correct directory, please see [the README in analysis](/analysis/README.md) for more instructions on how to run the code. 
