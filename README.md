@@ -1,16 +1,16 @@
 # Fruitfly Organogenesis Paper
-This contains all the scripts and codes for the single-cell fruit fly organogenesis paper (ref when published). 
+This contains all the scripts and codes for the the paper [Organogenetic transcriptomes of the Drosophila embryo at single cell resolution](https://journals.biologists.com/dev/article/doi/10.1242/dev.202097/340234/Organogenetic-transcriptomes-of-the-Drosophila). 
 
 ## Processed Data 
-The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO database]() (will release when the manuscript is accepted). The Seurat version is 4.3.0. 
+The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO database](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE234602). The Seurat version is 4.3.0. 
 
 The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland, trachea and germ cells can be found below. The Monocle3 version is 1.3.1. 
 
 |Cell Types | monocle3 object |
 | --------- | --------------- |
-| salivary gland | [download](https://cahanlab.s3.amazonaws.com/Dan.Peng/Drosophila_Organogenetic_2023/monocle3_objects/SG_monocle3_object.rds) |
-| trachea | [download](https://cahanlab.s3.amazonaws.com/Dan.Peng/Drosophila_Organogenetic_2023/monocle3_objects/trachea_monocle3_object.rds) |
-| germ cells | [download](https://cahanlab.s3.amazonaws.com/Dan.Peng/Drosophila_Organogenetic_2023/monocle3_objects/germ_monocle3_object.rds) |
+| salivary gland | [download](https://cnobjects.s3.amazonaws.com/drosophila_2023/monocle3_objects/SG_monocle3_object.rds) |
+| trachea | [download](https://cnobjects.s3.amazonaws.com/drosophila_2023/monocle3_objects/trachea_monocle3_object.rds) |
+| germ cells | [download](https://cnobjects.s3.amazonaws.com/drosophila_2023/monocle3_objects/germ_monocle3_object.rds) |
 
 
 ## Navigating the analysis code 
