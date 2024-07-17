@@ -2,7 +2,11 @@
 This contains all the scripts and codes for the the paper [Organogenetic transcriptomes of the Drosophila embryo at single cell resolution](https://journals.biologists.com/dev/article/doi/10.1242/dev.202097/340234/Organogenetic-transcriptomes-of-the-Drosophila). 
 
 ## Processed Data 
-The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO database](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE234602). The Seurat version is 4.3.0. 
+The raw count matrices and processed data (Seurat object in .rds format) for stage 10-12 and stage 13-16 can be found on [GEO (GSE234602)](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE234602). The Seurat version used is 4.3.0. 
+|Stage| Seurat object |
+| --------- | --------------- |
+| stage 10-12 | [download from GEO](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE234602&format=file&file=GSE234602%5Fstage10%5F12%5Fseurat%5Fobject%2Erds%2Egz) |
+| stage 13-16 | [download from GEO](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE234602&format=file&file=GSE234602%5Fstage13%5F16%5Fseurat%5Fobject%2Erds%2Egz) |
 
 The Monocle3 object (in .rds format) for the in-depth analysis of salivary gland, trachea and germ cells can be found below. The Monocle3 version is 1.3.1. 
 
